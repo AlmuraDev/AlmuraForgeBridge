@@ -1,0 +1,4 @@
+name: AlmuraForgeBridge
+main: com.almuramc.almuraforgebridge.BridgeMain
+version: 1.0
+authors: [AlmuraDev]

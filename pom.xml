@@ -1,0 +1,261 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<!-- Project information -->
+	<groupId>com.almuramc</groupId>
+	<artifactId>almuraforgebridge</artifactId>
+	<version>1.1</version>
+	<name>Almura Forge Bridge</name>
+	<url>http://www.almuradev.com</url>
+	<description>Cauldron to Forge Bridge plugin.</description>
+
+	<!-- Parent information -->
+	<parent>
+		<groupId>org.sonatype.oss</groupId>
+		<artifactId>oss-parent</artifactId>
+		<version>7</version>
+	</parent>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<bukkitVersion>1.6.4-R1.0</bukkitVersion>		
+		<mainClass>com.almuramc.almuraforgebridge.BridgeMain</mainClass>
+	</properties>
+
+	<!-- Organization -->
+	<organization>
+		<name>AlmuraDev</name>
+		<url>http://www.almuradev.com</url>
+	</organization>
+
+	<!-- License -->
+	<licenses>
+		<license>
+			<name>GNU General Public License Version 3</name>
+			<url>http://www.gnu.org/licenses/gpl.html</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<!-- Source code access -->
+	<scm>
+		<developerConnection>scm:git:git@github.com:AlmuraDev/AlmuraControlPanel.git</developerConnection>
+		<connection>scm:git:git://github.com/AlmuraDev/AlmuraControlPanel.git</connection>
+		<url>https://github.com/AlmuraDev/AlmuraControlPanel</url>
+	</scm>
+
+	<!-- Repository locations -->
+	<repositories>
+		<repository>
+			<id>bukkit-releases</id>
+			<url>http://repo.bukkit.org/content/repositories/releases</url>
+		</repository>
+		<repository>
+			<id>bukkit-snapshots</id>
+			<url>http://repo.bukkit.org/content/repositories/snapshots</url>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>sonatype-nexus-releases</id>
+			<url>https://oss.sonatype.org/content/repositories/releases</url>
+		</repository>
+		<repository>
+			<id>sonatype-nexus-snapshots</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>Plugin Metrics</id>
+			<url>http://repo.mcstats.org/content/repositories/public</url>
+		</repository>
+	</repositories>
+
+	<!-- Dependencies -->
+	<dependencies>
+		<dependency>
+			<groupId>org.bukkit</groupId>
+			<artifactId>1.6.4-R1.0</artifactId>
+			<version>${bukkitVersion}</version>
+			<scope>system</scope>
+            <systemPath>${project.basedir}/libs/Bukkit.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>net.ess3</groupId>
+			<artifactId>api</artifactId>
+			<version>unknown</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/libs/Essentials.jar</systemPath>
+		</dependency>				
+		<dependency>
+			<groupId>com.earth2me</groupId>
+			<artifactId>essentials</artifactId>
+			<version>unknown</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/libs/Essentials.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>org.anjocaido</groupId>
+			<artifactId>groupmanager</artifactId>
+			<version>unknown</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/libs/EssentialsGroupManager.jar</systemPath>
+		</dependency>		
+		<dependency>
+			<groupId>me.zford</groupId>
+			<artifactId>jobs</artifactId>
+			<version>2.11.5</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/libs/Jobs-2.11.5.jar</systemPath>
+		</dependency>				
+	</dependencies>
+	<!-- Build plugin repositories -->
+	<pluginRepositories>
+		<pluginRepository>
+			<id>sonatype-nexus-releases</id>
+			<url>https://oss.sonatype.org/content/repositories/releases</url>
+		</pluginRepository>
+		<pluginRepository>
+			<id>sonatype-nexus-snapshots</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+			</snapshots>
+		</pluginRepository>
+	</pluginRepositories>
+	<!-- Build configuration -->
+	<build>
+		<defaultGoal>clean package install</defaultGoal>
+		<!-- Resources to include -->
+		<resources>
+			<!-- Static resources -->
+			<resource>
+				<targetPath>.</targetPath>
+				<filtering>false</filtering>
+				<directory>${basedir}</directory>
+				<includes>
+					<include>LICENSE.txt</include>
+				</includes>
+			</resource>
+			<resource>
+				<targetPath>.</targetPath>
+				<filtering>false</filtering>
+				<directory>${basedir}/src/main/resources</directory>
+				<includes>
+					<include>**/*</include>
+				</includes>
+			</resource>
+			<!-- Filtered resources -->
+			<resource>
+				<targetPath>.</targetPath>
+				<filtering>true</filtering>
+				<directory>${basedir}/src/main/resources</directory>
+				<includes>
+					<include>*.yml</include>
+				</includes>
+			</resource>
+		</resources>
+
+		<!-- Build plugins -->
+		<plugins>
+			<!-- License headers plugin -->
+			<plugin>
+				<groupId>com.mycila.maven-license-plugin</groupId>
+				<artifactId>maven-license-plugin</artifactId>
+				<version>1.10.b1</version>
+				<executions>
+					<execution>
+						<configuration>
+							<quiet>true</quiet>
+							<encoding>UTF-8</encoding>
+							<strictCheck>true</strictCheck>
+							<header>${basedir}/HEADER.txt</header>
+							<mapping>
+								<java>SLASHSTAR_STYLE</java>
+							</mapping>
+							<properties>
+								<name>${project.name}</name>
+								<url>${project.organization.url}</url>
+								<license>GNU General Public License</license>
+								<copyright>© 2013 ${project.organization.name}</copyright>
+							</properties>
+							<includes>
+								<include>src/main/java/**</include>
+								<include>src/test/java/**</include>
+							</includes>
+						</configuration>
+						<phase>clean</phase>
+						<goals>
+							<goal>format</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- Source compiler plugin -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.1</version>
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+					<compilerArguments>
+						<O>-Xlint:all</O>
+						<O>-Xlint:-path</O>
+					</compilerArguments>
+					<showWarnings>true</showWarnings>
+					<showDeprecation>true</showDeprecation>
+				</configuration>
+			</plugin>
+			<!-- Dependency addition plugin -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>2.1</version>
+				<executions>
+					<execution>
+						<configuration>
+							<minimizeJar>true</minimizeJar>
+							<filters>
+								<filter>
+									<artifact>*:*</artifact>
+									<excludes>
+										<exclude>lib/**</exclude>
+										<exclude>templates/**</exclude>
+										<exclude>META-INF/*.xml</exclude>
+										<exclude>META-INF/*.txt</exclude>
+										<exclude>**/LICENSE</exclude>
+										<exclude>**/NOTICE</exclude>
+										<exclude>**/DEPENDENCIES</exclude>
+										<exclude>**/*.java</exclude>
+									</excludes>
+								</filter>								
+							</filters>
+						</configuration>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- Reporting plugin -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.12.4</version>
+				<configuration>
+					<redirectTestOutputToFile>true</redirectTestOutputToFile>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
