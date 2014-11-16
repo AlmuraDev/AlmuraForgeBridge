@@ -35,7 +35,6 @@
 	<classpathentry kind="lib" path="C:/Development/dependencies/bukkit-1.6.4-R1.1-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="C:/Development/dependencies/PlayerPlus-1.4.jar"/>
 	<classpathentry kind="lib" path="C:/Development/dependencies/backpack-b148.jar"/>
-	<classpathentry kind="lib" path="S:/Projects/SpoutcraftPlugin/target/spoutcraftplugin-1.6.4.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Lab/.m2/repository/me/zford/jobs/2.11.5/jobs-2.11.5.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
