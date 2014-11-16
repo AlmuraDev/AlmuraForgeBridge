@@ -277,6 +277,7 @@ public class BridgeMain extends JavaPlugin implements Listener{
     }
 
     public void AlmuraTitle(Player player) {
+        /*
         if (player.hasPermission("admin.title") && player.isOp()) {
             player.setTitle(player.getDisplayName()+"\n"+ChatColor.DARK_RED+"Almura SuperAdmin" + ChatColor.RESET);			
             return;
@@ -334,13 +335,13 @@ public class BridgeMain extends JavaPlugin implements Listener{
         if (player.hasPermission("Guest.title") && !player.hasPermission("Member.title")) {
             player.setTitle(player.getDisplayName()+"\n"+ChatColor.GRAY+"Guest" + ChatColor.RESET);
             return;
-        }		
+        }	*/	
     }	
 
     public void specialOptions(Player player) {
         // Abby
         if (player.getName().equalsIgnoreCase("mcsfam")) {
-            player.setCanFly(true);
+           //player.setCanFly(true);
         }
     }
 }
