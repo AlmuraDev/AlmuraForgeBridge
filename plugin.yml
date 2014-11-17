@@ -1,4 +1,4 @@
 name: AlmuraForgeBridge
-main: com.almuramc.almuraforgebridge.BridgeMain
+main: com.almuramc.almuraforgebridge.BridgePluginin
 version: 1.0
 authors: [AlmuraDev]
