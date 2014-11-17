@@ -57,8 +57,6 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import net.ess3.api.events.NickChangeEvent;
-
 public class BridgePlugin extends JavaPlugin implements Listener {
 
     private static BridgePlugin instance;
@@ -73,10 +71,11 @@ public class BridgePlugin extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
-        PluginManager pm = getServer().getPluginManager();
         instance = this;
-        pm.registerEvents(this, this);
         Bukkit.getMessenger().registerOutgoingPluginChannel(this, BridgeNetwork.CHANNEL);
+        PluginManager pm = getServer().getPluginManager();
+        pm.registerEvents(this, this);
+        pm.registerEvents(new BridgeNetwork(), this);
     }
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
@@ -94,16 +93,6 @@ public class BridgePlugin extends JavaPlugin implements Listener {
             return true;
         }
         return false;
-    }
-
-    @EventHandler
-    public void onNickChanged(NickChangeEvent event) {
-        Player player = Bukkit.getPlayer(event.getAffected().getName());
-        System.out.println("Player:" + event.getAffected().getName());
-        if (player == null) {
-            System.out.println("Player is Null");
-        }
-        BridgeNetwork.sendDisplayName(player, event.getValue());
     }
     
     @EventHandler
