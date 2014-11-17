@@ -20,7 +20,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<bukkitVersion>1.6.4-R1.0</bukkitVersion>		
-		<mainClass>com.almuramc.almuraforgebridge.BridgeMain</mainClass>
+		<mainClass>com.almuramc.almuraforgebridge.BridgePlugin</mainClass>
 	</properties>
 
 	<!-- Organization -->

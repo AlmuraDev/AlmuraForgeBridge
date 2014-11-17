@@ -40,11 +40,11 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import net.ess3.api.events.NickChangeEvent;
 
-public class BridgeMain extends JavaPlugin implements Listener{
+public class BridgePlugin extends JavaPlugin implements Listener {
 
-    private static BridgeMain instance;
+    private static BridgePlugin instance;
 
-    public static BridgeMain getInstance() {
+    public static BridgePlugin getInstance() {
         return instance;
     }
 
@@ -57,6 +57,7 @@ public class BridgeMain extends JavaPlugin implements Listener{
         PluginManager pm = getServer().getPluginManager();
         instance = this;
         pm.registerEvents(this, this);
+        Bukkit.getMessenger().registerOutgoingPluginChannel(this, BridgeNetwork.CHANNEL);
     }
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
