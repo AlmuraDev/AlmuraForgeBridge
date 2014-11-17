@@ -29,20 +29,14 @@ public class BridgeNetwork {
     public static final int DISCRIMINATOR_CURRENCY = 1;
 
     public static void sendDisplayName(Player player, String displayName) {
-        final byte[] rawBytes = displayName.getBytes();
-        player.sendPluginMessage(BridgePlugin.getInstance(), CHANNEL, prefixDiscriminator(DISCRIMINATOR_DISPLAY_NAME, rawBytes));
+        player.sendPluginMessage(BridgePlugin.getInstance(), CHANNEL, prefixDiscriminator(DISCRIMINATOR_DISPLAY_NAME, displayName.getBytes()));
     }
 
     public static void sendCurrencyAmount(Player player, double amount) {
-        final byte[] rawBytes = ((ByteBuffer) ByteBuffer.allocate(8).putDouble(amount).flip()).array();
-        player.sendPluginMessage(BridgePlugin.getInstance(), CHANNEL, prefixDiscriminator(DISCRIMINATOR_CURRENCY, rawBytes));
+        player.sendPluginMessage(BridgePlugin.getInstance(), CHANNEL, prefixDiscriminator(DISCRIMINATOR_CURRENCY, ((ByteBuffer) ByteBuffer.allocate(8).putDouble(amount).flip()).array()));
     }
 
     private static byte[] prefixDiscriminator(int discriminator, byte[] value) {
-        final ByteBuffer buf = ByteBuffer.allocate(value.length + 4);
-        buf.putInt(discriminator);
-        buf.put(value);
-        buf.flip();
-        return buf.array();
+        return ((ByteBuffer) ByteBuffer.allocate(value.length + 4).putInt(discriminator).put(value).flip()).array();
     }
 }
