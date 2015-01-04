@@ -102,44 +102,21 @@ public class BridgePlugin extends JavaPlugin implements Listener {
             Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
                 public void run() {
 
-                    AlmuraTitle(player);			
+                    AlmuraTitle(player);
 
                     if ((GMUserEvent.Action.USER_GROUP_CHANGED == event.getAction()) && (event.getUser().getGroupName().equalsIgnoreCase("member"))) {
-                        Bukkit.broadcastMessage(ChatColor.DARK_PURPLE + player.getDisplayName() + ChatColor.WHITE + " has been promoted to: [" + ChatColor.GOLD + event.getUser().getGroupName() + ChatColor.WHITE + "]");
-                    }
-
-                    if ((GMUserEvent.Action.USER_GROUP_CHANGED == event.getAction()) && (event.getUser().getGroupName().equalsIgnoreCase("supermember"))) {
-                        Bukkit.broadcastMessage(ChatColor.DARK_PURPLE + player.getDisplayName() + ChatColor.WHITE + " has been promoted to: [" + ChatColor.GOLD + event.getUser().getGroupName() + ChatColor.WHITE + "]");
+                        Bukkit.broadcastMessage(ChatColor.DARK_PURPLE + player.getDisplayName() + ChatColor.WHITE + " has been granted: [" + ChatColor.GOLD + event.getUser().getGroupName() + ChatColor.WHITE + "]");
                         Bukkit.broadcastMessage(ChatColor.WHITE + "Almura Thanks " + ChatColor.GOLD + player.getDisplayName() + ChatColor.WHITE + " for their donation.  It is very much appreciated.");
                     }
 
-                    if ((GMUserEvent.Action.USER_GROUP_CHANGED == event.getAction()) && (event.getUser().getGroupName().equalsIgnoreCase("ultramember"))) {
-                        Bukkit.broadcastMessage(ChatColor.DARK_PURPLE + player.getDisplayName() + ChatColor.WHITE + " has been promoted to: [" + ChatColor.GOLD + event.getUser().getGroupName() + ChatColor.WHITE + "]");
-                        Bukkit.broadcastMessage(ChatColor.WHITE + "Almura Thanks " + ChatColor.GOLD + player.getDisplayName() + ChatColor.WHITE + " for their donation.  It is very much appreciated.");
+                    if ((GMUserEvent.Action.USER_GROUP_CHANGED == event.getAction()) && (event.getUser().getGroupName().equalsIgnoreCase("veteran"))) {
+                        Bukkit.broadcastMessage(ChatColor.DARK_PURPLE + player.getDisplayName() + ChatColor.WHITE + " has been promoted to: [" + ChatColor.GOLD + event.getUser().getGroupName() + ChatColor.WHITE + "]");                        
                     }
                 }
             }, 40L);
 
         }
-    }
-
-    public void promoteMessage(Player player, String newGroup) {				
-        AlmuraTitle(player);	
-
-        if (newGroup.equalsIgnoreCase("member")) {						
-            Bukkit.broadcastMessage(ChatColor.DARK_PURPLE + player.getDisplayName() + ChatColor.WHITE + " has been promoted to: [" + ChatColor.GOLD + "Member" + ChatColor.WHITE + "]");					
-        }
-
-        if (newGroup.equalsIgnoreCase("supermember")) {							
-            Bukkit.broadcastMessage(ChatColor.DARK_PURPLE + player.getDisplayName() + ChatColor.WHITE + " has been promoted to: [" + ChatColor.GOLD + "SuperMember" + ChatColor.WHITE + "]");
-            Bukkit.broadcastMessage(ChatColor.WHITE + "Almura Thanks " + ChatColor.GOLD + player.getDisplayName() + ChatColor.WHITE + " for their donation.  It is very much appreciated.");
-        }
-
-        if (newGroup.equalsIgnoreCase("ultramember")) {							
-            Bukkit.broadcastMessage(ChatColor.DARK_PURPLE + player.getDisplayName() + ChatColor.WHITE + " has been promoted to: [" + ChatColor.GOLD + "UltraMember" + ChatColor.WHITE + "]");
-            Bukkit.broadcastMessage(ChatColor.WHITE + "Almura Thanks " + ChatColor.GOLD + player.getDisplayName() + ChatColor.WHITE + " for their donation.  It is very much appreciated.");
-        }
-    }
+    }  
 
     @EventHandler(priority=EventPriority.HIGHEST)
     public void onPlayerTeleport(PlayerTeleportEvent event)  {
@@ -175,38 +152,23 @@ public class BridgePlugin extends JavaPlugin implements Listener {
             return;
         }
 
-        if (player.hasPermission("spoutteam.title") && !player.hasPermission("Admin.title")) {			
-            Bukkit.broadcastMessage(ChatColor.WHITE + "[" + ChatColor.DARK_BLUE + "SpoutTeam"  + ChatColor.WHITE + "] -  " + player.getDisplayName() + ", has left the server.");
+        if (player.hasPermission("developer.title") && !player.hasPermission("Admin.title")) {
+            Bukkit.broadcastMessage(ChatColor.WHITE + "[" + ChatColor.DARK_AQUA + "Developer"  + ChatColor.WHITE + "] -  " + player.getDisplayName() + ", has left the server.");
             return;
         }
 
         if (player.hasPermission("mod.title") && !player.hasPermission("Admin.title")) {
-            Bukkit.broadcastMessage(ChatColor.WHITE + "[" + ChatColor.DARK_BLUE + "Moderator"  + ChatColor.WHITE + "] -  " + player.getDisplayName() + ", has left the server.");				
+            Bukkit.broadcastMessage(ChatColor.WHITE + "[" + ChatColor.AQUA + "Moderator"  + ChatColor.WHITE + "] -  " + player.getDisplayName() + ", has left the server.");				
             return;
         }
 
-        if (player.hasPermission("Dev.title") && !player.hasPermission("admin.title")) {			
-            Bukkit.broadcastMessage(ChatColor.WHITE + "[" + ChatColor.YELLOW + "Developer"  + ChatColor.WHITE + "] -  " + player.getDisplayName() + ", has left the server.");
-            return;
-        }
-
-        if (player.hasPermission("CreativeMember.title") && !player.hasPermission("Mod.title")) {							
-            Bukkit.broadcastMessage(ChatColor.WHITE + "[" + ChatColor.DARK_BLUE + "CreativeMember" + ChatColor.WHITE + "] -  " + player.getDisplayName() + ", has left the server.");
-            return;
-        }
-
-        if (player.hasPermission("Ultra.title") && !player.hasPermission("CreativeMember.title")) {			
-            Bukkit.broadcastMessage(ChatColor.WHITE + "[" + ChatColor.GOLD + "UltraMember" + ChatColor.WHITE + "] -  " + player.getDisplayName() + ", has left the server.");
-            return;
-        }
-
-        if (player.hasPermission("SuperMember.title") && !player.hasPermission("UltraMember.title")) {							
-            Bukkit.broadcastMessage(ChatColor.WHITE + "[" + ChatColor.DARK_GREEN + "SuperMember" + ChatColor.WHITE + "] -  " + player.getDisplayName() + ", has left the server.");
+        if (player.hasPermission("veteran.title") && !player.hasPermission("member.title")) {
+            Bukkit.broadcastMessage(ChatColor.WHITE + "[" + ChatColor.GOLD + "Veteran" + ChatColor.WHITE + "] -  " + player.getDisplayName() + ", has left the server.");
             return;
         }
 
         if (player.hasPermission("Member.title") && !player.hasPermission("SuperMember.title")) {			
-            Bukkit.broadcastMessage(ChatColor.WHITE + "[" + ChatColor.YELLOW + "Member" + ChatColor.WHITE + "] -  " + player.getDisplayName() + ", has left the server.");
+            Bukkit.broadcastMessage(ChatColor.WHITE + "[" + ChatColor.GREEN + "Member" + ChatColor.WHITE + "] -  " + player.getDisplayName() + ", has left the server.");
             return;
         }
 
@@ -219,7 +181,6 @@ public class BridgePlugin extends JavaPlugin implements Listener {
             Bukkit.broadcastMessage(ChatColor.WHITE + "[" + ChatColor.DARK_RED + "Survival" + ChatColor.WHITE + "] -  " + player.getDisplayName() + ", has left the server.");
             return;
         }
-
     }
 
     public void AlmuraBroadcastLogin(Player player) {
@@ -243,38 +204,23 @@ public class BridgePlugin extends JavaPlugin implements Listener {
             return;
         }
 
-        if (player.hasPermission("spoutteam.title") && !player.hasPermission("Admin.title")) {
-            Bukkit.broadcastMessage(ChatColor.WHITE + "[" + ChatColor.DARK_BLUE + "SpoutTeam"  + ChatColor.WHITE + "] -  " + player.getDisplayName() + ", has joined the server.");
+        if (player.hasPermission("moderator.title") && !player.hasPermission("Admin.title")) {
+            Bukkit.broadcastMessage(ChatColor.WHITE + "[" + ChatColor.AQUA + "Moderator"  + ChatColor.WHITE + "] -  " + player.getDisplayName() + ", has joined the server.");
             return;
         }
 
-        if (player.hasPermission("mod.title") && !player.hasPermission("Admin.title")) {
-            Bukkit.broadcastMessage(ChatColor.WHITE + "[" + ChatColor.DARK_BLUE + "Moderator"  + ChatColor.WHITE + "] -  " + player.getDisplayName() + ", has joined the server.");
+        if (player.hasPermission("Developer.title") && !player.hasPermission("admin.title")) {
+            Bukkit.broadcastMessage(ChatColor.WHITE + "[" + ChatColor.DARK_AQUA + "Developer"  + ChatColor.WHITE + "] -  " + player.getDisplayName() + ", has joined the server.");
             return;
         }
 
-        if (player.hasPermission("Dev.title") && !player.hasPermission("admin.title")) {
-            Bukkit.broadcastMessage(ChatColor.WHITE + "[" + ChatColor.DARK_RED + "Developer"  + ChatColor.WHITE + "] -  " + player.getDisplayName() + ", has joined the server.");
-            return;
-        }
-
-        if (player.hasPermission("CreativeMember.title") && !player.hasPermission("Mod.title")) {
-            Bukkit.broadcastMessage(ChatColor.WHITE + "[" + ChatColor.LIGHT_PURPLE + "CreativeMember" + ChatColor.WHITE + "] -  " + player.getDisplayName() + ", has joined the server.");
-            return;
-        }
-
-        if (player.hasPermission("Ultra.title") && !player.hasPermission("CreativeMember.title")) {
-            Bukkit.broadcastMessage(ChatColor.WHITE + "[" + ChatColor.GOLD + "UltraMember" + ChatColor.WHITE + "] -  " + player.getDisplayName() + ", has joined the server.");
-            return;
-        }
-
-        if (player.hasPermission("SuperMember.title") && !player.hasPermission("UltraMember.title")) {
-            Bukkit.broadcastMessage(ChatColor.WHITE + "[" + ChatColor.DARK_GREEN + "SuperMember" + ChatColor.WHITE + "] -  " + player.getDisplayName() + ", has joined the server.");
+        if (player.hasPermission("veteran.title") && !player.hasPermission("moderator.title")) {
+            Bukkit.broadcastMessage(ChatColor.WHITE + "[" + ChatColor.GOLD + "Veteran" + ChatColor.WHITE + "] -  " + player.getDisplayName() + ", has joined the server.");
             return;
         }
 
         if (player.hasPermission("Member.title") && !player.hasPermission("SuperMember.title")) {
-            Bukkit.broadcastMessage(ChatColor.WHITE + "[" + ChatColor.YELLOW + "Member" + ChatColor.WHITE + "] -  " + player.getDisplayName() + ", has joined the server.");
+            Bukkit.broadcastMessage(ChatColor.WHITE + "[" + ChatColor.GREEN + "Member" + ChatColor.WHITE + "] -  " + player.getDisplayName() + ", has joined the server.");
             return;
         }
 
@@ -284,7 +230,7 @@ public class BridgePlugin extends JavaPlugin implements Listener {
         }
 
         if (player.hasPermission("Survival.title") && !player.hasPermission("Member.title")) {			
-            Bukkit.broadcastMessage(ChatColor.WHITE + "[" + ChatColor.DARK_RED + "Survival" + ChatColor.WHITE + "] -  " + player.getDisplayName() + ", has joined the server.");
+            Bukkit.broadcastMessage(ChatColor.WHITE + "[" + ChatColor.LIGHT_PURPLE + "Survival" + ChatColor.WHITE + "] -  " + player.getDisplayName() + ", has joined the server.");
             return;
         }
 
