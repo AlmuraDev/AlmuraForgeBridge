@@ -46,19 +46,7 @@
 	</scm>
 
 	<!-- Repository locations -->
-	<repositories>
-		<repository>
-			<id>bukkit-releases</id>
-			<url>http://repo.bukkit.org/content/repositories/releases</url>
-		</repository>
-		<repository>
-			<id>bukkit-snapshots</id>
-			<url>http://repo.bukkit.org/content/repositories/snapshots</url>
-			<snapshots>
-				<enabled>true</enabled>
-				<updatePolicy>always</updatePolicy>
-			</snapshots>
-		</repository>
+	<repositories>		
 		<repository>
 			<id>sonatype-nexus-releases</id>
 			<url>https://oss.sonatype.org/content/repositories/releases</url>
@@ -74,6 +62,10 @@
 		<repository>
 			<id>Plugin Metrics</id>
 			<url>http://repo.mcstats.org/content/repositories/public</url>
+		</repository>
+		<repository>
+			<id>Me</id>
+			<url>http://repo.greatmancode.com/content/groups/public/</url>
 		</repository>
 	</repositories>
 
@@ -113,7 +105,20 @@
 			<version>2.11.5</version>
 			<scope>system</scope>
 			<systemPath>${project.basedir}/libs/Jobs-2.11.5.jar</systemPath>
-		</dependency>				
+		</dependency>		
+		 <dependency>
+            <groupId>com.greatmancode</groupId>
+            <artifactId>craftconomy3</artifactId>
+            <version>3.1.4-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>	
+        <dependency>
+            <groupId>net.milkbowl</groupId>
+            <artifactId>vault</artifactId>
+            <version>1.2.12</version>
+            <scope>system</scope>
+			<systemPath>${project.basedir}/libs/Vault-1.4.1.jar</systemPath>
+        </dependency>	
 	</dependencies>
 	<!-- Build plugin repositories -->
 	<pluginRepositories>

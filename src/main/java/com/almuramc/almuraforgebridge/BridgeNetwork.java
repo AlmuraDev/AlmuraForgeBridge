@@ -20,13 +20,20 @@
 package com.almuramc.almuraforgebridge;
 
 import com.google.common.base.Charsets;
+import com.greatmancode.craftconomy3.tools.events.bukkit.events.EconomyChangeEvent;
+
 import net.ess3.api.events.NickChangeEvent;
+import net.milkbowl.vault.economy.Economy;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.plugin.RegisteredServiceProvider;
 
 import java.nio.ByteBuffer;
 
@@ -34,10 +41,19 @@ public class BridgeNetwork implements Listener {
     public static final String CHANNEL = "AM|BUK";
     public static final byte DISCRIMINATOR_DISPLAY_NAME = 0;
     public static final byte DISCRIMINATOR_CURRENCY = 1;
+    public static final byte DISCRIMINATOR_ADDITIONAL_WORLD_INFO = 2;
+    private static Economy economy;
 
+    public BridgeNetwork() {
+        final RegisteredServiceProvider<Economy> economyProvider = Bukkit.getServer().getServicesManager().getRegistration(Economy.class);
+        if (economyProvider != null) {
+            economy = economyProvider.getProvider();
+        }
+    }
+    
     public static void sendDisplayName(Player player, String displayName) {
         final ByteBuffer buf = ByteBuffer.allocate(displayName.getBytes(Charsets.UTF_8).length + 2);
-        writeUTF8String(buf, displayName);
+        writeUTF8String(buf, displayName);       
         player.sendPluginMessage(BridgePlugin.getInstance(), CHANNEL, prefixDiscriminator(DISCRIMINATOR_DISPLAY_NAME, ((ByteBuffer) buf.flip()).array()));
     }
 
@@ -45,6 +61,14 @@ public class BridgeNetwork implements Listener {
         player.sendPluginMessage(BridgePlugin.getInstance(), CHANNEL, prefixDiscriminator(DISCRIMINATOR_CURRENCY, ((ByteBuffer) ByteBuffer.allocate(8).putDouble(amount).flip()).array()));
     }
 
+    public static void sendAdditionalWorldInfo(Player player, String worldName, int currentPlayers, int maxPlayers) {
+        final ByteBuffer buf = ByteBuffer.allocate(worldName.getBytes(Charsets.UTF_8).length + 10);
+        writeUTF8String(buf, worldName);
+        buf.putInt(currentPlayers);
+        buf.putInt(maxPlayers);
+        player.sendPluginMessage(BridgePlugin.getInstance(), CHANNEL, prefixDiscriminator(DISCRIMINATOR_ADDITIONAL_WORLD_INFO, ((ByteBuffer) buf.flip()).array()));        
+    }
+    
     private static byte[] prefixDiscriminator(byte discriminator, byte[] value) {
         return ((ByteBuffer) ByteBuffer.allocate(value.length + 1).put(discriminator).put(value).flip()).array();
     }
@@ -68,13 +92,29 @@ public class BridgeNetwork implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerJoin(final PlayerJoinEvent event) {
         Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
+            @SuppressWarnings("deprecation")
             @Override
             public void run() {
                 sendDisplayName(event.getPlayer(), event.getPlayer().getDisplayName());
+                sendCurrencyAmount(event.getPlayer(),economy.getBalance(event.getPlayer().getName()));
             }
         }, 20L);
+        
+        for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+            sendAdditionalWorldInfo(player, player.getWorld().getName(), Bukkit.getOnlinePlayers().length, Bukkit.getMaxPlayers());
+        }        
+    }
+    
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onPlayerQuit(final PlayerQuitEvent event) {
+        sendAdditionalWorldInfo(event.getPlayer(), event.getPlayer().getWorld().getName(), Bukkit.getOnlinePlayers().length, Bukkit.getMaxPlayers());
     }
 
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onPlayerChangedWorld(final PlayerChangedWorldEvent event) {
+        sendAdditionalWorldInfo(event.getPlayer(), event.getPlayer().getWorld().getName(), Bukkit.getOnlinePlayers().length, Bukkit.getMaxPlayers());
+    }
+    
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onNickChanged(NickChangeEvent event) {
         final Player player = Bukkit.getPlayer(event.getAffected().getName());
@@ -87,5 +127,13 @@ public class BridgeNetwork implements Listener {
                 sendDisplayName(player, player.getDisplayName());
             }
         }, 20L);
+    }
+    
+    @EventHandler
+    public void onEconomyChange(EconomyChangeEvent event) {
+        Player player = Bukkit.getPlayer(event.getAccount());
+        if (player != null) {
+            sendCurrencyAmount(player, event.getAmount());
+        }
     }
 }
