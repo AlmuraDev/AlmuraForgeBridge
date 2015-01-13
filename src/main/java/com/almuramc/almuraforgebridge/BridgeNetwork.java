@@ -107,7 +107,9 @@ public class BridgeNetwork implements Listener {
     
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerQuit(final PlayerQuitEvent event) {
-        sendAdditionalWorldInfo(event.getPlayer(), event.getPlayer().getWorld().getName(), Bukkit.getOnlinePlayers().length, Bukkit.getMaxPlayers());
+        for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+            sendAdditionalWorldInfo(player, player.getWorld().getName(), Bukkit.getOnlinePlayers().length, Bukkit.getMaxPlayers());
+        }  
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

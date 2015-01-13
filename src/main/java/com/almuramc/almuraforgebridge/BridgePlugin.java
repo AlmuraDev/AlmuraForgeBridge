@@ -45,17 +45,21 @@ package com.almuramc.almuraforgebridge;
 import org.anjocaido.groupmanager.events.GMUserEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import com.earth2me.essentials.User;
 
 public class BridgePlugin extends JavaPlugin implements Listener {
 
@@ -76,6 +80,10 @@ public class BridgePlugin extends JavaPlugin implements Listener {
         PluginManager pm = getServer().getPluginManager();
         pm.registerEvents(this, this);
         pm.registerEvents(new BridgeNetwork(), this);
+    }
+    
+    public void playerLookup(Player player) {        
+        
     }
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
@@ -103,7 +111,7 @@ public class BridgePlugin extends JavaPlugin implements Listener {
                 public void run() {
 
                     //AlmuraTitle(player);
-                    
+                   
                     if ((GMUserEvent.Action.USER_GROUP_CHANGED == event.getAction()) && (event.getUser().getGroupName().equalsIgnoreCase("member"))) {
                         Bukkit.broadcastMessage(ChatColor.DARK_PURPLE + player.getDisplayName() + ChatColor.WHITE + " has been granted: [" + ChatColor.GOLD + event.getUser().getGroupName() + ChatColor.WHITE + "]");
                         Bukkit.broadcastMessage(ChatColor.WHITE + "Almura Thanks " + ChatColor.GOLD + player.getDisplayName() + ChatColor.WHITE + " for their donation.  It is very much appreciated.");
@@ -118,6 +126,20 @@ public class BridgePlugin extends JavaPlugin implements Listener {
         }
     }  
 
+    @SuppressWarnings("deprecation")
+    @EventHandler
+    public void onPlayerInteract(PlayerInteractEvent event) {        
+        if (event.getPlayer().getItemInHand().getType() == Material.getMaterial("ALMURA_TOOLSMMWAND_INFORMATION_WAND")) {
+            if (event.getClickedBlock() != null) {
+                event.getPlayer().sendMessage(ChatColor.ITALIC + "Block Information:");
+                event.getPlayer().sendMessage(ChatColor.WHITE + "ID: " + ChatColor.RED + event.getClickedBlock().getTypeId());
+                event.getPlayer().sendMessage(ChatColor.WHITE + "Material: " + ChatColor.GOLD + event.getClickedBlock().getType());
+                event.getPlayer().sendMessage(ChatColor.WHITE + "MetaData: " + ChatColor.AQUA + event.getClickedBlock().getData());
+                event.getPlayer().sendMessage(ChatColor.WHITE + "Biome: " + ChatColor.LIGHT_PURPLE + event.getClickedBlock().getBiome() + "\n");
+                event.getPlayer().sendMessage(" ");
+            }
+        }
+    }
     @EventHandler(priority=EventPriority.HIGHEST)
     public void onPlayerTeleport(PlayerTeleportEvent event)  {
         for (Player player : getServer().getOnlinePlayers()) {			
