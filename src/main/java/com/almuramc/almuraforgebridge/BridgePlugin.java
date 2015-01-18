@@ -48,14 +48,30 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Chicken;
+import org.bukkit.entity.Cow;
+import org.bukkit.entity.Creeper;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Pig;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.entity.Sheep;
+import org.bukkit.entity.Wolf;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityInteractEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -81,10 +97,6 @@ public class BridgePlugin extends JavaPlugin implements Listener {
         pm.registerEvents(this, this);
         pm.registerEvents(new BridgeNetwork(), this);
     }
-    
-    public void playerLookup(Player player) {        
-        
-    }
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         Player player = null;
@@ -102,16 +114,16 @@ public class BridgePlugin extends JavaPlugin implements Listener {
         }
         return false;
     }
-    
+
     @EventHandler
     public void onGMUserEvent(GMUserEvent userEvent) {
-        for (final Player player : getServer().getOnlinePlayers()) {			
+        for (final Player player : getServer().getOnlinePlayers()) {
             final GMUserEvent event = userEvent;
             Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
                 public void run() {
 
                     //AlmuraTitle(player);
-                   
+
                     if ((GMUserEvent.Action.USER_GROUP_CHANGED == event.getAction()) && (event.getUser().getGroupName().equalsIgnoreCase("member"))) {
                         Bukkit.broadcastMessage(ChatColor.DARK_PURPLE + player.getDisplayName() + ChatColor.WHITE + " has been granted: [" + ChatColor.GOLD + event.getUser().getGroupName() + ChatColor.WHITE + "]");
                         Bukkit.broadcastMessage(ChatColor.WHITE + "Almura Thanks " + ChatColor.GOLD + player.getDisplayName() + ChatColor.WHITE + " for their donation.  It is very much appreciated.");
@@ -126,9 +138,8 @@ public class BridgePlugin extends JavaPlugin implements Listener {
         }
     }  
 
-    @SuppressWarnings("deprecation")
     @EventHandler
-    public void onPlayerInteract(PlayerInteractEvent event) {        
+    public void onPlayerInteract(PlayerInteractEvent event) {
         if (event.getPlayer().getItemInHand().getType() == Material.getMaterial("ALMURA_TOOLSMMWAND_INFORMATION_WAND")) {
             if (event.getClickedBlock() != null) {
                 event.getPlayer().sendMessage(ChatColor.ITALIC + "Block Information:");
@@ -136,13 +147,38 @@ public class BridgePlugin extends JavaPlugin implements Listener {
                 event.getPlayer().sendMessage(ChatColor.WHITE + "Material: " + ChatColor.GOLD + event.getClickedBlock().getType());
                 event.getPlayer().sendMessage(ChatColor.WHITE + "MetaData: " + ChatColor.AQUA + event.getClickedBlock().getData());
                 event.getPlayer().sendMessage(ChatColor.WHITE + "Biome: " + ChatColor.LIGHT_PURPLE + event.getClickedBlock().getBiome() + "\n");
-                event.getPlayer().sendMessage(" ");
             }
         }
     }
+    
+    @EventHandler
+    public void onEntityDamage(EntityDamageEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
+        LivingEntity attacker = null;
+        Entity defender = event.getEntity();
+        if (event.getCause() == DamageCause.ENTITY_ATTACK) {
+            EntityDamageByEntityEvent e = (EntityDamageByEntityEvent) event;
+            if (e.getDamager() instanceof LivingEntity) {
+                attacker = (LivingEntity) e.getDamager();
+            }
+        }
+        
+        if (attacker instanceof Player && defender instanceof LivingEntity && !attacker.equals(defender)) {
+            Player player = (Player) attacker;
+            if (player.getItemInHand().getType() == Material.getMaterial("ALMURA_TOOLSMMWAND_INFORMATION_WAND")) {
+                player.sendMessage(ChatColor.ITALIC + "Entity Information:");
+                player.sendMessage(ChatColor.WHITE + "ID: " + ChatColor.RED + event.getEntity().getEntityId());
+                player.sendMessage(ChatColor.WHITE + "Type: " + ChatColor.GOLD + event.getEntity().getType());
+                player.sendMessage(ChatColor.WHITE + "Type Name: " + ChatColor.GREEN + event.getEntity().getType().getName());
+            }
+        }
+    }
+    
     @EventHandler(priority=EventPriority.HIGHEST)
-    public void onPlayerTeleport(PlayerTeleportEvent event)  {
-        for (Player player : getServer().getOnlinePlayers()) {			
+    public void onPlayerTeleport(PlayerTeleportEvent event) {
+        for (Player player : getServer().getOnlinePlayers()) {
             //AlmuraTitle(player);
         }
     }
@@ -151,21 +187,21 @@ public class BridgePlugin extends JavaPlugin implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event)  {
         Player player = event.getPlayer();
         event.setJoinMessage("");
-        AlmuraBroadcastLogin(player);		
+        AlmuraBroadcastLogin(player);
         //AlmuraTitle(player);
     }
 
     @EventHandler(priority=EventPriority.LOWEST)
     public void onPlayerQuit(PlayerQuitEvent event) {
         event.setQuitMessage("");
-        Player player = event.getPlayer();		
+        Player player = event.getPlayer();
 
-        if (player.hasPermission("admin.title") && player.isOp()) {			
+        if (player.hasPermission("admin.title") && player.isOp()) {
             Bukkit.broadcastMessage(ChatColor.WHITE + "[" + ChatColor.DARK_RED + "Almura SuperAdmin" + ChatColor.WHITE + "] -  " + player.getDisplayName() + ", has left the server.");
             return;
         }	
 
-        if (player.hasPermission("admin.title") && !player.isOp()) {			
+        if (player.hasPermission("admin.title") && !player.isOp()) {
             if (player.getName().equalsIgnoreCase("wifee")) {
                 Bukkit.broadcastMessage(ChatColor.WHITE + "[" + ChatColor.GOLD + "The Destroyer of Worlds..."  + ChatColor.WHITE + "] -  " + player.getDisplayName() + ", has left the server.");
             } else {
@@ -189,17 +225,17 @@ public class BridgePlugin extends JavaPlugin implements Listener {
             return;
         }
 
-        if (player.hasPermission("Member.title") && !player.hasPermission("veteran.title")) {			
+        if (player.hasPermission("Member.title") && !player.hasPermission("veteran.title")) {
             Bukkit.broadcastMessage(ChatColor.WHITE + "[" + ChatColor.GREEN + "Member" + ChatColor.WHITE + "] -  " + player.getDisplayName() + ", has left the server.");
             return;
         }
 
-        if (player.hasPermission("Guest.title") && !player.hasPermission("Member.title")) {			
+        if (player.hasPermission("Guest.title") && !player.hasPermission("Member.title")) {
             Bukkit.broadcastMessage(ChatColor.WHITE + "[" + ChatColor.GRAY + "Guest" + ChatColor.WHITE + "] -  " + player.getDisplayName() + ", has left the server.");
             return;
         }
 
-        if (player.hasPermission("Survival.title") && !player.hasPermission("Member.title")) {			
+        if (player.hasPermission("Survival.title") && !player.hasPermission("Member.title")) {
             Bukkit.broadcastMessage(ChatColor.WHITE + "[" + ChatColor.DARK_RED + "Survival" + ChatColor.WHITE + "] -  " + player.getDisplayName() + ", has left the server.");
             return;
         }
@@ -257,10 +293,10 @@ public class BridgePlugin extends JavaPlugin implements Listener {
         }
     }
 
-    public void AlmuraTitle(Player player) {       
-        
+    public void AlmuraTitle(Player player) {
+
         if (player.hasPermission("admin.title") && player.isOp()) {
-            player.setCustomName(player.getDisplayName()+"\n"+ChatColor.DARK_RED+"Almura SuperAdmin" + ChatColor.RESET);			
+            player.setCustomName(player.getDisplayName()+"\n"+ChatColor.DARK_RED+"Almura SuperAdmin" + ChatColor.RESET);
             return;
         }	
 
@@ -274,22 +310,22 @@ public class BridgePlugin extends JavaPlugin implements Listener {
         }
 
         if (player.hasPermission("spoutteam.title") && !player.hasPermission("Admin.title")) {
-            player.setCustomName(player.getDisplayName()+"\n"+ChatColor.DARK_BLUE+"SpoutTeam" + ChatColor.RESET);			
+            player.setCustomName(player.getDisplayName()+"\n"+ChatColor.DARK_BLUE+"SpoutTeam" + ChatColor.RESET);
             return;
         }
 
         if (player.hasPermission("mod.title") && !player.hasPermission("Admin.title")) {
-            player.setCustomName(player.getDisplayName()+"\n"+ChatColor.DARK_BLUE+"Moderator" + ChatColor.RESET);			
+            player.setCustomName(player.getDisplayName()+"\n"+ChatColor.DARK_BLUE+"Moderator" + ChatColor.RESET);
             return;
         }
 
         if (player.hasPermission("Dev.title") && !player.hasPermission("admin.title")) {
-            player.setCustomName(player.getDisplayName()+"\n"+ChatColor.DARK_RED+"Developer" + ChatColor.RESET);			
+            player.setCustomName(player.getDisplayName()+"\n"+ChatColor.DARK_RED+"Developer" + ChatColor.RESET);
             return;
         }
 
         if (player.hasPermission("CreativeMember.title") && !player.hasPermission("Mod.title")) {
-            player.setCustomName(player.getDisplayName()+"\n"+ChatColor.LIGHT_PURPLE+"CreativeMember" + ChatColor.RESET);			
+            player.setCustomName(player.getDisplayName()+"\n"+ChatColor.LIGHT_PURPLE+"CreativeMember" + ChatColor.RESET);
             return;
         }
 
@@ -299,7 +335,7 @@ public class BridgePlugin extends JavaPlugin implements Listener {
         }
 
         if (player.hasPermission("SuperMember.title") && !player.hasPermission("UltraMember.title")) {
-            player.setCustomName(player.getDisplayName()+"\n"+ChatColor.DARK_GREEN+"SuperMember" + ChatColor.RESET);				
+            player.setCustomName(player.getDisplayName()+"\n"+ChatColor.DARK_GREEN+"SuperMember" + ChatColor.RESET);
             return;
         }
 
@@ -309,7 +345,7 @@ public class BridgePlugin extends JavaPlugin implements Listener {
         }
 
         if (!player.hasPlayedBefore()) {
-            player.setCustomName(player.getDisplayName()+"\n"+ChatColor.LIGHT_PURPLE + "Newbie" + ChatColor.RESET);			
+            player.setCustomName(player.getDisplayName()+"\n"+ChatColor.LIGHT_PURPLE + "Newbie" + ChatColor.RESET);
             return;
         }
 
@@ -322,7 +358,59 @@ public class BridgePlugin extends JavaPlugin implements Listener {
     public void specialOptions(Player player) {
         // Abby
         if (player.getName().equalsIgnoreCase("mcsfam")) {
-           //player.setCanFly(true);
+            //player.setCanFly(true);
+        }
+    }
+
+    @EventHandler
+    public void onEntityDeath(EntityDeathEvent event){
+        if (event.getEntity() instanceof Wolf) {
+            Material material = Material.getMaterial("ALMURA_INGREDIENTSWOLFMEAT_RAW");
+            if (material != null) {
+                event.getDrops().add(new ItemStack(material, 4));
+            }
+        }
+
+        if (event.getEntity() instanceof Sheep) {
+            Material material = Material.getMaterial("ALMURA_INGREDIENTSLAMBCHOP_RAW");
+            if (material != null) {
+                event.getDrops().add(new ItemStack(material, 4));
+            }
+        }
+
+        if (event.getEntity() instanceof Chicken) {
+            Material material = Material.getMaterial("ALMURA_INGREDIENTSCHICKENLEG_RAW");
+            if (material != null) {
+                event.getDrops().add(new ItemStack(material, 2));
+            }
+        }
+
+        if (event.getEntity() instanceof Cow) {
+            Material material = Material.getMaterial("ALMURA_INGREDIENTSROASTBEEF_RAW");
+            if (material != null) {
+                event.getDrops().add(new ItemStack(material, 3));
+            }
+        }
+
+        if (event.getEntity() instanceof Creeper) {
+            Material material = Material.getMaterial("ALMURA_FOODCREEPERSTEAK");
+            if (material != null) {
+                event.getDrops().add(new ItemStack(material, 2));
+            }
+        }
+
+        if (event.getEntity() instanceof Pig) {
+            Material material = Material.getMaterial("ALMURA_INGREDIENTSPORKBELLY_RAW");
+            if (material != null) {
+                event.getDrops().add(new ItemStack(material, 3));
+            }
+        }
+        
+        if (event.getEntityType().getName().equalsIgnoreCase("MOCREATURES-KOMODODRAGON")) {
+            Material material = Material.getMaterial("ALMURA_INGREDIENTSLIZARD");
+            if (material != null) {
+                event.getDrops().add(new ItemStack(material, 4));
+            }
         }
     }
 }

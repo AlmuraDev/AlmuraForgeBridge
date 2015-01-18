@@ -97,19 +97,25 @@ public class BridgeNetwork implements Listener {
             public void run() {
                 sendDisplayName(event.getPlayer(), event.getPlayer().getDisplayName());
                 sendCurrencyAmount(event.getPlayer(),economy.getBalance(event.getPlayer().getName()));
+                
+                for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+                    sendAdditionalWorldInfo(player, player.getWorld().getName(), Bukkit.getOnlinePlayers().length, Bukkit.getMaxPlayers());
+                }
             }
         }, 20L);
-        
-        for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-            sendAdditionalWorldInfo(player, player.getWorld().getName(), Bukkit.getOnlinePlayers().length, Bukkit.getMaxPlayers());
-        }        
     }
     
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerQuit(final PlayerQuitEvent event) {
-        for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-            sendAdditionalWorldInfo(player, player.getWorld().getName(), Bukkit.getOnlinePlayers().length, Bukkit.getMaxPlayers());
-        }  
+        Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
+            @SuppressWarnings("deprecation")
+            @Override
+            public void run() {
+                for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+                    sendAdditionalWorldInfo(player, player.getWorld().getName(), Bukkit.getOnlinePlayers().length, Bukkit.getMaxPlayers());
+                }
+            }
+        }, 40L);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
