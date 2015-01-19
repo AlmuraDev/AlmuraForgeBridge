@@ -51,8 +51,9 @@ public class BridgeNetwork implements Listener {
         }
     }
     
-    public static void sendDisplayName(Player player, String displayName) {
-        final ByteBuffer buf = ByteBuffer.allocate(displayName.getBytes(Charsets.UTF_8).length + 2);
+    public static void sendDisplayName(Player player, String username, String displayName) {
+        final ByteBuffer buf = ByteBuffer.allocate(username.getBytes(Charsets.UTF_8).length + displayName.getBytes(Charsets.UTF_8).length + 4);
+        writeUTF8String(buf, username);
         writeUTF8String(buf, displayName);       
         player.sendPluginMessage(BridgePlugin.getInstance(), CHANNEL, prefixDiscriminator(DISCRIMINATOR_DISPLAY_NAME, ((ByteBuffer) buf.flip()).array()));
     }
@@ -95,10 +96,10 @@ public class BridgeNetwork implements Listener {
             @SuppressWarnings("deprecation")
             @Override
             public void run() {
-                sendDisplayName(event.getPlayer(), event.getPlayer().getDisplayName());
                 sendCurrencyAmount(event.getPlayer(),economy.getBalance(event.getPlayer().getName()));
                 
                 for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+                    sendDisplayName(player, event.getPlayer().getName(), event.getPlayer().getDisplayName());
                     sendAdditionalWorldInfo(player, player.getWorld().getName(), Bukkit.getOnlinePlayers().length, Bukkit.getMaxPlayers());
                 }
             }
@@ -125,14 +126,17 @@ public class BridgeNetwork implements Listener {
     
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onNickChanged(NickChangeEvent event) {
-        final Player player = Bukkit.getPlayer(event.getAffected().getName());
-        if (player == null) {
+        final Player p = Bukkit.getPlayer(event.getAffected().getName());
+        if (p == null) {
             return;
         }
+
         Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
             @Override
             public void run() {
-                sendDisplayName(player, player.getDisplayName());
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    sendDisplayName(player, p.getName(), p.getDisplayName());
+                }
             }
         }, 20L);
     }
