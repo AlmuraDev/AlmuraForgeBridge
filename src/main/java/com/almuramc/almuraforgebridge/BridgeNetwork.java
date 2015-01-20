@@ -101,6 +101,9 @@ public class BridgeNetwork implements Listener {
                 for (Player player : Bukkit.getServer().getOnlinePlayers()) {
                     sendDisplayName(player, event.getPlayer().getName(), event.getPlayer().getDisplayName());
                     sendAdditionalWorldInfo(player, player.getWorld().getName(), Bukkit.getOnlinePlayers().length, Bukkit.getMaxPlayers());
+                    if (player != event.getPlayer()) {
+                        sendDisplayName(event.getPlayer(), player.getName(), player.getDisplayName());
+                    }
                 }
             }
         }, 20L);
@@ -126,7 +129,7 @@ public class BridgeNetwork implements Listener {
     
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onNickChanged(NickChangeEvent event) {
-        final Player p = Bukkit.getPlayer(event.getAffected().getName());
+        final Player p = Bukkit.getPlayer(event.getController().getName());
         if (p == null) {
             return;
         }
