@@ -26,6 +26,8 @@ import net.ess3.api.events.NickChangeEvent;
 import net.milkbowl.vault.economy.Economy;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -35,7 +37,20 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
+import com.bekvon.bukkit.residence.Residence;
+import com.bekvon.bukkit.residence.event.ResidenceChangedEvent;
+import com.bekvon.bukkit.residence.event.ResidenceCreationEvent;
+import com.bekvon.bukkit.residence.event.ResidenceDeleteEvent;
+import com.bekvon.bukkit.residence.event.ResidenceFlagChangeEvent;
+import com.bekvon.bukkit.residence.protection.ClaimedResidence;
+import com.bekvon.bukkit.residence.protection.CuboidArea;
+import com.bekvon.bukkit.residence.protection.ResidencePermissions;
+
 import java.nio.ByteBuffer;
+import java.text.NumberFormat;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.Locale;
 
 public class BridgeNetwork implements Listener {
     public static final String CHANNEL = "AM|BUK";
@@ -43,6 +58,8 @@ public class BridgeNetwork implements Listener {
     public static final byte DISCRIMINATOR_CURRENCY = 1;
     public static final byte DISCRIMINATOR_ADDITIONAL_WORLD_INFO = 2;
     private static Economy economy;
+    private static NumberFormat numForm;
+    private static Locale caLoc = new Locale("en", "US");
 
     public BridgeNetwork() {
         final RegisteredServiceProvider<Economy> economyProvider = Bukkit.getServer().getServicesManager().getRegistration(Economy.class);
@@ -112,7 +129,6 @@ public class BridgeNetwork implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerQuit(final PlayerQuitEvent event) {
         Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
-            @SuppressWarnings("deprecation")
             @Override
             public void run() {
                 for (Player player : Bukkit.getServer().getOnlinePlayers()) {
@@ -150,5 +166,221 @@ public class BridgeNetwork implements Listener {
         if (player != null) {
             sendCurrencyAmount(player, event.getAmount());
         }
+    }
+    
+    
+    @EventHandler
+    public void onResidenceFlagChangeEvent(final ResidenceFlagChangeEvent event) {      
+        Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
+            public void run() {
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    sendResidenceInfo(player);
+                }
+            }
+        }, 20L);
+    }
+
+    @EventHandler
+    public void onResidenceChangedEvent(final ResidenceChangedEvent event) {
+        Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
+            public void run() {
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    sendResidenceInfo(player);
+                }
+            }
+        }, 20L);        
+    }
+
+    @EventHandler
+    public void onResidenceCreationEvent(final ResidenceCreationEvent event) {
+        Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
+            public void run() {
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    sendResidenceInfo(player);            
+                }
+            }
+        }, 20L);
+    }
+    
+    @EventHandler
+    public void onResidenceDeleteEvent(final ResidenceDeleteEvent event) {      
+        Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
+            public void run() {
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    sendResidenceInfo(player);
+                }
+            }
+        }, 20L);
+    }
+
+    
+    @SuppressWarnings("unused")
+    public void sendResidenceInfo(Player player) {
+        // The following values I need in all string form via a packet from Bridge to Almura.       
+        ClaimedResidence res = Residence.getResidenceManager().getByLoc(player.getLocation());  
+        if (res == null) {
+            // Send null residence into to client;
+            return;
+        }
+        
+        ResidencePermissions resperms = res.getPermissions(); // Residence Based Flags
+        OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(res.getOwner());
+        numForm = NumberFormat.getCurrencyInstance(caLoc);
+        
+        String resName = res.getName();
+        String ownersName = res.getOwner();
+        String lastOnline = ""; 
+        
+        if (offlinePlayer != null) {
+            if (offlinePlayer.isOnline()) {            
+                lastOnline = "Last Online: Now";
+            } else {
+                if (offlinePlayer.getLastPlayed()==0) {                 
+                    lastOnline = "Last Online: Unavailable";
+                } else {
+                    lastOnline = "Last Online: " + formatDateDiff(offlinePlayer.getLastPlayed());
+                }
+            }
+        }
+        
+        String leaseCost = "";
+        if (Residence.getLeaseManager().leaseExpires(resName)) {
+            
+            leaseCost = numForm.format(leaseCost);
+        } else {
+            leaseCost = "No Cost.";
+        }
+        
+        String leaseExpires = "";
+        if (Residence.getLeaseManager().leaseExpires(resName)) {
+            leaseExpires = Residence.getLeaseManager().getExpireTime(resName).toString();
+        } else {
+            leaseExpires = "Does not expire.";
+        }
+        
+        String areaName = res.getAreaIDbyLoc(player.getLocation());
+        String resBoundsValue = "";
+        if (areaName != null) {
+            CuboidArea area = res.getArea(areaName);
+            if (area != null) {
+                resBoundsValue = ChatColor.LIGHT_PURPLE + "X: " + area.getHighLoc().getBlockX() + " Y: " + area.getHighLoc().getBlockY() + " Z: " + area.getHighLoc().getBlockZ() + ChatColor.WHITE + " / " + ChatColor.LIGHT_PURPLE + " X: " + area.getLowLoc().getBlockX() + " Y: " + area.getLowLoc().getBlockY() + " Z: " + area.getLowLoc().getBlockZ();
+            } else {
+                resBoundsValue = "Res Boundary is null";
+            }
+        }
+        
+        String resSize = "";
+        resSize = "" + ChatColor.DARK_GREEN + res.getTotalSize();
+        
+        String bankVault = "";
+        bankVault = "" + ChatColor.GOLD + numForm.format(res.getBank().getStoredMoney());        
+        
+        boolean hasMOVE = resperms.playerHas(player.getName(), "move", true);
+        boolean hasBUILD = resperms.playerHas(player.getName(), "build", true);
+        boolean hasBANK = resperms.playerHas(player.getName(), "bank", true);
+        boolean hasPLACE = resperms.playerHas(player.getName(), "place", true);
+        boolean hasDESTROY = resperms.playerHas(player.getName(), "destroy", true); //Player Based Destroy Flag
+        boolean hasUSE = resperms.playerHas(player.getName(), "use", true); //Player Based Use Flag
+        boolean hasADMIN = resperms.playerHas(player.getName(), "admin", true); 
+        boolean hasBUTCHER = resperms.playerHas(player.getName(), "butcher", true); //Player Based Container Flag
+        boolean hasMAYOR = resperms.playerHas(player.getName(), "mayor", true); //Player Based Container Flag
+        boolean hasCONTAINER = resperms.playerHas(player.getName(), "container", true); //Player Based Container Flag
+        boolean hasPVP = resperms.playerHas(player.getName(), "pvp", true); //Player Based PVP Flag        
+        boolean hasTP = resperms.playerHas(player.getName(), "tp", true);
+        boolean hasMELT = resperms.playerHas(player.getName(), "melt", true);
+        boolean hasIGNITE = resperms.playerHas(player.getName(), "ignite", true);
+        boolean hasFIRESPREAD = resperms.playerHas(player.getName(), "firespread", true);
+        boolean hasBUCKET = resperms.playerHas(player.getName(), "bucket", true);
+        boolean hasFORM = resperms.playerHas(player.getName(), "form", true);
+        boolean hasLAVAFLOW = resperms.playerHas(player.getName(), "lavaflow", true);
+        boolean hasWATERFLOW = resperms.playerHas(player.getName(), "waterflow", true);
+        boolean hasCREEPER = resperms.playerHas(player.getName(), "creeper", true);
+        boolean hasTNT = resperms.playerHas(player.getName(), "tnt", true);
+        boolean hasMONSTERS = resperms.has("monsters",true); //Zone Monster Flag
+        boolean hasANIMALS = resperms.playerHas(player.getName(), "animals", true);
+        boolean hasFLY = resperms.playerHas(player.getName(), "fly", true);
+        boolean hasSUBZONE = resperms.playerHas(player.getName(), "subzone", true);
+        boolean hasHEALING = resperms.playerHas(player.getName(), "healing", true);
+        boolean hasPISTON = resperms.playerHas(player.getName(), "piston", true);
+        boolean hasSHEAR = resperms.playerHas(player.getName(), "shear", true);
+        boolean hasEGGHATCH = resperms.playerHas(player.getName(), "egghatch", true);
+        boolean hasTRAMPLE = resperms.playerHas(player.getName(), "trample", true);
+        boolean hasSOIL = resperms.playerHas(player.getName(), "soil", true);
+        boolean hasSTORMDAMAGE = resperms.playerHas(player.getName(), "stormdamage", true);        
+        boolean hasCHAT = resperms.playerHas(player.getName(), "chat", true); //Player Based Chat Flag
+        boolean hasSAFEZONE = resperms.playerHas(player.getName(), "safezone", true);
+        boolean hasMOAMBIENT = resperms.playerHas(player.getName(), "mo-ambient", true);
+        boolean hasMOAQUATIC = resperms.playerHas(player.getName(), "mo-aquatic", true);
+        boolean hasMOMONSTERS = resperms.playerHas(player.getName(), "mo-monsters", true);
+        boolean hasMOPASSIVE = resperms.playerHas(player.getName(), "mo-passive", true);
+        boolean hasTHAUMCRAFTMONSTERS = resperms.playerHas(player.getName(), "thaumcraft-monsters", true);
+        
+        
+    }
+    
+    public static String formatDateDiff(long date) {
+        Calendar c = new GregorianCalendar();
+        c.setTimeInMillis(date);
+        Calendar now = new GregorianCalendar();         
+        return formatDateDiff(now, c);
+    }
+
+    public static String formatDateDiff(Calendar fromDate, Calendar toDate) {
+        boolean future = false;
+        if (toDate.equals(fromDate)) {
+            return ("now");
+        }
+        if (toDate.after(fromDate)) {
+            future = true;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        int[] types = new int[]
+                {
+                Calendar.YEAR,
+                Calendar.MONTH,
+                Calendar.DAY_OF_MONTH,
+                Calendar.HOUR_OF_DAY,
+                Calendar.MINUTE,
+                //Calendar.SECOND
+                };
+        String[] names = new String[]
+                {
+                ("year"),
+                ("years"),
+                ("month"),
+                ("months"),
+                ("day"),
+                ("days"),
+                ("hour"),
+                ("hours"),
+                ("minute"),
+                ("minutes"),
+                //("second"),
+                //("seconds")
+                };
+        for (int i = 0; i < types.length; i++) {
+            int diff = dateDiff(types[i], fromDate, toDate, future);
+            if (diff > 0) {
+                sb.append(" ").append(diff).append(" ").append(names[i * 2 + (diff > 1 ? 1 : 0)]);
+            }
+        }
+        if (sb.length() == 0) {
+            return "moment ago";
+        }
+        return sb.toString();
+    }
+
+    private static int dateDiff(int type, Calendar fromDate, Calendar toDate, boolean future) {
+        int diff = 0;
+        long savedDate = fromDate.getTimeInMillis();
+        while ((future && !fromDate.after(toDate)) || (!future && !fromDate.before(toDate))) {
+            savedDate = fromDate.getTimeInMillis();
+            fromDate.add(type, future ? 1 : -1);
+            diff++;
+        }
+        diff--;
+        fromDate.setTimeInMillis(savedDate);
+        return diff;
     }
 }
