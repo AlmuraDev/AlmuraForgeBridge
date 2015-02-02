@@ -57,9 +57,10 @@ public class BridgeNetwork implements Listener {
     public static final byte DISCRIMINATOR_DISPLAY_NAME = 0;
     public static final byte DISCRIMINATOR_CURRENCY = 1;
     public static final byte DISCRIMINATOR_ADDITIONAL_WORLD_INFO = 2;
+    public static final byte DISCRIMINATOR_RESIDENCE_INFO = 3;
+    private static final Locale LOCALE_EN = new Locale("en", "US");
+    private static final NumberFormat FORMAT_NUMBER_EN = NumberFormat.getCurrencyInstance(LOCALE_EN);
     private static Economy economy;
-    private static NumberFormat numForm;
-    private static Locale caLoc = new Locale("en", "US");
 
     public BridgeNetwork() {
         final RegisteredServiceProvider<Economy> economyProvider = Bukkit.getServer().getServicesManager().getRegistration(Economy.class);
@@ -86,7 +87,117 @@ public class BridgeNetwork implements Listener {
         buf.putInt(maxPlayers);
         player.sendPluginMessage(BridgePlugin.getInstance(), CHANNEL, prefixDiscriminator(DISCRIMINATOR_ADDITIONAL_WORLD_INFO, ((ByteBuffer) buf.flip()).array()));        
     }
-    
+
+    public static void sendResidenceInfo(Player player, ClaimedResidence res) {
+        if (res == null) {
+            final ByteBuffer buf = ByteBuffer.allocate(1);
+            buf.put((byte) 0);
+            player.sendPluginMessage(BridgePlugin.getInstance(), CHANNEL, prefixDiscriminator(DISCRIMINATOR_RESIDENCE_INFO, ((ByteBuffer) buf.flip()).array()));
+            return;
+        }
+
+        final ResidencePermissions resperms = res.getPermissions();
+        final OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(res.getOwner());
+
+        final String resName = res.getName();
+        final String ownersName = res.getOwner();
+        String lastOnline = "";
+
+        if (offlinePlayer != null) {
+            if (offlinePlayer.isOnline()) {
+                lastOnline = "Last Online: Now";
+            } else {
+                if (offlinePlayer.getLastPlayed() == 0) {
+                    lastOnline = "Last Online: Unavailable";
+                } else {
+                    lastOnline = "Last Online: " + formatDateDiff(offlinePlayer.getLastPlayed());
+                }
+            }
+        }
+
+        String leaseCost = "";
+        if (Residence.getLeaseManager().leaseExpires(resName)) {
+            leaseCost = FORMAT_NUMBER_EN.format(leaseCost);
+        } else {
+            leaseCost = "No Cost.";
+        }
+
+        String leaseExpires;
+        if (Residence.getLeaseManager().leaseExpires(resName)) {
+            leaseExpires = Residence.getLeaseManager().getExpireTime(resName).toString();
+        } else {
+            leaseExpires = "Does not expire.";
+        }
+
+        String areaName = res.getAreaIDbyLoc(player.getLocation());
+        String resBoundsValue = "";
+        if (areaName != null) {
+            CuboidArea area = res.getArea(areaName);
+            if (area != null) {
+                resBoundsValue = ChatColor.LIGHT_PURPLE + "X: " + area.getHighLoc().getBlockX() + " Y: " + area.getHighLoc().getBlockY() + " Z: " + area.getHighLoc().getBlockZ() + ChatColor.WHITE + " / " + ChatColor.LIGHT_PURPLE + " X: " + area.getLowLoc().getBlockX() + " Y: " + area.getLowLoc().getBlockY() + " Z: " + area.getLowLoc().getBlockZ();
+            } else {
+                resBoundsValue = "Res Boundary is null";
+            }
+        }
+
+        String resSize;
+        resSize = "" + ChatColor.DARK_GREEN + res.getTotalSize();
+
+        String bankVault;
+        bankVault = "" + ChatColor.GOLD + FORMAT_NUMBER_EN.format(res.getBank().getStoredMoney());
+
+        final ByteBuffer buf = ByteBuffer.allocate(resName.getBytes(Charsets.UTF_8).length + ownersName.getBytes(Charsets.UTF_8).length + lastOnline.getBytes(Charsets.UTF_8).length + leaseCost.getBytes(Charsets.UTF_8).length + leaseExpires.getBytes(Charsets.UTF_8).length + resBoundsValue.getBytes(Charsets.UTF_8).length + resSize.getBytes(Charsets.UTF_8).length + bankVault.getBytes(Charsets.UTF_8).length + 39);
+        buf.put((byte) 1);
+        writeUTF8String(buf, resName);
+        writeUTF8String(buf, ownersName);
+        writeUTF8String(buf, lastOnline);
+        writeUTF8String(buf, leaseCost);
+        writeUTF8String(buf, leaseExpires);
+        writeUTF8String(buf, resBoundsValue);
+        writeUTF8String(buf, resSize);
+        writeUTF8String(buf, bankVault);
+
+        buf.put((byte) (resperms.playerHas(player.getName(), "move", true) ? 1 : 0));
+        buf.put((byte) (resperms.playerHas(player.getName(), "build", true) ? 1 : 0));
+        buf.put((byte) (resperms.playerHas(player.getName(), "bank", true) ? 1 : 0));
+        buf.put((byte) (resperms.playerHas(player.getName(), "place", true) ? 1 : 0));
+        buf.put((byte) (resperms.playerHas(player.getName(), "destroy", true) ? 1 : 0));
+        buf.put((byte) (resperms.playerHas(player.getName(), "use", true) ? 1 : 0));
+        buf.put((byte) (resperms.playerHas(player.getName(), "admin", true) ? 1 : 0));
+        buf.put((byte) (resperms.playerHas(player.getName(), "butcher", true) ? 1 : 0));
+        buf.put((byte) (resperms.playerHas(player.getName(), "mayor", true) ? 1 : 0));
+        buf.put((byte) (resperms.playerHas(player.getName(), "container", true) ? 1 : 0));
+        buf.put((byte) (resperms.playerHas(player.getName(), "pvp", true) ? 1 : 0));
+        buf.put((byte) (resperms.playerHas(player.getName(), "tp", true) ? 1 : 0));
+        buf.put((byte) (resperms.playerHas(player.getName(), "melt", true) ? 1 : 0));
+        buf.put((byte) (resperms.playerHas(player.getName(), "ignite", true) ? 1 : 0));
+        buf.put((byte) (resperms.playerHas(player.getName(), "firespread", true) ? 1 : 0));
+        buf.put((byte) (resperms.playerHas(player.getName(), "bucket", true) ? 1 : 0));
+        buf.put((byte) (resperms.playerHas(player.getName(), "form", true) ? 1 : 0));
+        buf.put((byte) (resperms.playerHas(player.getName(), "lavaflow", true) ? 1 : 0));
+        buf.put((byte) (resperms.playerHas(player.getName(), "waterflow", true) ? 1 : 0));
+        buf.put((byte) (resperms.playerHas(player.getName(), "creeper", true) ? 1 : 0));
+        buf.put((byte) (resperms.playerHas(player.getName(), "tnt", true) ? 1 : 0));
+        buf.put((byte) (resperms.playerHas(player.getName(), "monsters", true) ? 1 : 0));
+        buf.put((byte) (resperms.playerHas(player.getName(), "animals", true) ? 1 : 0));
+        buf.put((byte) (resperms.playerHas(player.getName(), "fly", true) ? 1 : 0));
+        buf.put((byte) (resperms.playerHas(player.getName(), "subzone", true) ? 1 : 0));
+        buf.put((byte) (resperms.playerHas(player.getName(), "healing", true) ? 1 : 0));
+        buf.put((byte) (resperms.playerHas(player.getName(), "piston", true) ? 1 : 0));
+        buf.put((byte) (resperms.playerHas(player.getName(), "shear", true) ? 1 : 0));
+        buf.put((byte) (resperms.playerHas(player.getName(), "egghatch", true) ? 1 : 0));
+        buf.put((byte) (resperms.playerHas(player.getName(), "trample", true) ? 1 : 0));
+        buf.put((byte) (resperms.playerHas(player.getName(), "soil", true) ? 1 : 0));
+        buf.put((byte) (resperms.playerHas(player.getName(), "stormdamage", true) ? 1 : 0));
+        buf.put((byte) (resperms.playerHas(player.getName(), "chat", true) ? 1 : 0));
+        buf.put((byte) (resperms.playerHas(player.getName(), "safezone", true) ? 1 : 0));
+        buf.put((byte) (resperms.playerHas(player.getName(), "mo-ambient", true) ? 1 : 0));
+        buf.put((byte) (resperms.playerHas(player.getName(), "mo-aquatic", true) ? 1 : 0));
+        buf.put((byte) (resperms.playerHas(player.getName(), "mo-monsters", true) ? 1 : 0));
+        buf.put((byte) (resperms.playerHas(player.getName(), "mo-passive", true) ? 1 : 0));
+        buf.put((byte) (resperms.playerHas(player.getName(), "thaumcraft-monsters", true) ? 1 : 0));
+    }
+
     private static byte[] prefixDiscriminator(byte discriminator, byte[] value) {
         return ((ByteBuffer) ByteBuffer.allocate(value.length + 1).put(discriminator).put(value).flip()).array();
     }
@@ -105,6 +216,72 @@ public class BridgeNetwork implements Listener {
         byte[] utf8Bytes = value.getBytes(Charsets.UTF_8);
         writeVarInt(buf, utf8Bytes.length);
         buf.put(utf8Bytes);
+    }
+
+    private static String formatDateDiff(long date) {
+        Calendar c = new GregorianCalendar();
+        c.setTimeInMillis(date);
+        Calendar now = new GregorianCalendar();
+        return formatDateDiff(now, c);
+    }
+
+    private static String formatDateDiff(Calendar fromDate, Calendar toDate) {
+        boolean future = false;
+        if (toDate.equals(fromDate)) {
+            return ("now");
+        }
+        if (toDate.after(fromDate)) {
+            future = true;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        int[] types = new int[]
+                {
+                        Calendar.YEAR,
+                        Calendar.MONTH,
+                        Calendar.DAY_OF_MONTH,
+                        Calendar.HOUR_OF_DAY,
+                        Calendar.MINUTE,
+                        //Calendar.SECOND
+                };
+        String[] names = new String[]
+                {
+                        ("year"),
+                        ("years"),
+                        ("month"),
+                        ("months"),
+                        ("day"),
+                        ("days"),
+                        ("hour"),
+                        ("hours"),
+                        ("minute"),
+                        ("minutes"),
+                        //("second"),
+                        //("seconds")
+                };
+        for (int i = 0; i < types.length; i++) {
+            int diff = dateDiff(types[i], fromDate, toDate, future);
+            if (diff > 0) {
+                sb.append(" ").append(diff).append(" ").append(names[i * 2 + (diff > 1 ? 1 : 0)]);
+            }
+        }
+        if (sb.length() == 0) {
+            return "moment ago";
+        }
+        return sb.toString();
+    }
+
+    private static int dateDiff(int type, Calendar fromDate, Calendar toDate, boolean future) {
+        int diff = 0;
+        long savedDate = fromDate.getTimeInMillis();
+        while ((future && !fromDate.after(toDate)) || (!future && !fromDate.before(toDate))) {
+            savedDate = fromDate.getTimeInMillis();
+            fromDate.add(type, future ? 1 : -1);
+            diff++;
+        }
+        diff--;
+        fromDate.setTimeInMillis(savedDate);
+        return diff;
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -170,11 +347,11 @@ public class BridgeNetwork implements Listener {
     
     
     @EventHandler
-    public void onResidenceFlagChangeEvent(final ResidenceFlagChangeEvent event) {      
+    public void onResidenceFlagChangeEvent(final ResidenceFlagChangeEvent event) {
         Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
             public void run() {
-                for (Player player : Bukkit.getOnlinePlayers()) {
-                    sendResidenceInfo(player);
+                for (Player player : event.getResidence().getPlayersInResidence()) {
+                    sendResidenceInfo(player, Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation()));
                 }
             }
         }, 20L);
@@ -184,8 +361,8 @@ public class BridgeNetwork implements Listener {
     public void onResidenceChangedEvent(final ResidenceChangedEvent event) {
         Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
             public void run() {
-                for (Player player : Bukkit.getOnlinePlayers()) {
-                    sendResidenceInfo(player);
+                for (Player player : event.getResidence().getPlayersInResidence()) {
+                    sendResidenceInfo(player, Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation()));
                 }
             }
         }, 20L);        
@@ -195,8 +372,8 @@ public class BridgeNetwork implements Listener {
     public void onResidenceCreationEvent(final ResidenceCreationEvent event) {
         Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
             public void run() {
-                for (Player player : Bukkit.getOnlinePlayers()) {
-                    sendResidenceInfo(player);            
+                for (Player player : event.getResidence().getPlayersInResidence()) {
+                    sendResidenceInfo(player, Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation()));
                 }
             }
         }, 20L);
@@ -206,181 +383,10 @@ public class BridgeNetwork implements Listener {
     public void onResidenceDeleteEvent(final ResidenceDeleteEvent event) {      
         Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
             public void run() {
-                for (Player player : Bukkit.getOnlinePlayers()) {
-                    sendResidenceInfo(player);
+                for (Player player : event.getResidence().getPlayersInResidence()) {
+                    sendResidenceInfo(player, Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation()));
                 }
             }
         }, 20L);
-    }
-
-    
-    @SuppressWarnings("unused")
-    public void sendResidenceInfo(Player player) {
-        // The following values I need in all string form via a packet from Bridge to Almura.       
-        ClaimedResidence res = Residence.getResidenceManager().getByLoc(player.getLocation());  
-        if (res == null) {
-            // Send null residence into to client;
-            return;
-        }
-        
-        ResidencePermissions resperms = res.getPermissions(); // Residence Based Flags
-        OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(res.getOwner());
-        numForm = NumberFormat.getCurrencyInstance(caLoc);
-        
-        String resName = res.getName();
-        String ownersName = res.getOwner();
-        String lastOnline = ""; 
-        
-        if (offlinePlayer != null) {
-            if (offlinePlayer.isOnline()) {            
-                lastOnline = "Last Online: Now";
-            } else {
-                if (offlinePlayer.getLastPlayed()==0) {                 
-                    lastOnline = "Last Online: Unavailable";
-                } else {
-                    lastOnline = "Last Online: " + formatDateDiff(offlinePlayer.getLastPlayed());
-                }
-            }
-        }
-        
-        String leaseCost = "";
-        if (Residence.getLeaseManager().leaseExpires(resName)) {
-            
-            leaseCost = numForm.format(leaseCost);
-        } else {
-            leaseCost = "No Cost.";
-        }
-        
-        String leaseExpires = "";
-        if (Residence.getLeaseManager().leaseExpires(resName)) {
-            leaseExpires = Residence.getLeaseManager().getExpireTime(resName).toString();
-        } else {
-            leaseExpires = "Does not expire.";
-        }
-        
-        String areaName = res.getAreaIDbyLoc(player.getLocation());
-        String resBoundsValue = "";
-        if (areaName != null) {
-            CuboidArea area = res.getArea(areaName);
-            if (area != null) {
-                resBoundsValue = ChatColor.LIGHT_PURPLE + "X: " + area.getHighLoc().getBlockX() + " Y: " + area.getHighLoc().getBlockY() + " Z: " + area.getHighLoc().getBlockZ() + ChatColor.WHITE + " / " + ChatColor.LIGHT_PURPLE + " X: " + area.getLowLoc().getBlockX() + " Y: " + area.getLowLoc().getBlockY() + " Z: " + area.getLowLoc().getBlockZ();
-            } else {
-                resBoundsValue = "Res Boundary is null";
-            }
-        }
-        
-        String resSize = "";
-        resSize = "" + ChatColor.DARK_GREEN + res.getTotalSize();
-        
-        String bankVault = "";
-        bankVault = "" + ChatColor.GOLD + numForm.format(res.getBank().getStoredMoney());        
-        
-        boolean hasMOVE = resperms.playerHas(player.getName(), "move", true);
-        boolean hasBUILD = resperms.playerHas(player.getName(), "build", true);
-        boolean hasBANK = resperms.playerHas(player.getName(), "bank", true);
-        boolean hasPLACE = resperms.playerHas(player.getName(), "place", true);
-        boolean hasDESTROY = resperms.playerHas(player.getName(), "destroy", true); //Player Based Destroy Flag
-        boolean hasUSE = resperms.playerHas(player.getName(), "use", true); //Player Based Use Flag
-        boolean hasADMIN = resperms.playerHas(player.getName(), "admin", true); 
-        boolean hasBUTCHER = resperms.playerHas(player.getName(), "butcher", true); //Player Based Container Flag
-        boolean hasMAYOR = resperms.playerHas(player.getName(), "mayor", true); //Player Based Container Flag
-        boolean hasCONTAINER = resperms.playerHas(player.getName(), "container", true); //Player Based Container Flag
-        boolean hasPVP = resperms.playerHas(player.getName(), "pvp", true); //Player Based PVP Flag        
-        boolean hasTP = resperms.playerHas(player.getName(), "tp", true);
-        boolean hasMELT = resperms.playerHas(player.getName(), "melt", true);
-        boolean hasIGNITE = resperms.playerHas(player.getName(), "ignite", true);
-        boolean hasFIRESPREAD = resperms.playerHas(player.getName(), "firespread", true);
-        boolean hasBUCKET = resperms.playerHas(player.getName(), "bucket", true);
-        boolean hasFORM = resperms.playerHas(player.getName(), "form", true);
-        boolean hasLAVAFLOW = resperms.playerHas(player.getName(), "lavaflow", true);
-        boolean hasWATERFLOW = resperms.playerHas(player.getName(), "waterflow", true);
-        boolean hasCREEPER = resperms.playerHas(player.getName(), "creeper", true);
-        boolean hasTNT = resperms.playerHas(player.getName(), "tnt", true);
-        boolean hasMONSTERS = resperms.has("monsters",true); //Zone Monster Flag
-        boolean hasANIMALS = resperms.playerHas(player.getName(), "animals", true);
-        boolean hasFLY = resperms.playerHas(player.getName(), "fly", true);
-        boolean hasSUBZONE = resperms.playerHas(player.getName(), "subzone", true);
-        boolean hasHEALING = resperms.playerHas(player.getName(), "healing", true);
-        boolean hasPISTON = resperms.playerHas(player.getName(), "piston", true);
-        boolean hasSHEAR = resperms.playerHas(player.getName(), "shear", true);
-        boolean hasEGGHATCH = resperms.playerHas(player.getName(), "egghatch", true);
-        boolean hasTRAMPLE = resperms.playerHas(player.getName(), "trample", true);
-        boolean hasSOIL = resperms.playerHas(player.getName(), "soil", true);
-        boolean hasSTORMDAMAGE = resperms.playerHas(player.getName(), "stormdamage", true);        
-        boolean hasCHAT = resperms.playerHas(player.getName(), "chat", true); //Player Based Chat Flag
-        boolean hasSAFEZONE = resperms.playerHas(player.getName(), "safezone", true);
-        boolean hasMOAMBIENT = resperms.playerHas(player.getName(), "mo-ambient", true);
-        boolean hasMOAQUATIC = resperms.playerHas(player.getName(), "mo-aquatic", true);
-        boolean hasMOMONSTERS = resperms.playerHas(player.getName(), "mo-monsters", true);
-        boolean hasMOPASSIVE = resperms.playerHas(player.getName(), "mo-passive", true);
-        boolean hasTHAUMCRAFTMONSTERS = resperms.playerHas(player.getName(), "thaumcraft-monsters", true);
-        
-        
-    }
-    
-    public static String formatDateDiff(long date) {
-        Calendar c = new GregorianCalendar();
-        c.setTimeInMillis(date);
-        Calendar now = new GregorianCalendar();         
-        return formatDateDiff(now, c);
-    }
-
-    public static String formatDateDiff(Calendar fromDate, Calendar toDate) {
-        boolean future = false;
-        if (toDate.equals(fromDate)) {
-            return ("now");
-        }
-        if (toDate.after(fromDate)) {
-            future = true;
-        }
-
-        StringBuilder sb = new StringBuilder();
-        int[] types = new int[]
-                {
-                Calendar.YEAR,
-                Calendar.MONTH,
-                Calendar.DAY_OF_MONTH,
-                Calendar.HOUR_OF_DAY,
-                Calendar.MINUTE,
-                //Calendar.SECOND
-                };
-        String[] names = new String[]
-                {
-                ("year"),
-                ("years"),
-                ("month"),
-                ("months"),
-                ("day"),
-                ("days"),
-                ("hour"),
-                ("hours"),
-                ("minute"),
-                ("minutes"),
-                //("second"),
-                //("seconds")
-                };
-        for (int i = 0; i < types.length; i++) {
-            int diff = dateDiff(types[i], fromDate, toDate, future);
-            if (diff > 0) {
-                sb.append(" ").append(diff).append(" ").append(names[i * 2 + (diff > 1 ? 1 : 0)]);
-            }
-        }
-        if (sb.length() == 0) {
-            return "moment ago";
-        }
-        return sb.toString();
-    }
-
-    private static int dateDiff(int type, Calendar fromDate, Calendar toDate, boolean future) {
-        int diff = 0;
-        long savedDate = fromDate.getTimeInMillis();
-        while ((future && !fromDate.after(toDate)) || (!future && !fromDate.before(toDate))) {
-            savedDate = fromDate.getTimeInMillis();
-            fromDate.add(type, future ? 1 : -1);
-            diff++;
-        }
-        diff--;
-        fromDate.setTimeInMillis(savedDate);
-        return diff;
     }
 }
