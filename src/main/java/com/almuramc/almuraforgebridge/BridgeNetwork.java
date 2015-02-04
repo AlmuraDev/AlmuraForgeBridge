@@ -56,7 +56,7 @@ public class BridgeNetwork implements Listener {
     public static final String CHANNEL = "AM|BUK";
     public static final byte DISCRIMINATOR_DISPLAY_NAME = 0;
     public static final byte DISCRIMINATOR_CURRENCY = 1;
-    public static final byte DISCRIMINATOR_ADDITIONAL_WORLD_INFO = 2;
+    public static final byte DISCRIMINATOR_ADDITIONAL_WORLD_INFORMATION = 2;
     public static final byte DISCRIMINATOR_RESIDENCE_INFO = 3;
     private static final Locale LOCALE_EN = new Locale("en", "US");
     private static final NumberFormat FORMAT_NUMBER_EN = NumberFormat.getCurrencyInstance(LOCALE_EN);
@@ -76,8 +76,10 @@ public class BridgeNetwork implements Listener {
         player.sendPluginMessage(BridgePlugin.getInstance(), CHANNEL, prefixDiscriminator(DISCRIMINATOR_DISPLAY_NAME, ((ByteBuffer) buf.flip()).array()));
     }
 
-    public static void sendCurrencyAmount(Player player, double amount) {
-        player.sendPluginMessage(BridgePlugin.getInstance(), CHANNEL, prefixDiscriminator(DISCRIMINATOR_CURRENCY, ((ByteBuffer) ByteBuffer.allocate(8).putDouble(amount).flip()).array()));
+    public static void sendCurrencyAmount(Player player, String formattedCurrency) {
+        final ByteBuffer buf = ByteBuffer.allocate(formattedCurrency.getBytes(Charsets.UTF_8).length + 4);
+        writeUTF8String(buf, formattedCurrency);
+        player.sendPluginMessage(BridgePlugin.getInstance(), CHANNEL, prefixDiscriminator(DISCRIMINATOR_CURRENCY, ((ByteBuffer) buf.flip()).array()));
     }
 
     public static void sendAdditionalWorldInfo(Player player, String worldName, int currentPlayers, int maxPlayers) {
@@ -85,7 +87,7 @@ public class BridgeNetwork implements Listener {
         writeUTF8String(buf, worldName);
         buf.putInt(currentPlayers);
         buf.putInt(maxPlayers);
-        player.sendPluginMessage(BridgePlugin.getInstance(), CHANNEL, prefixDiscriminator(DISCRIMINATOR_ADDITIONAL_WORLD_INFO, ((ByteBuffer) buf.flip()).array()));        
+        player.sendPluginMessage(BridgePlugin.getInstance(), CHANNEL, prefixDiscriminator(DISCRIMINATOR_ADDITIONAL_WORLD_INFORMATION, ((ByteBuffer) buf.flip()).array()));
     }
 
     public static void sendResidenceInfo(Player player, ClaimedResidence res) {
@@ -290,7 +292,7 @@ public class BridgeNetwork implements Listener {
             @SuppressWarnings("deprecation")
             @Override
             public void run() {
-                sendCurrencyAmount(event.getPlayer(),economy.getBalance(event.getPlayer().getName()));
+                sendCurrencyAmount(event.getPlayer(),String.format(ChatColor.WHITE + FORMAT_NUMBER_EN.format(economy.getBalance(event.getPlayer().getName()))));
                 
                 for (Player player : Bukkit.getServer().getOnlinePlayers()) {
                     sendDisplayName(player, event.getPlayer().getName(), event.getPlayer().getDisplayName());
@@ -341,7 +343,7 @@ public class BridgeNetwork implements Listener {
     public void onEconomyChange(EconomyChangeEvent event) {
         Player player = Bukkit.getPlayer(event.getAccount());
         if (player != null) {
-            sendCurrencyAmount(player, event.getAmount());
+            sendCurrencyAmount(player, String.format(ChatColor.WHITE + FORMAT_NUMBER_EN.format(event.getAmount())));
         }
     }
     
