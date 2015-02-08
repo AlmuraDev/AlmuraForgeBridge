@@ -76,10 +76,8 @@ public class BridgeNetwork implements Listener {
         player.sendPluginMessage(BridgePlugin.getInstance(), CHANNEL, prefixDiscriminator(DISCRIMINATOR_DISPLAY_NAME, ((ByteBuffer) buf.flip()).array()));
     }
 
-    public static void sendCurrencyAmount(Player player, String formattedCurrency) {
-        final ByteBuffer buf = ByteBuffer.allocate(formattedCurrency.getBytes(Charsets.UTF_8).length + 4);
-        writeUTF8String(buf, formattedCurrency);
-        player.sendPluginMessage(BridgePlugin.getInstance(), CHANNEL, prefixDiscriminator(DISCRIMINATOR_CURRENCY, ((ByteBuffer) buf.flip()).array()));
+    public static void sendCurrencyAmount(Player player, double amount) {
+        player.sendPluginMessage(BridgePlugin.getInstance(), CHANNEL, prefixDiscriminator(DISCRIMINATOR_CURRENCY, ((ByteBuffer) ByteBuffer.allocate(8).putDouble(amount).flip()).array()));
     }
 
     public static void sendAdditionalWorldInfo(Player player, String worldName, int currentPlayers, int maxPlayers) {
@@ -292,8 +290,7 @@ public class BridgeNetwork implements Listener {
             @SuppressWarnings("deprecation")
             @Override
             public void run() {
-                sendCurrencyAmount(event.getPlayer(),String.format(ChatColor.WHITE + FORMAT_NUMBER_EN.format(economy.getBalance(event.getPlayer().getName()))));
-                
+                sendCurrencyAmount(event.getPlayer(),economy.getBalance(event.getPlayer().getName()));
                 for (Player player : Bukkit.getServer().getOnlinePlayers()) {
                     sendDisplayName(player, event.getPlayer().getName(), event.getPlayer().getDisplayName());
                     sendAdditionalWorldInfo(player, player.getWorld().getName(), Bukkit.getOnlinePlayers().length, Bukkit.getMaxPlayers());
@@ -343,7 +340,7 @@ public class BridgeNetwork implements Listener {
     public void onEconomyChange(EconomyChangeEvent event) {
         Player player = Bukkit.getPlayer(event.getAccount());
         if (player != null) {
-            sendCurrencyAmount(player, String.format(ChatColor.WHITE + FORMAT_NUMBER_EN.format(event.getAmount())));
+            sendCurrencyAmount(player, event.getAmount());
         }
     }
     
@@ -352,8 +349,10 @@ public class BridgeNetwork implements Listener {
     public void onResidenceFlagChangeEvent(final ResidenceFlagChangeEvent event) {
         Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
             public void run() {
-                for (Player player : event.getResidence().getPlayersInResidence()) {
-                    sendResidenceInfo(player, Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation()));
+                if (event.getResidence() != null) {
+                    for (Player player : event.getResidence().getPlayersInResidence()) {
+                        sendResidenceInfo(player, Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation()));
+                    }
                 }
             }
         }, 20L);
@@ -363,11 +362,13 @@ public class BridgeNetwork implements Listener {
     public void onResidenceChangedEvent(final ResidenceChangedEvent event) {
         Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
             public void run() {
-                for (Player player : event.getResidence().getPlayersInResidence()) {
-                    sendResidenceInfo(player, Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation()));
+                if (event.getResidence() != null) {
+                    for (Player player : event.getResidence().getPlayersInResidence()) {
+                        sendResidenceInfo(player, Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation()));
+                    }
                 }
             }
-        }, 20L);        
+        }, 20L);
     }
 
     @EventHandler
@@ -385,8 +386,10 @@ public class BridgeNetwork implements Listener {
     public void onResidenceDeleteEvent(final ResidenceDeleteEvent event) {      
         Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
             public void run() {
-                for (Player player : event.getResidence().getPlayersInResidence()) {
-                    sendResidenceInfo(player, Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation()));
+                if (event.getResidence() != null) {
+                    for (Player player : event.getResidence().getPlayersInResidence()) {
+                        sendResidenceInfo(player, Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation()));
+                    }
                 }
             }
         }, 20L);

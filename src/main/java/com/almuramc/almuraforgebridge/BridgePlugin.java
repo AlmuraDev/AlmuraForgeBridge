@@ -134,8 +134,8 @@ public class BridgePlugin extends JavaPlugin implements Listener {
     }  
 
     @EventHandler
-    public void onPlayerInteract(PlayerInteractEvent event) {
-        if (event.getPlayer().getItemInHand().getType() == Material.getMaterial("ALMURA_TOOLSMMWAND_INFORMATION_WAND")) {
+    public void onPlayerInteract(PlayerInteractEvent event) {        
+        if (event.getPlayer().getItemInHand().getType() == Material.getMaterial("ALMURA_WANDINFORMATION")) {
             if (event.getClickedBlock() != null) {
                 event.getPlayer().sendMessage(ChatColor.ITALIC + "Block Information:");
                 event.getPlayer().sendMessage(ChatColor.WHITE + "ID: " + ChatColor.RED + event.getClickedBlock().getTypeId());
