@@ -197,6 +197,9 @@ public class BridgeNetwork implements Listener {
         buf.put((byte) (resperms.playerHas(player.getName(), "mo-monsters", true) ? 1 : 0));
         buf.put((byte) (resperms.playerHas(player.getName(), "mo-passive", true) ? 1 : 0));
         buf.put((byte) (resperms.playerHas(player.getName(), "thaumcraft-monsters", true) ? 1 : 0));
+
+        player.sendPluginMessage(BridgePlugin.getInstance(), CHANNEL, prefixDiscriminator(DISCRIMINATOR_RESIDENCE_INFO, ((ByteBuffer) buf.flip()).array()));
+
     }
 
     private static byte[] prefixDiscriminator(byte discriminator, byte[] value) {
