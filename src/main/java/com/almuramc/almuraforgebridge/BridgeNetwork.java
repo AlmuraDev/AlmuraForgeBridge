@@ -89,6 +89,7 @@ public class BridgeNetwork implements Listener {
     }
 
     public static void sendResidenceInfo(Player player, ClaimedResidence res) {
+        System.out.println("Player: " + player.getName() + " Res: " + res);
         if (res == null) {
             final ByteBuffer buf = ByteBuffer.allocate(1);
             buf.put((byte) 0);
@@ -349,9 +350,10 @@ public class BridgeNetwork implements Listener {
     public void onResidenceFlagChangeEvent(final ResidenceFlagChangeEvent event) {
         Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
             public void run() {
-                if (event.getResidence() != null) {
-                    for (Player player : event.getResidence().getPlayersInResidence()) {
-                        sendResidenceInfo(player, Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation()));
+                ClaimedResidence res = Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation());
+                if (res != null) {                    
+                    for (Player player : res.getPlayersInResidence()) {
+                        sendResidenceInfo(player, res);
                     }
                 }
             }
@@ -359,12 +361,13 @@ public class BridgeNetwork implements Listener {
     }
 
     @EventHandler
-    public void onResidenceChangedEvent(final ResidenceChangedEvent event) {
+    public void onResidenceChangedEvent(final ResidenceChangedEvent event) {        
         Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
             public void run() {
-                if (event.getResidence() != null) {
-                    for (Player player : event.getResidence().getPlayersInResidence()) {
-                        sendResidenceInfo(player, Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation()));
+                ClaimedResidence res = Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation());
+                if (res != null) {                    
+                    for (Player player : res.getPlayersInResidence()) {
+                        sendResidenceInfo(player, res);
                     }
                 }
             }
@@ -375,8 +378,11 @@ public class BridgeNetwork implements Listener {
     public void onResidenceCreationEvent(final ResidenceCreationEvent event) {
         Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
             public void run() {
-                for (Player player : event.getResidence().getPlayersInResidence()) {
-                    sendResidenceInfo(player, Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation()));
+                ClaimedResidence res = Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation());
+                if (res != null) {                    
+                    for (Player player : res.getPlayersInResidence()) {
+                        sendResidenceInfo(player, res);
+                    }
                 }
             }
         }, 20L);
@@ -386,9 +392,10 @@ public class BridgeNetwork implements Listener {
     public void onResidenceDeleteEvent(final ResidenceDeleteEvent event) {      
         Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
             public void run() {
-                if (event.getResidence() != null) {
-                    for (Player player : event.getResidence().getPlayersInResidence()) {
-                        sendResidenceInfo(player, Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation()));
+                ClaimedResidence res = Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation());
+                if (res != null) {                    
+                    for (Player player : res.getPlayersInResidence()) {
+                        sendResidenceInfo(player, res);
                     }
                 }
             }
