@@ -147,7 +147,7 @@ public class BridgeNetwork implements Listener {
         String bankVault;
         bankVault = "" + ChatColor.GOLD + FORMAT_NUMBER_EN.format(res.getBank().getStoredMoney());
 
-        final ByteBuffer buf = ByteBuffer.allocate(resName.getBytes(Charsets.UTF_8).length + ownersName.getBytes(Charsets.UTF_8).length + lastOnline.getBytes(Charsets.UTF_8).length + leaseCost.getBytes(Charsets.UTF_8).length + leaseExpires.getBytes(Charsets.UTF_8).length + resBoundsValue.getBytes(Charsets.UTF_8).length + resSize.getBytes(Charsets.UTF_8).length + bankVault.getBytes(Charsets.UTF_8).length + 39);
+        final ByteBuffer buf = ByteBuffer.allocate(resName.getBytes(Charsets.UTF_8).length + ownersName.getBytes(Charsets.UTF_8).length + lastOnline.getBytes(Charsets.UTF_8).length + leaseCost.getBytes(Charsets.UTF_8).length + leaseExpires.getBytes(Charsets.UTF_8).length + resBoundsValue.getBytes(Charsets.UTF_8).length + resSize.getBytes(Charsets.UTF_8).length + bankVault.getBytes(Charsets.UTF_8).length + 55);
         buf.put((byte) 1);
         writeUTF8String(buf, resName);
         writeUTF8String(buf, ownersName);
