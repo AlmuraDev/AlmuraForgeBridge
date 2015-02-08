@@ -106,21 +106,22 @@ public class BridgeNetwork implements Listener {
 
         if (offlinePlayer != null) {
             if (offlinePlayer.isOnline()) {
-                lastOnline = "Last Online: Now";
+                lastOnline = "is Online";
             } else {
                 if (offlinePlayer.getLastPlayed() == 0) {
-                    lastOnline = "Last Online: Unavailable";
+                    lastOnline = "Unavailable";
                 } else {
-                    lastOnline = "Last Online: " + formatDateDiff(offlinePlayer.getLastPlayed());
+                    lastOnline = "" + formatDateDiff(offlinePlayer.getLastPlayed());
                 }
             }
         }
 
-        String leaseCost = "";
+        String resLeaseCost = "";
         if (Residence.getLeaseManager().leaseExpires(resName)) {
-            leaseCost = FORMAT_NUMBER_EN.format(leaseCost);
+            int leaseCost = Residence.getLeaseManager().getRenewCost(res);
+            resLeaseCost = FORMAT_NUMBER_EN.format(leaseCost);
         } else {
-            leaseCost = "No Cost.";
+            resLeaseCost = "No Cost.";
         }
 
         String leaseExpires;
@@ -147,12 +148,12 @@ public class BridgeNetwork implements Listener {
         String bankVault;
         bankVault = "" + ChatColor.GOLD + FORMAT_NUMBER_EN.format(res.getBank().getStoredMoney());
 
-        final ByteBuffer buf = ByteBuffer.allocate(resName.getBytes(Charsets.UTF_8).length + ownersName.getBytes(Charsets.UTF_8).length + lastOnline.getBytes(Charsets.UTF_8).length + leaseCost.getBytes(Charsets.UTF_8).length + leaseExpires.getBytes(Charsets.UTF_8).length + resBoundsValue.getBytes(Charsets.UTF_8).length + resSize.getBytes(Charsets.UTF_8).length + bankVault.getBytes(Charsets.UTF_8).length + 55);
+        final ByteBuffer buf = ByteBuffer.allocate(resName.getBytes(Charsets.UTF_8).length + ownersName.getBytes(Charsets.UTF_8).length + lastOnline.getBytes(Charsets.UTF_8).length + resLeaseCost.getBytes(Charsets.UTF_8).length + leaseExpires.getBytes(Charsets.UTF_8).length + resBoundsValue.getBytes(Charsets.UTF_8).length + resSize.getBytes(Charsets.UTF_8).length + bankVault.getBytes(Charsets.UTF_8).length + 55);
         buf.put((byte) 1);
         writeUTF8String(buf, resName);
         writeUTF8String(buf, ownersName);
         writeUTF8String(buf, lastOnline);
-        writeUTF8String(buf, leaseCost);
+        writeUTF8String(buf, resLeaseCost);
         writeUTF8String(buf, leaseExpires);
         writeUTF8String(buf, resBoundsValue);
         writeUTF8String(buf, resSize);
@@ -298,6 +299,8 @@ public class BridgeNetwork implements Listener {
                 for (Player player : Bukkit.getServer().getOnlinePlayers()) {
                     sendDisplayName(player, event.getPlayer().getName(), event.getPlayer().getDisplayName());
                     sendAdditionalWorldInfo(player, player.getWorld().getName(), Bukkit.getOnlinePlayers().length, Bukkit.getMaxPlayers());
+                    ClaimedResidence res = Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation());                
+                    sendResidenceInfo(event.getPlayer(), res);  
                     if (player != event.getPlayer()) {
                         sendDisplayName(event.getPlayer(), player.getName(), player.getDisplayName());
                     }
@@ -320,6 +323,8 @@ public class BridgeNetwork implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerChangedWorld(final PlayerChangedWorldEvent event) {
+        ClaimedResidence res = Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation());                
+        sendResidenceInfo(event.getPlayer(), res);  
         sendAdditionalWorldInfo(event.getPlayer(), event.getPlayer().getWorld().getName(), Bukkit.getOnlinePlayers().length, Bukkit.getMaxPlayers());
     }
     
@@ -339,7 +344,7 @@ public class BridgeNetwork implements Listener {
             }
         }, 20L);
     }
-    
+
     @EventHandler
     public void onEconomyChange(EconomyChangeEvent event) {
         Player player = Bukkit.getPlayer(event.getAccount());
@@ -347,34 +352,27 @@ public class BridgeNetwork implements Listener {
             sendCurrencyAmount(player, event.getAmount());
         }
     }
-    
-    
+
     @EventHandler
     public void onResidenceFlagChangeEvent(final ResidenceFlagChangeEvent event) {
         Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
             public void run() {
                 ClaimedResidence res = Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation());
-                if (res != null) {                    
-                    for (Player player : res.getPlayersInResidence()) {
-                        sendResidenceInfo(player, res);
-                    }
+                for (Player player : res.getPlayersInResidence()) {
+                    sendResidenceInfo(player, res);
                 }
             }
-        }, 20L);
+        }, 10L);
     }
 
     @EventHandler
-    public void onResidenceChangedEvent(final ResidenceChangedEvent event) {        
+    public void onResidenceChangedEvent(final ResidenceChangedEvent event) {
         Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
             public void run() {
                 ClaimedResidence res = Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation());
-                if (res != null) {                    
-                    for (Player player : res.getPlayersInResidence()) {
-                        sendResidenceInfo(player, res);
-                    }
-                }
+                sendResidenceInfo(event.getPlayer(), res);                
             }
-        }, 20L);
+        }, 10L);
     }
 
     @EventHandler
@@ -382,26 +380,22 @@ public class BridgeNetwork implements Listener {
         Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
             public void run() {
                 ClaimedResidence res = Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation());
-                if (res != null) {                    
-                    for (Player player : res.getPlayersInResidence()) {
-                        sendResidenceInfo(player, res);
-                    }
+                for (Player player : res.getPlayersInResidence()) {
+                    sendResidenceInfo(player, res);
                 }
             }
-        }, 20L);
+        }, 10L);
     }
-    
+
     @EventHandler
-    public void onResidenceDeleteEvent(final ResidenceDeleteEvent event) {      
+    public void onResidenceDeleteEvent(final ResidenceDeleteEvent event) {
         Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
             public void run() {
-                ClaimedResidence res = Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation());
-                if (res != null) {                    
-                    for (Player player : res.getPlayersInResidence()) {
-                        sendResidenceInfo(player, res);
-                    }
+                ClaimedResidence res = Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation()); // Has to use online players because this res is now null.                                
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    sendResidenceInfo(player, res);
                 }
             }
-        }, 20L);
+        }, 10L);
     }
 }
