@@ -89,7 +89,6 @@ public class BridgeNetwork implements Listener {
     }
 
     public static void sendResidenceInfo(Player player, ClaimedResidence res) {
-        System.out.println("Player: " + player.getName() + " Res: " + res);
         if (res == null) {
             final ByteBuffer buf = ByteBuffer.allocate(1);
             buf.put((byte) 0);
@@ -392,8 +391,10 @@ public class BridgeNetwork implements Listener {
         Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
             public void run() {
                 ClaimedResidence res = Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation()); // Has to use online players because this res is now null.                                
-                for (Player player : Bukkit.getOnlinePlayers()) {
-                    sendResidenceInfo(player, res);
+                if (Bukkit.getOnlinePlayers() != null) {
+                    for (Player player : Bukkit.getOnlinePlayers()) { // Can be null if no players are online and a residence gets deleted automatically by server.
+                        sendResidenceInfo(player, res);
+                    }
                 }
             }
         }, 10L);

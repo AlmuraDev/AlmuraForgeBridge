@@ -111,26 +111,22 @@ public class BridgePlugin extends JavaPlugin implements Listener {
     }
 
     @EventHandler
-    public void onGMUserEvent(GMUserEvent userEvent) {
-        for (final Player player : getServer().getOnlinePlayers()) {
-            final GMUserEvent event = userEvent;
-            Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
-                public void run() {
-
-                    //AlmuraTitle(player);
-
-                    if ((GMUserEvent.Action.USER_GROUP_CHANGED == event.getAction()) && (event.getUser().getGroupName().equalsIgnoreCase("member"))) {
-                        Bukkit.broadcastMessage(ChatColor.DARK_PURPLE + player.getDisplayName() + ChatColor.WHITE + " has been granted: [" + ChatColor.GOLD + event.getUser().getGroupName() + ChatColor.WHITE + "]");
-                        Bukkit.broadcastMessage(ChatColor.WHITE + "Almura Thanks " + ChatColor.GOLD + player.getDisplayName() + ChatColor.WHITE + " for their donation.  It is very much appreciated.");
-                    }
-
-                    if ((GMUserEvent.Action.USER_GROUP_CHANGED == event.getAction()) && (event.getUser().getGroupName().equalsIgnoreCase("guest"))) {
-                        Bukkit.broadcastMessage(ChatColor.DARK_PURPLE + player.getDisplayName() + ChatColor.WHITE + " has been promoted to: [" + ChatColor.GOLD + event.getUser().getGroupName() + ChatColor.WHITE + "]");                        
-                    }
+    public void onGMUserEvent(GMUserEvent userEvent) {        
+        final GMUserEvent event = userEvent;
+        Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+            @SuppressWarnings("deprecation")
+            public void run() {
+                Player player = Bukkit.getPlayer(event.getUser().getName());               
+                if ((GMUserEvent.Action.USER_GROUP_CHANGED == event.getAction()) && (event.getUser().getGroupName().equalsIgnoreCase("veteran"))) {
+                    Bukkit.broadcastMessage(ChatColor.DARK_PURPLE + player.getDisplayName() + ChatColor.WHITE + " has been promoted to: [" + ChatColor.GOLD + event.getUser().getGroupName() + ChatColor.WHITE + "]");
+                    Bukkit.broadcastMessage(ChatColor.WHITE + "Thank you, " + ChatColor.GOLD + player.getDisplayName() + ChatColor.WHITE + " for your donation and continued support.");
                 }
-            }, 40L);
 
-        }
+                if ((GMUserEvent.Action.USER_GROUP_CHANGED == event.getAction()) && (event.getUser().getGroupName().equalsIgnoreCase("member"))) {
+                    Bukkit.broadcastMessage(ChatColor.DARK_PURPLE + player.getDisplayName() + ChatColor.WHITE + " has been promoted to: [" + ChatColor.GOLD + event.getUser().getGroupName() + ChatColor.WHITE + "]");                        
+                }
+            }
+        }, 20L);        
     }  
 
     @EventHandler
@@ -180,16 +176,19 @@ public class BridgePlugin extends JavaPlugin implements Listener {
 
     @EventHandler(priority=EventPriority.LOWEST)
     public void onPlayerJoin(PlayerJoinEvent event)  {
-        Player player = event.getPlayer();
+        final Player player = event.getPlayer();
         event.setJoinMessage("");
-        AlmuraBroadcastLogin(player);
-        //AlmuraTitle(player);
+        Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {            
+            public void run() {
+                AlmuraBroadcastLogin(player); //Have to use delayed login to allow nicknames to be set prior to broadcast.
+            }
+        }, 20L);
     }
 
     @EventHandler(priority=EventPriority.LOWEST)
     public void onPlayerQuit(PlayerQuitEvent event) {
         event.setQuitMessage("");
-        Player player = event.getPlayer();
+        final Player player = event.getPlayer();
 
         if (player.hasPermission("admin.title") && player.isOp()) {
             Bukkit.broadcastMessage(ChatColor.WHITE + "[" + ChatColor.DARK_RED + "Almura SuperAdmin" + ChatColor.WHITE + "] -  " + player.getDisplayName() + ", has left the server.");
