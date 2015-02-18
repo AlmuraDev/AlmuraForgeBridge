@@ -19,15 +19,18 @@
  */
 package com.almuramc.almuraforgebridge;
 
+import com.almuradev.almura.extension.entity.IExtendedEntityLivingBase;
 import com.google.common.base.Charsets;
 import com.greatmancode.craftconomy3.tools.events.bukkit.events.EconomyChangeEvent;
 
 import net.ess3.api.events.NickChangeEvent;
 import net.milkbowl.vault.economy.Economy;
 
+import org.anjocaido.groupmanager.events.GMUserEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -289,20 +292,29 @@ public class BridgeNetwork implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerJoin(final PlayerJoinEvent event) {
         Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
-            @SuppressWarnings("deprecation")
             @Override
             public void run() {
-                sendCurrencyAmount(event.getPlayer(),String.format(ChatColor.WHITE + FORMAT_NUMBER_EN.format(economy.getBalance(event.getPlayer().getName()))));
-                
                 for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-                    sendDisplayName(player, event.getPlayer().getName(), event.getPlayer().getDisplayName());
-                    sendAdditionalWorldInfo(player, player.getWorld().getName(), Bukkit.getOnlinePlayers().length, Bukkit.getMaxPlayers());
-                    if (player != event.getPlayer()) {
-                        sendDisplayName(event.getPlayer(), player.getName(), player.getDisplayName());
+                    if (((CraftPlayer) player).getHandle() instanceof IExtendedEntityLivingBase) {
+                        IExtendedEntityLivingBase extendedPlayer = (IExtendedEntityLivingBase) ((CraftPlayer) player).getHandle();
+
+                        sendAdditionalWorldInfo(player, player.getWorld().getName(), Bukkit.getOnlinePlayers().length, Bukkit.getMaxPlayers());
+
+                        String displayName = extendedPlayer.getTitle() == null ? player.getDisplayName() : player.getDisplayName() + "\n" + extendedPlayer.getTitle();
+
+                        //Send everyone the display name of the player
+                        sendDisplayName(player, event.getPlayer().getName(), displayName);
+
+                        //Send the player the display name of the other people
+                        if (!player.getName().equalsIgnoreCase(event.getPlayer().getName())) {
+                            sendDisplayName(event.getPlayer(), player.getName(), displayName);
+                        }
                     }
                 }
             }
         }, 20L);
+
+        //sendCurrencyAmount(event.getPlayer(), String.format(ChatColor.WHITE + FORMAT_NUMBER_EN.format(economy.getBalance(event.getPlayer().getName()))));
     }
     
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -314,12 +326,33 @@ public class BridgeNetwork implements Listener {
                     sendAdditionalWorldInfo(player, player.getWorld().getName(), Bukkit.getOnlinePlayers().length, Bukkit.getMaxPlayers());
                 }
             }
-        }, 40L);
+        }, 20L);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerChangedWorld(final PlayerChangedWorldEvent event) {
-        sendAdditionalWorldInfo(event.getPlayer(), event.getPlayer().getWorld().getName(), Bukkit.getOnlinePlayers().length, Bukkit.getMaxPlayers());
+        Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
+            @Override
+            public void run() {
+                for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+                    if (((CraftPlayer) player).getHandle() instanceof IExtendedEntityLivingBase) {
+                        IExtendedEntityLivingBase extendedPlayer = (IExtendedEntityLivingBase) ((CraftPlayer) player).getHandle();
+
+                        sendAdditionalWorldInfo(player, player.getWorld().getName(), Bukkit.getOnlinePlayers().length, Bukkit.getMaxPlayers());
+
+                        String displayName = extendedPlayer.getTitle() == null ? player.getDisplayName() : player.getDisplayName() + "\n" + extendedPlayer.getTitle();
+
+                        //Send everyone the display name of the player
+                        sendDisplayName(player, event.getPlayer().getName(), displayName);
+
+                        //Send the player the display name of the other people
+                        if (!player.getName().equalsIgnoreCase(event.getPlayer().getName())) {
+                            sendDisplayName(event.getPlayer(), player.getName(), displayName);
+                        }
+                    }
+                }
+            }
+        }, 20L);
     }
     
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -329,16 +362,57 @@ public class BridgeNetwork implements Listener {
             return;
         }
 
-        Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
-            @Override
-            public void run() {
-                for (Player player : Bukkit.getOnlinePlayers()) {
-                    sendDisplayName(player, p.getName(), p.getDisplayName());
+        if (((CraftPlayer) p).getHandle() instanceof IExtendedEntityLivingBase) {
+            final IExtendedEntityLivingBase extendedPlayer = (IExtendedEntityLivingBase) ((CraftPlayer) p).getHandle();
+
+            Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
+                @Override
+                public void run() {
+                    for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+                        sendAdditionalWorldInfo(player, player.getWorld().getName(), Bukkit.getOnlinePlayers().length, Bukkit.getMaxPlayers());
+
+                        String
+                                displayName =
+                                extendedPlayer.getTitle() == null ? player.getDisplayName()
+                                                                  : player.getDisplayName() + "\n" + extendedPlayer.getTitle();
+
+                        //Send everyone the display name of the player
+                        sendDisplayName(player, p.getName(), displayName);
+                    }
                 }
-            }
-        }, 20L);
+            }, 20L);
+        }
     }
-    
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onGMUserEvent(GMUserEvent userEvent) {
+        final Player p = Bukkit.getPlayer(userEvent.getUserName());
+        if (p == null) {
+            return;
+        }
+
+        if (((CraftPlayer) p).getHandle() instanceof IExtendedEntityLivingBase) {
+            final IExtendedEntityLivingBase extendedPlayer = (IExtendedEntityLivingBase) ((CraftPlayer) p).getHandle();
+
+            Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
+                @Override
+                public void run() {
+                    for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+                        sendAdditionalWorldInfo(player, player.getWorld().getName(), Bukkit.getOnlinePlayers().length, Bukkit.getMaxPlayers());
+
+                        String
+                                displayName =
+                                extendedPlayer.getTitle() == null ? player.getDisplayName()
+                                                                  : player.getDisplayName() + "\n" + extendedPlayer.getTitle();
+
+                        //Send everyone the display name of the player
+                        sendDisplayName(player, p.getName(), displayName);
+                    }
+                }
+            }, 20L);
+        }
+    }
+
     @EventHandler
     public void onEconomyChange(EconomyChangeEvent event) {
         Player player = Bukkit.getPlayer(event.getAccount());
@@ -367,7 +441,7 @@ public class BridgeNetwork implements Listener {
                     sendResidenceInfo(player, Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation()));
                 }
             }
-        }, 20L);        
+        }, 20L);
     }
 
     @EventHandler

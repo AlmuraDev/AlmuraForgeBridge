@@ -73,13 +73,6 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.bukkit</groupId>
-			<artifactId>1.6.4-R1.0</artifactId>
-			<version>${bukkitVersion}</version>
-			<scope>system</scope>
-            <systemPath>${project.basedir}/libs/Bukkit.jar</systemPath>
-		</dependency>
-		<dependency>
-			<groupId>org.bukkit</groupId>
 			<artifactId>craftbukkit</artifactId>
 			<version>1.6.4-R2.1</version>
 			<scope>system</scope>
