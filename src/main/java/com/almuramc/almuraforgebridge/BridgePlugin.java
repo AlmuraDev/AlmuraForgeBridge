@@ -1,6 +1,25 @@
 /*
  * This file is part of Almura Forge Bridge.
  *
+ * © 2015 AlmuraDev <http://www.almuradev.com/>
+ * Almura Forge Bridge is licensed under the GNU General Public License.
+ *
+ * Almura Forge Bridge is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Almura Forge Bridge is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License. If not,
+ * see <http://www.gnu.org/licenses/> for the GNU General Public License.
+ */
+/*
+ * This file is part of Almura Forge Bridge.
+ *
  * © 2013 AlmuraDev <http://www.almuradev.com/>
  * Almura Forge Bridge is licensed under the GNU General Public License.
  *
@@ -43,7 +62,7 @@ import org.anjocaido.groupmanager.events.GMUserEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_7_R4.entity.CraftPlayer;
 import org.bukkit.entity.Chicken;
 import org.bukkit.entity.Cow;
 import org.bukkit.entity.Creeper;
@@ -186,6 +205,12 @@ public class BridgePlugin extends JavaPlugin implements Listener {
             return;
         }
 
+        if (player.hasPermission("spongeteam.leader.title") && !player.hasPermission("Admin.title")) {
+            Bukkit.broadcastMessage(ChatColor.WHITE + "[" + ChatColor.GOLD + "Sponge " + ChatColor.BLUE + "Leader" + ChatColor.WHITE + "] - " + player.getDisplayName()
+                    + ", has left the server.");
+            return;
+        }
+
         if (player.hasPermission("developer.title") && !player.hasPermission("Admin.title")) {
             Bukkit.broadcastMessage(ChatColor.WHITE + "[" + ChatColor.DARK_AQUA + "Developer" + ChatColor.WHITE + "] -  " + player.getDisplayName()
                                     + ", has left the server.");
@@ -302,6 +327,12 @@ public class BridgePlugin extends JavaPlugin implements Listener {
             return;
         }
 
+        if (player.hasPermission("spongeteam.leader.title") && !player.hasPermission("Admin.title")) {
+            Bukkit.broadcastMessage(ChatColor.WHITE + "[" + ChatColor.GOLD + "Sponge " + ChatColor.BLUE + "Leader" + ChatColor.WHITE + "] - " + player.getDisplayName()
+                    + ", has joined the server.");
+            return;
+        }
+
         if (player.hasPermission("moderator.title") && !player.hasPermission("Admin.title")) {
             Bukkit.broadcastMessage(ChatColor.WHITE + "[" + ChatColor.AQUA + "Moderator" + ChatColor.WHITE + "] -  " + player.getDisplayName()
                                     + ", has joined the server.");
@@ -353,6 +384,11 @@ public class BridgePlugin extends JavaPlugin implements Listener {
                 } else {
                     extendedPlayer.setTitle(ChatColor.DARK_RED + "Almura Admin");
                 }
+                return;
+            }
+
+            if (player.hasPermission("spongeteam.leader.title") && !player.hasPermission("Admin.title")) {
+                extendedPlayer.setTitle(ChatColor.GOLD + "Sponge " + ChatColor.BLUE + "Leader");
                 return;
             }
 
