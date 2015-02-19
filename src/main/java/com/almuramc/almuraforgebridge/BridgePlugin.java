@@ -291,10 +291,14 @@ public class BridgePlugin extends JavaPlugin implements Listener {
             }
         }
 
-        if (event.getEntityType().getName().equalsIgnoreCase("MOCREATURES-KOMODODRAGON")) {
-            Material material = Material.getMaterial("ALMURA_INGREDIENTSLIZARD");
-            if (material != null) {
-                event.getDrops().add(new ItemStack(material, 4));
+        if (event.getEntityType() != null) {
+            if (event.getEntityType().getName() != null) {
+                if (event.getEntityType().getName().equalsIgnoreCase("MOCREATURES-KOMODODRAGON")) {
+                    Material material = Material.getMaterial("ALMURA_INGREDIENTSLIZARD");
+                    if (material != null) {
+                        event.getDrops().add(new ItemStack(material, 4));
+                    }
+                }
             }
         }
     }
