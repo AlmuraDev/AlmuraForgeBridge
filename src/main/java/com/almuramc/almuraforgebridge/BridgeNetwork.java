@@ -333,7 +333,7 @@ public class BridgeNetwork implements Listener {
                 }
             }, 20L);
 
-            //sendCurrencyAmount(event.getPlayer(), String.format(ChatColor.WHITE + FORMAT_NUMBER_EN.format(economy.getBalance(event.getPlayer().getName()))));
+            sendCurrencyAmount(event.getPlayer(), String.format(ChatColor.WHITE + FORMAT_NUMBER_EN.format(economy.getBalance(event.getPlayer().getName()))));
         }
     }
     

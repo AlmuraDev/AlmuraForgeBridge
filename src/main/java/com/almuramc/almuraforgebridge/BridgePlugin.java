@@ -129,7 +129,7 @@ public class BridgePlugin extends JavaPlugin implements Listener {
                                 + event.getUser().getGroupName() + ChatColor.WHITE + "]");
                     }
                 }
-            }, 40L);
+            }, 20L);
 
         }
     }
