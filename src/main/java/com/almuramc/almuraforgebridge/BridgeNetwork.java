@@ -57,6 +57,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
 import com.bekvon.bukkit.residence.Residence;
@@ -329,15 +330,17 @@ public class BridgeNetwork implements Listener {
 
                         sendAdditionalWorldInfo(player, player.getWorld().getName(), Bukkit.getOnlinePlayers().size(), Bukkit.getMaxPlayers());
 
-                        String displayName = extendedPlayer.getTitle() == null ? event.getPlayer().getDisplayName() : event.getPlayer().getDisplayName() + "\n" + extendedPlayer.getTitle();
+                        String displayName = extendedPlayer.getTitle() == null ? ChatColor.stripColor(event.getPlayer().getDisplayName()) : ChatColor.stripColor(event.getPlayer().getDisplayName()) + "\n" + extendedPlayer.getTitle();
 
                         sendDisplayName(player, event.getPlayer().getName(), displayName);
+                        System.out.println("Display: " + displayName);
 
                         // Send all other players display names to the joining player
                         if (!player.getName().equalsIgnoreCase(event.getPlayer().getName())) {
                             extendedPlayer = (IExtendedEntityLivingBase) ((CraftPlayer) player).getHandle();
-                            displayName = extendedPlayer.getTitle() == null ? player.getDisplayName() : player.getDisplayName() + "\n" + extendedPlayer.getTitle();
+                            displayName = extendedPlayer.getTitle() == null ? ChatColor.stripColor(player.getDisplayName()) : ChatColor.stripColor(player.getDisplayName()) + "\n" + extendedPlayer.getTitle();
                             sendDisplayName(event.getPlayer(), player.getName(), displayName);
+                            System.out.println("Display2: " + displayName);
                         }
                     }
                 }
@@ -375,13 +378,13 @@ public class BridgeNetwork implements Listener {
 
                         sendAdditionalWorldInfo(player, player.getWorld().getName(), Bukkit.getOnlinePlayers().size(), Bukkit.getMaxPlayers());
 
-                        String displayName = extendedPlayer.getTitle() == null ? ChatColor.stripColor(event.getPlayer().getDisplayName()) : ChatColor.stripColor(event.getPlayer().getDisplayName()) + "\n" + extendedPlayer.getTitle();
+                        String displayName = extendedPlayer.getTitle() == null ? ChatColor.WHITE + ChatColor.stripColor(event.getPlayer().getDisplayName()) : ChatColor.WHITE + ChatColor.stripColor(event.getPlayer().getDisplayName()) + "\n" + extendedPlayer.getTitle();
 
                         sendDisplayName(player, event.getPlayer().getName(), displayName);
 
                         if (!player.getName().equalsIgnoreCase(event.getPlayer().getName())) {
                             extendedPlayer = (IExtendedEntityLivingBase) ((CraftPlayer) player).getHandle();
-                            displayName = extendedPlayer.getTitle() == null ? ChatColor.stripColor(player.getDisplayName()) : ChatColor.stripColor(player.getDisplayName()) + "\n" + extendedPlayer.getTitle();
+                            displayName = extendedPlayer.getTitle() == null ? ChatColor.WHITE + ChatColor.stripColor(player.getDisplayName()) : ChatColor.WHITE + ChatColor.stripColor(player.getDisplayName()) + "\n" + extendedPlayer.getTitle();
                             sendDisplayName(event.getPlayer(), player.getName(), displayName);
                         }
                     }
@@ -406,7 +409,7 @@ public class BridgeNetwork implements Listener {
 
                         sendAdditionalWorldInfo(player, player.getWorld().getName(), Bukkit.getOnlinePlayers().size(), Bukkit.getMaxPlayers());
 
-                        String displayName = extendedPlayer.getTitle() == null ? ChatColor.stripColor(p.getDisplayName()) : ChatColor.stripColor(p.getDisplayName()) + "\n" + extendedPlayer.getTitle();
+                        String displayName = extendedPlayer.getTitle() == null ? ChatColor.WHITE + ChatColor.stripColor(p.getDisplayName()) : ChatColor.WHITE + ChatColor.stripColor(p.getDisplayName()) + "\n" + extendedPlayer.getTitle();
 
                         sendDisplayName(player, p.getName(), displayName);
                     }
@@ -431,12 +434,41 @@ public class BridgeNetwork implements Listener {
 
                         sendAdditionalWorldInfo(player, player.getWorld().getName(), Bukkit.getOnlinePlayers().size(), Bukkit.getMaxPlayers());
 
-                        String displayName = extendedPlayer.getTitle() == null ? ChatColor.stripColor(p.getDisplayName()) : ChatColor.stripColor(p.getDisplayName()) + "\n" + extendedPlayer.getTitle();
+                        String displayName = extendedPlayer.getTitle() == null ? ChatColor.WHITE + ChatColor.stripColor(p.getDisplayName()) : ChatColor.WHITE + ChatColor.stripColor(p.getDisplayName()) + "\n" + extendedPlayer.getTitle();
 
                         sendDisplayName(player, p.getName(), displayName);
                     }
                 }
             }, 20L);
+        }
+    }    
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onPlayerTeleport(final PlayerTeleportEvent event) {
+        if (((CraftPlayer) event.getPlayer()).getHandle() instanceof IExtendedEntityLivingBase) {
+            Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
+                @Override
+                public void run() {
+                    final ClaimedResidence res = Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation());
+                    sendResidenceInfo(event.getPlayer(), res);
+
+                    for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+                        IExtendedEntityLivingBase extendedPlayer = (IExtendedEntityLivingBase) ((CraftPlayer) event.getPlayer()).getHandle();
+
+                        sendAdditionalWorldInfo(player, player.getWorld().getName(), Bukkit.getOnlinePlayers().size(), Bukkit.getMaxPlayers());
+
+                        String displayName = extendedPlayer.getTitle() == null ? ChatColor.WHITE + ChatColor.stripColor(event.getPlayer().getDisplayName()) : ChatColor.WHITE + ChatColor.stripColor(event.getPlayer().getDisplayName()) + "\n" + extendedPlayer.getTitle();
+
+                        sendDisplayName(player, event.getPlayer().getName(), displayName);
+
+                        if (!player.getName().equalsIgnoreCase(event.getPlayer().getName())) {
+                            extendedPlayer = (IExtendedEntityLivingBase) ((CraftPlayer) player).getHandle();
+                            displayName = extendedPlayer.getTitle() == null ? ChatColor.WHITE + ChatColor.stripColor(player.getDisplayName()) : ChatColor.WHITE + ChatColor.stripColor(player.getDisplayName()) + "\n" + extendedPlayer.getTitle();
+                            sendDisplayName(event.getPlayer(), player.getName(), displayName);
+                        }
+                    }
+                }
+            }, 10L);
         }
     }
 
