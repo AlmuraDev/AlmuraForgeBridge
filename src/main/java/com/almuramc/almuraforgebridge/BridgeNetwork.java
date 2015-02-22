@@ -312,10 +312,14 @@ public class BridgeNetwork implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerJoin(final PlayerJoinEvent event) {
+
         if (((CraftPlayer) event.getPlayer()).getHandle() instanceof IExtendedEntityLivingBase) {
             Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
                 @Override
                 public void run() {
+                    final ClaimedResidence res = Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation());
+                    sendResidenceInfo(event.getPlayer(), res);
+
                     for (Player player : Bukkit.getServer().getOnlinePlayers()) {
                         IExtendedEntityLivingBase extendedPlayer = (IExtendedEntityLivingBase) ((CraftPlayer) event.getPlayer()).getHandle();
 
@@ -327,8 +331,6 @@ public class BridgeNetwork implements Listener {
 
                         // Send all other players display names to the joining player
                         if (!player.getName().equalsIgnoreCase(event.getPlayer().getName())) {
-                            ClaimedResidence res = Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation());
-                            sendResidenceInfo(player, res);
                             extendedPlayer = (IExtendedEntityLivingBase) ((CraftPlayer) player).getHandle();
                             displayName = extendedPlayer.getTitle() == null ? player.getDisplayName() : player.getDisplayName() + "\n" + extendedPlayer.getTitle();
                             sendDisplayName(event.getPlayer(), player.getName(), displayName);
@@ -355,12 +357,13 @@ public class BridgeNetwork implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerChangedWorld(final PlayerChangedWorldEvent event) {
-        sendAdditionalWorldInfo(event.getPlayer(), event.getPlayer().getWorld().getName(), Bukkit.getOnlinePlayers().size(), Bukkit.getMaxPlayers());
-
         if (((CraftPlayer) event.getPlayer()).getHandle() instanceof IExtendedEntityLivingBase) {
             Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
                 @Override
                 public void run() {
+                    final ClaimedResidence res = Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation());
+                    sendResidenceInfo(event.getPlayer(), res);
+
                     for (Player player : Bukkit.getServer().getOnlinePlayers()) {
                         IExtendedEntityLivingBase extendedPlayer = (IExtendedEntityLivingBase) ((CraftPlayer) event.getPlayer()).getHandle();
 
@@ -371,8 +374,6 @@ public class BridgeNetwork implements Listener {
                         sendDisplayName(player, event.getPlayer().getName(), displayName);
 
                         if (!player.getName().equalsIgnoreCase(event.getPlayer().getName())) {
-                            ClaimedResidence res = Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation());
-                            sendResidenceInfo(player, res);
                             extendedPlayer = (IExtendedEntityLivingBase) ((CraftPlayer) player).getHandle();
                             displayName = extendedPlayer.getTitle() == null ? player.getDisplayName() : player.getDisplayName() + "\n" + extendedPlayer.getTitle();
                             sendDisplayName(event.getPlayer(), player.getName(), displayName);
