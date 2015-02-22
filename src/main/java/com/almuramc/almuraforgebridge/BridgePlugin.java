@@ -145,29 +145,26 @@ public class BridgePlugin extends JavaPlugin implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onGMUserEvent(GMUserEvent userEvent) {
-        for (final Player player : getServer().getOnlinePlayers()) {
-            final GMUserEvent event = userEvent;
-            Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
-                public void run() {
-                    setCustomTitle(player);
-
-                    if ((GMUserEvent.Action.USER_GROUP_CHANGED == event.getAction()) && (event.getUser().getGroupName().equalsIgnoreCase("member"))) {
-                        Bukkit.broadcastMessage(
-                                ChatColor.DARK_PURPLE + player.getDisplayName() + ChatColor.WHITE + " has been granted: [" + ChatColor.GOLD + event
-                                        .getUser().getGroupName() + ChatColor.WHITE + "]");
-                        Bukkit.broadcastMessage(ChatColor.WHITE + "Almura Thanks " + ChatColor.GOLD + player.getDisplayName() + ChatColor.WHITE
-                                                + " for their donation.  It is very much appreciated.");
-                    }
-
-                    if ((GMUserEvent.Action.USER_GROUP_CHANGED == event.getAction()) && (event.getUser().getGroupName().equalsIgnoreCase("guest"))) {
-                        Bukkit.broadcastMessage(
-                                ChatColor.DARK_PURPLE + player.getDisplayName() + ChatColor.WHITE + " has been promoted to: [" + ChatColor.GOLD
-                                + event.getUser().getGroupName() + ChatColor.WHITE + "]");
-                    }
+        final GMUserEvent event = userEvent;
+        final Player player = event.getUser().getBukkitPlayer();
+        Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+            public void run() {
+                setCustomTitle(player);
+                if ((GMUserEvent.Action.USER_GROUP_CHANGED == event.getAction()) && (event.getUser().getGroupName().equalsIgnoreCase("contributor"))) {
+                    Bukkit.broadcastMessage(
+                            ChatColor.DARK_PURPLE + player.getDisplayName() + ChatColor.WHITE + " has been granted: [" + ChatColor.GOLD + event
+                            .getUser().getGroupName() + ChatColor.WHITE + "]");
+                    Bukkit.broadcastMessage(ChatColor.WHITE + "Almura Thanks " + ChatColor.GOLD + player.getDisplayName() + ChatColor.WHITE
+                            + " for their donation.  It is very much appreciated.");
                 }
-            }, 20L);
 
-        }
+                if ((GMUserEvent.Action.USER_GROUP_CHANGED == event.getAction()) && (event.getUser().getGroupName().equalsIgnoreCase("member"))) {
+                    Bukkit.broadcastMessage(
+                            ChatColor.DARK_PURPLE + player.getDisplayName() + ChatColor.WHITE + " has been promoted to: [" + ChatColor.GOLD
+                            + event.getUser().getGroupName() + ChatColor.WHITE + "]");
+                }
+            }
+        }, 5L);
     }
 
     @EventHandler
