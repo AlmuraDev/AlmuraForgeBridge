@@ -19,7 +19,6 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<bukkitVersion>1.6.4-R1.0</bukkitVersion>		
 		<mainClass>com.almuramc.almuraforgebridge.BridgePlugin</mainClass>
 	</properties>
 
@@ -71,19 +70,19 @@
 
 	<!-- Dependencies -->
 	<dependencies>
-		<dependency>
-			<groupId>org.bukkit</groupId>
-			<artifactId>1.6.4-R1.0</artifactId>
-			<version>${bukkitVersion}</version>
-			<scope>system</scope>
-            <systemPath>${project.basedir}/libs/Bukkit.jar</systemPath>
-		</dependency>
-		<dependency>
+        <dependency>
+            <groupId>org.bukkit</groupId>
+            <artifactId>bukkit</artifactId>
+            <version>1.7.10</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/libs/bukkit-1.7.10.jar</systemPath>
+        </dependency>
+        <dependency>
 			<groupId>org.bukkit</groupId>
 			<artifactId>craftbukkit</artifactId>
-			<version>1.6.4-R2.1</version>
+			<version>1.7.10</version>
 			<scope>system</scope>
-			<systemPath>${basedir}/libs/almura-server-1.6.4-R2.1-SNAPSHOT.jar</systemPath>
+			<systemPath>${basedir}/libs/craftbukkit-1.7.10.jar</systemPath>
 		</dependency>	
 		<dependency>
 			<groupId>net.ess3</groupId>
@@ -203,7 +202,7 @@
 								<name>${project.name}</name>
 								<url>${project.organization.url}</url>
 								<license>GNU General Public License</license>
-								<copyright>© 2013 ${project.organization.name}</copyright>
+								<copyright>© 2015 ${project.organization.name}</copyright>
 							</properties>
 							<includes>
 								<include>src/main/java/**</include>
