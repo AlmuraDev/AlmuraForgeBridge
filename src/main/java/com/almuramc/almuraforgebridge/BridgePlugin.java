@@ -207,16 +207,8 @@ public class BridgePlugin extends JavaPlugin implements Listener {
             }
         }
     }
-
-    @EventHandler(priority = EventPriority.LOWEST)
-    public void onPlayerJoin(PlayerJoinEvent event) {
-        final Player player = event.getPlayer();
-        event.setJoinMessage("");
-        broadcastLogin(player);
-        setCustomTitle(player);
-    }
-    
-    public void broadcastLogin(Player player) {
+   
+    public static void broadcastLogin(Player player) {
 
         if (player.getName().equalsIgnoreCase("ninjazidane")) {
             Bukkit.broadcastMessage(spongeleader + player.getDisplayName() + enterMessage);
@@ -273,11 +265,8 @@ public class BridgePlugin extends JavaPlugin implements Listener {
             Bukkit.broadcastMessage(survival + player.getDisplayName() + enterMessage);
         }
     }
-
-    @EventHandler(priority = EventPriority.LOWEST)
-    public void onPlayerQuit(PlayerQuitEvent event) {
-        event.setQuitMessage("");
-        final Player player = event.getPlayer();
+    
+    public static void broadcastLogout(Player player) {
 
         if (player.getName().equalsIgnoreCase("ninjazidane")) {
             Bukkit.broadcastMessage(spongeleader + player.getDisplayName() + leaveMessage);
@@ -384,7 +373,7 @@ public class BridgePlugin extends JavaPlugin implements Listener {
         }
     }
 
-    public void setCustomTitle(Player player) {
+    public static void setCustomTitle(Player player) {
         if (((CraftPlayer) player).getHandle() instanceof IExtendedEntityLivingBase) {
             final IExtendedEntityLivingBase extendedPlayer = (IExtendedEntityLivingBase) ((CraftPlayer) player).getHandle();
 

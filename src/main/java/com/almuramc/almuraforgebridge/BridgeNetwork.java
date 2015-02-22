@@ -310,16 +310,20 @@ public class BridgeNetwork implements Listener {
         return diff;
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerJoin(final PlayerJoinEvent event) {
-
+        event.setJoinMessage("");
         if (((CraftPlayer) event.getPlayer()).getHandle() instanceof IExtendedEntityLivingBase) {
             Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
                 @Override
                 public void run() {
                     final ClaimedResidence res = Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation());
                     sendResidenceInfo(event.getPlayer(), res);
-
+                    // Broadcast Login
+                    BridgePlugin.broadcastLogin(event.getPlayer());
+                    // Send Title
+                    BridgePlugin.setCustomTitle(event.getPlayer());
+                    
                     for (Player player : Bukkit.getServer().getOnlinePlayers()) {
                         IExtendedEntityLivingBase extendedPlayer = (IExtendedEntityLivingBase) ((CraftPlayer) event.getPlayer()).getHandle();
 
@@ -345,9 +349,11 @@ public class BridgeNetwork implements Listener {
     
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerQuit(final PlayerQuitEvent event) {
+        event.setQuitMessage("");
         Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
             @Override
             public void run() {
+                BridgePlugin.broadcastLogout(event.getPlayer());
                 for (Player player : Bukkit.getServer().getOnlinePlayers()) {
                     sendAdditionalWorldInfo(player, player.getWorld().getName(), Bukkit.getOnlinePlayers().size(), Bukkit.getMaxPlayers());
                 }
@@ -369,18 +375,18 @@ public class BridgeNetwork implements Listener {
 
                         sendAdditionalWorldInfo(player, player.getWorld().getName(), Bukkit.getOnlinePlayers().size(), Bukkit.getMaxPlayers());
 
-                        String displayName = extendedPlayer.getTitle() == null ? event.getPlayer().getDisplayName() : event.getPlayer().getDisplayName() + "\n" + extendedPlayer.getTitle();
+                        String displayName = extendedPlayer.getTitle() == null ? ChatColor.stripColor(event.getPlayer().getDisplayName()) : ChatColor.stripColor(event.getPlayer().getDisplayName()) + "\n" + extendedPlayer.getTitle();
 
                         sendDisplayName(player, event.getPlayer().getName(), displayName);
 
                         if (!player.getName().equalsIgnoreCase(event.getPlayer().getName())) {
                             extendedPlayer = (IExtendedEntityLivingBase) ((CraftPlayer) player).getHandle();
-                            displayName = extendedPlayer.getTitle() == null ? player.getDisplayName() : player.getDisplayName() + "\n" + extendedPlayer.getTitle();
+                            displayName = extendedPlayer.getTitle() == null ? ChatColor.stripColor(player.getDisplayName()) : ChatColor.stripColor(player.getDisplayName()) + "\n" + extendedPlayer.getTitle();
                             sendDisplayName(event.getPlayer(), player.getName(), displayName);
                         }
                     }
                 }
-            }, 20L);
+            }, 10L);
         }
     }
     
@@ -400,12 +406,12 @@ public class BridgeNetwork implements Listener {
 
                         sendAdditionalWorldInfo(player, player.getWorld().getName(), Bukkit.getOnlinePlayers().size(), Bukkit.getMaxPlayers());
 
-                        String displayName = extendedPlayer.getTitle() == null ? p.getDisplayName() : p.getDisplayName() + "\n" + extendedPlayer.getTitle();
+                        String displayName = extendedPlayer.getTitle() == null ? ChatColor.stripColor(p.getDisplayName()) : ChatColor.stripColor(p.getDisplayName()) + "\n" + extendedPlayer.getTitle();
 
                         sendDisplayName(player, p.getName(), displayName);
                     }
                 }
-            }, 20L);
+            }, 10L);
         }
     }
 
@@ -425,7 +431,7 @@ public class BridgeNetwork implements Listener {
 
                         sendAdditionalWorldInfo(player, player.getWorld().getName(), Bukkit.getOnlinePlayers().size(), Bukkit.getMaxPlayers());
 
-                        String displayName = extendedPlayer.getTitle() == null ? p.getDisplayName() : p.getDisplayName() + "\n" + extendedPlayer.getTitle();
+                        String displayName = extendedPlayer.getTitle() == null ? ChatColor.stripColor(p.getDisplayName()) : ChatColor.stripColor(p.getDisplayName()) + "\n" + extendedPlayer.getTitle();
 
                         sendDisplayName(player, p.getName(), displayName);
                     }
