@@ -218,7 +218,7 @@ public class BridgePlugin extends JavaPlugin implements Listener {
     
     public void broadcastLogin(Player player) {
 
-        if (player.hasPermission("spongeteam.leader.title")) {
+        if (player.getName().equalsIgnoreCase("ninjazidane")) {
             Bukkit.broadcastMessage(spongeleader + player.getDisplayName() + enterMessage);
             return;
         }
@@ -279,7 +279,7 @@ public class BridgePlugin extends JavaPlugin implements Listener {
         event.setQuitMessage("");
         final Player player = event.getPlayer();
 
-        if (player.hasPermission("spongeteam.leader.title")) {
+        if (player.getName().equalsIgnoreCase("ninjazidane")) {
             Bukkit.broadcastMessage(spongeleader + player.getDisplayName() + leaveMessage);
             return;
         }
@@ -388,7 +388,7 @@ public class BridgePlugin extends JavaPlugin implements Listener {
         if (((CraftPlayer) player).getHandle() instanceof IExtendedEntityLivingBase) {
             final IExtendedEntityLivingBase extendedPlayer = (IExtendedEntityLivingBase) ((CraftPlayer) player).getHandle();
 
-            if (player.hasPermission("spongeteam.leader.title")) {
+            if (player.getName().equalsIgnoreCase("ninjazidane")) {
                 extendedPlayer.setTitle(spongeleaderColor1 + "Sponge " + spongeleaderColor2 + "Leader");
                 return;
             }
