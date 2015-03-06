@@ -350,7 +350,7 @@ public class BridgeNetwork implements Listener {
         }
     }
     
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerQuit(final PlayerQuitEvent event) {
         event.setQuitMessage("");
         Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
