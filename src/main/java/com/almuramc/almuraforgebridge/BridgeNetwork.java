@@ -362,6 +362,7 @@ public class BridgeNetwork implements Listener {
                 }
             }
         }, 20L);
+        BridgePlugin.broadcastLogout(event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
