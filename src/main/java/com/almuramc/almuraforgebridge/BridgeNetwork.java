@@ -333,14 +333,12 @@ public class BridgeNetwork implements Listener {
                         String displayName = extendedPlayer.getTitle() == null ? ChatColor.stripColor(event.getPlayer().getDisplayName()) : ChatColor.stripColor(event.getPlayer().getDisplayName()) + "\n" + extendedPlayer.getTitle();
 
                         sendDisplayName(player, event.getPlayer().getName(), displayName);
-                        System.out.println("Display: " + displayName);
 
                         // Send all other players display names to the joining player
                         if (!player.getName().equalsIgnoreCase(event.getPlayer().getName())) {
                             extendedPlayer = (IExtendedEntityLivingBase) ((CraftPlayer) player).getHandle();
                             displayName = extendedPlayer.getTitle() == null ? ChatColor.stripColor(player.getDisplayName()) : ChatColor.stripColor(player.getDisplayName()) + "\n" + extendedPlayer.getTitle();
                             sendDisplayName(event.getPlayer(), player.getName(), displayName);
-                            System.out.println("Display2: " + displayName);
                         }
                     }
                 }
@@ -356,7 +354,6 @@ public class BridgeNetwork implements Listener {
         Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
             @Override
             public void run() {
-                BridgePlugin.broadcastLogout(event.getPlayer());
                 for (Player player : Bukkit.getServer().getOnlinePlayers()) {
                     sendAdditionalWorldInfo(player, player.getWorld().getName(), Bukkit.getOnlinePlayers().size(), Bukkit.getMaxPlayers());
                 }
@@ -485,6 +482,7 @@ public class BridgeNetwork implements Listener {
     public void onResidenceFlagChangeEvent(final ResidenceFlagChangeEvent event) {
         Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
             public void run() {
+                if (event.getPlayer() == null) return;
                 ClaimedResidence res = Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation());
                 for (Player player : res.getPlayersInResidence()) {
                     sendResidenceInfo(player, res);
@@ -497,8 +495,9 @@ public class BridgeNetwork implements Listener {
     public void onResidenceChangedEvent(final ResidenceChangedEvent event) {
         Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
             public void run() {
+                if (event.getPlayer() == null) return;
                 ClaimedResidence res = Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation());
-                sendResidenceInfo(event.getPlayer(), res);                
+                sendResidenceInfo(event.getPlayer(), res);
             }
         }, 20L);
     }
@@ -507,7 +506,9 @@ public class BridgeNetwork implements Listener {
     public void onResidenceCreationEvent(final ResidenceCreationEvent event) {
         Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
             public void run() {
+                if (event.getPlayer() == null) return;
                 ClaimedResidence res = Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation());
+                if (res == null) return;
                 for (Player player : res.getPlayersInResidence()) {
                     sendResidenceInfo(player, res);
                 }
@@ -519,6 +520,12 @@ public class BridgeNetwork implements Listener {
     public void onResidenceDeleteEvent(final ResidenceDeleteEvent event) {
         Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
             public void run() {
+                if (Residence.getResidenceManager() == null)
+                    System.out.println("BridgeNetwork.java - Debug2 - Residence Manager Null");
+                if (event.getPlayer() == null)
+                    System.out.println("BridgeNetwork.java - Debug2 - Player is  Null");
+                if (event.getPlayer() != null && event.getPlayer().getLocation() == null)
+                    System.out.println("BridgeNetwork.java - Debug2 - Player Location is  Null");
                 ClaimedResidence res = Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation());
                     for (Player player : Bukkit.getOnlinePlayers()) {
                         sendResidenceInfo(player, res);

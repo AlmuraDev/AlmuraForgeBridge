@@ -2,3 +2,16 @@ name: AlmuraForgeBridge
 main: com.almuramc.almuraforgebridge.BridgePlugin
 version: 1.0
 authors: [AlmuraDev]
+commands:
+    bridge-info:
+        description: The general command of Bridge Info
+        aliases: 
+        usage: /bridge-info
+    bridge-info-debug:
+        description: The general command of Bridge Info Debug
+        aliases: 
+        usage: /bridge-info-debug
+    bridge-clear-items:
+        description: The general command of Bridge Clear Items Method
+        aliases: 
+        usage: /bridge-clear-items

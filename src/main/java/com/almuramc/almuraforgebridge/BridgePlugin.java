@@ -58,19 +58,27 @@
 package com.almuramc.almuraforgebridge;
 
 import com.almuradev.almura.extension.entity.IExtendedEntityLivingBase;
+
 import org.anjocaido.groupmanager.events.GMUserEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_7_R4.entity.CraftPlayer;
+import org.bukkit.entity.Animals;
 import org.bukkit.entity.Chicken;
 import org.bukkit.entity.Cow;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Monster;
 import org.bukkit.entity.Pig;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Sheep;
+import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.Wolf;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -89,43 +97,43 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class BridgePlugin extends JavaPlugin implements Listener {
 
     private static BridgePlugin instance;
-    
+
     // Color setups for membership levels 
     private static String superadminColor = "" + ChatColor.DARK_RED;
-    private static String superadmin = ChatColor.WHITE + "[" + superadminColor + "SuperAdmin" + ChatColor.WHITE + "] -  ";
-    
+    private static String superadmin = ChatColor.WHITE + "[" + superadminColor + "Super-Admin" + ChatColor.WHITE + "] -  ";
+
     private static String adminColor = "" + ChatColor.RED;
     private static String admin = ChatColor.WHITE + "[" + adminColor + "Admin" + ChatColor.WHITE + "] -  ";
-    
+
     private static String spongeleaderColor1 = "" + ChatColor.GOLD;
     private static String spongeleaderColor2 = "" + ChatColor.BLUE;
     private static String spongeleader = ChatColor.WHITE + "[" + spongeleaderColor1 + "Sponge " + spongeleaderColor2 + "Leader" + ChatColor.WHITE + "] - ";
-    
+
     private static String moderatorColor = "" + ChatColor.BLUE;
     private static String moderator = ChatColor.WHITE + "[" + moderatorColor + "Moderator" + ChatColor.WHITE + "] -  ";
-    
+
     private static String veteranColor = "" + ChatColor.GOLD;
     private static String veteran = ChatColor.WHITE + "[" + veteranColor + "Veteran" + ChatColor.WHITE + "] -  ";
-    
+
     private static String contributorColor = "" + ChatColor.DARK_AQUA;
     private static String contributor = ChatColor.WHITE + "[" + contributorColor + "Contributor" + ChatColor.WHITE + "] -  ";
-    
-    private static String memberColor = "" + ChatColor.GREEN;
+
+    private static String memberColor = "" + ChatColor.DARK_GREEN;
     private static String member = ChatColor.WHITE + "[" + memberColor + "Member" + ChatColor.WHITE + "] -  ";
-    
+
     private static String guestColor = "" + ChatColor.GRAY;
     private static String guest = ChatColor.WHITE + "[" + guestColor + "Guest" + ChatColor.WHITE + "] -  ";
-    
+
     private static String survivalColor = "" + ChatColor.LIGHT_PURPLE;
     private static String survival = ChatColor.WHITE + "[" + survivalColor + "Survival" + ChatColor.WHITE + "] -  ";
-    
+
     private static String newbieColor = "" + ChatColor.LIGHT_PURPLE;
     private static String newbie = ChatColor.WHITE + "[" + newbieColor + "Newbie" + ChatColor.WHITE + "] -  ";
-    
+
     // Enter and Leave messages
     private static String enterMessage = ", has joined the server.";
     private static String leaveMessage = ", has left the server.";
-    
+
     public static BridgePlugin getInstance() {
         return instance;
     }
@@ -204,7 +212,7 @@ public class BridgePlugin extends JavaPlugin implements Listener {
             }
         }
     }
-   
+
     public static void broadcastLogin(Player player) {
 
         if (player.getName().equalsIgnoreCase("ninjazidane")) {
@@ -224,8 +232,9 @@ public class BridgePlugin extends JavaPlugin implements Listener {
 
         if (player.hasPermission("admin.title") && !player.isOp()) {
             if (player.getName().equalsIgnoreCase("wifee")) {
-                Bukkit.broadcastMessage(
-                        ChatColor.WHITE + "[" + ChatColor.GOLD + "The Destroyer of Worlds..." + ChatColor.WHITE + "] -  " + player.getDisplayName() + enterMessage);
+                Bukkit.broadcastMessage(ChatColor.WHITE + "[" + ChatColor.GOLD + "The Destroyer of Worlds..." + ChatColor.WHITE + "] -  " + player.getDisplayName() + enterMessage);
+            } else if (player.getName().equalsIgnoreCase("wolfeyeamd0")) {
+                Bukkit.broadcastMessage(ChatColor.WHITE + "[" + ChatColor.GOLD + "The Harbinger..." + ChatColor.WHITE + "] -  " + player.getDisplayName() + enterMessage);
             } else {
                 Bukkit.broadcastMessage(admin + player.getDisplayName() + enterMessage);
             }
@@ -241,7 +250,7 @@ public class BridgePlugin extends JavaPlugin implements Listener {
             Bukkit.broadcastMessage(veteran + player.getDisplayName() + enterMessage);
             return;
         }
-        
+
         if (player.hasPermission("contributor.title") && !player.hasPermission("veteran.title")) {
             Bukkit.broadcastMessage(contributor + player.getDisplayName() + enterMessage);
             return;
@@ -260,9 +269,10 @@ public class BridgePlugin extends JavaPlugin implements Listener {
 
         if (player.hasPermission("Survival.title") && !player.hasPermission("Member.title")) {
             Bukkit.broadcastMessage(survival + player.getDisplayName() + enterMessage);
+            return;
         }
     }
-    
+
     public static void broadcastLogout(Player player) {
 
         if (player.getName().equalsIgnoreCase("ninjazidane")) {
@@ -278,6 +288,8 @@ public class BridgePlugin extends JavaPlugin implements Listener {
         if (player.hasPermission("admin.title") && !player.isOp()) {
             if (player.getName().equalsIgnoreCase("wifee")) {
                 Bukkit.broadcastMessage(ChatColor.WHITE + "[" + ChatColor.GOLD + "The Destroyer of Worlds..." + ChatColor.WHITE + "] -  " + player.getDisplayName() + leaveMessage);
+            } else if (player.getName().equalsIgnoreCase("wolfeyeamd0")) {
+                Bukkit.broadcastMessage(ChatColor.WHITE + "[" + ChatColor.GOLD + "The Harbinger..." + ChatColor.WHITE + "] -  " + player.getDisplayName() + leaveMessage);
             } else {
                 Bukkit.broadcastMessage(admin + player.getDisplayName() + leaveMessage);
             }
@@ -293,7 +305,7 @@ public class BridgePlugin extends JavaPlugin implements Listener {
             Bukkit.broadcastMessage(veteran + player.getDisplayName() + leaveMessage);
             return;
         }
-        
+
         if (player.hasPermission("contributor.title") && !player.hasPermission("veteran.title")) {
             Bukkit.broadcastMessage(contributor + player.getDisplayName() + leaveMessage);
             return;
@@ -311,6 +323,7 @@ public class BridgePlugin extends JavaPlugin implements Listener {
 
         if (player.hasPermission("Survival.title") && !player.hasPermission("Member.title")) {
             Bukkit.broadcastMessage(survival + player.getDisplayName() + leaveMessage);
+            return;
         }
     }
 
@@ -370,10 +383,17 @@ public class BridgePlugin extends JavaPlugin implements Listener {
         }
     }
 
+    public static String getCustomTitle(Player player) {
+        if (((CraftPlayer) player).getHandle() instanceof IExtendedEntityLivingBase) {
+            final IExtendedEntityLivingBase extendedPlayer = (IExtendedEntityLivingBase) ((CraftPlayer) player).getHandle();
+            return extendedPlayer.getTitle();
+        }
+        return "No title";
+    }
+
     public static void setCustomTitle(Player player) {
         if (((CraftPlayer) player).getHandle() instanceof IExtendedEntityLivingBase) {
             final IExtendedEntityLivingBase extendedPlayer = (IExtendedEntityLivingBase) ((CraftPlayer) player).getHandle();
-
             if (player.getName().equalsIgnoreCase("ninjazidane")) {
                 extendedPlayer.setTitle(spongeleaderColor1 + "Sponge " + spongeleaderColor2 + "Leader");
                 return;
@@ -387,12 +407,14 @@ public class BridgePlugin extends JavaPlugin implements Listener {
             if (player.hasPermission("admin.title") && !player.isOp()) {
                 if (player.getName().equalsIgnoreCase("wifee")) {
                     extendedPlayer.setTitle(ChatColor.GOLD + "Destroyer of Worlds");
+                } else if (player.getName().equalsIgnoreCase("wolfeyeamd0")) {
+                    extendedPlayer.setTitle(ChatColor.GOLD + "Harbinger");
                 } else {
                     extendedPlayer.setTitle(adminColor + "Admin");
                 }
                 return;
             }
- 
+
             if (player.hasPermission("moderator.title") && !player.hasPermission("Admin.title")) {
                 extendedPlayer.setTitle(moderatorColor + "Moderator");
                 return;
@@ -422,10 +444,133 @@ public class BridgePlugin extends JavaPlugin implements Listener {
                 extendedPlayer.setTitle(guestColor + "Guest");
                 return;
             }
-            
+
             if (player.hasPermission("survival.title") && !player.hasPermission("member.title")) {
                 extendedPlayer.setTitle(survivalColor + "Survival");
                 return;
+            }
+        }
+    }
+
+    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+        if (cmd.getName().equalsIgnoreCase("bridge-info")) {
+            if (sender instanceof Player) {
+                if (sender.isOp()) {
+                    if (args.length == 0) {
+                        displayInfo((Player) sender, false, false);
+                        return true;
+                    }
+                } else {
+                    sender.sendMessage("[Almura Bridge] - Insufficient Permissions, requires OP.");
+                }
+            } else {
+                displayInfo(null, true, false);
+            }
+        }
+        if (cmd.getName().equalsIgnoreCase("bridge-info-debug")) {
+            if (sender instanceof Player) {
+                if (sender.isOp()) {
+                    if (args.length == 0) {
+                        displayInfo((Player) sender, false, false);
+                        return true;
+                    }
+                } else {
+                    sender.sendMessage("[Almura Bridge] - Insufficient Permissions, requires OP.");
+                }
+            } else {
+                displayInfo(null, true, true);
+            }
+        }
+        if (cmd.getName().equalsIgnoreCase("bridge-clear-items")) {
+            if (sender instanceof Player) {
+                if (sender.isOp()) {
+                    if (args.length == 0) {
+                        clearItems((Player) sender, false);
+                        return true;
+                    }
+                } else {
+                    sender.sendMessage("[Almura Bridge] - Insufficient Permissions, requires OP.");
+                }
+            } else {
+                displayInfo(null, true, false);
+            }
+        }
+        return false;
+    }
+
+    public void clearItems(Player player, boolean console) {
+        int removedCount = 0;
+        for (World w : Bukkit.getServer().getWorlds()) {
+            for (Entity e : w.getEntities()) {
+                if (e.isDead())
+                    continue;
+                if (e instanceof Item) {
+                    e.remove();
+                    removedCount++;
+                }
+            }
+        }
+        if (console) {
+            System.out.println("[Bridge Item Cleanup] - Removed: " + removedCount);
+        } else {
+            if (player != null) {
+                player.sendMessage("[Bridge Item Cleanup] - Removed: " + removedCount);
+            }
+        }
+    }
+
+    public void displayInfo(Player player, boolean console, boolean debug) {
+        int mobcount = 0;
+        int totalMobs = 0;
+        int animalCount = 0;
+        int totalAnimals = 0;
+        int itemcount = 0;
+        int totalItems = 0;
+        int totalChunks = 0;
+        int totalPlayers = 0;
+
+        if (!console && player != null) {
+            player.sendMessage("---------------------------------------------------------------------------------------------");
+        }
+        for (World w : Bukkit.getServer().getWorlds()) {
+            for (Entity e : w.getEntities()) {
+                if (e.isDead())
+                    continue;
+                if (e instanceof Player) {
+                } else if (e instanceof Monster) {
+                    mobcount++;
+                } else if (e instanceof Animals) {
+                    animalCount++;
+                } else if (e instanceof Item) {
+                    itemcount++;
+                }
+                if (console) {
+                    System.out.println("Entity: " + e.getType() + " Age: " + ((e.getTicksLived()/20)/60) + " minutes, Location: " + e.getLocation());
+                }
+            }
+            if (console) {
+                System.out.println(w.getName() + " - Chunks: " + w.getLoadedChunks().length + " Players: " + w.getPlayers().size() + " Items: " + itemcount + " Monsters: " + mobcount + " Animals: " + animalCount);
+            } else {
+                if (player !=null) {
+                    player.sendMessage(ChatColor.DARK_GREEN + w.getName() + ChatColor.WHITE + " - Chunks: " + ChatColor.RED + w.getLoadedChunks().length + ChatColor.WHITE + " Players: " + ChatColor.GREEN + w.getPlayers().size() + ChatColor.WHITE + " Items: " + ChatColor.AQUA + itemcount + ChatColor.WHITE + " Monsters: " + ChatColor.GOLD + mobcount + ChatColor.WHITE + " Animals: " + ChatColor.DARK_AQUA + animalCount);
+                }
+            }
+            totalAnimals = totalAnimals + animalCount;
+            totalMobs = totalMobs + mobcount;
+            totalItems = totalItems + itemcount;
+            totalChunks = totalChunks + w.getLoadedChunks().length;
+            totalPlayers = totalPlayers + w.getPlayers().size();
+            mobcount = 0;
+            animalCount = 0;
+            itemcount = 0;
+        }
+
+        if (console) {
+            System.out.println("Totals - Chunks: " + totalChunks + " Players: " + totalPlayers + " Items: " + totalItems + " Monsters: " + totalMobs + " Animals: " + totalAnimals);                
+        } else {
+            if (player !=null) {
+                player.sendMessage("---------------------------------------------------------------------------------------------");
+                player.sendMessage(ChatColor.RED + "Totals" + ChatColor.WHITE + " - Chunks: " + ChatColor.RED + totalChunks + ChatColor.WHITE + " Players: " + ChatColor.GREEN + totalPlayers + ChatColor.WHITE + " Items: " + ChatColor.AQUA + totalItems + ChatColor.WHITE + " Monsters: " + ChatColor.GOLD + totalMobs + ChatColor.WHITE + " Animals: " + ChatColor.DARK_AQUA + totalAnimals);
             }
         }
     }
