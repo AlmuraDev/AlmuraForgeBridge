@@ -1,3 +1,22 @@
+/*
+ * This file is part of Almura Forge Bridge.
+ *
+ * © 2015 AlmuraDev <http://www.almuradev.com/>
+ * Almura Forge Bridge is licensed under the GNU General Public License.
+ *
+ * Almura Forge Bridge is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Almura Forge Bridge is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License. If not,
+ * see <http://www.gnu.org/licenses/> for the GNU General Public License.
+ */
 package com.almuradev.almura.econ;
 
 import java.text.NumberFormat;
@@ -22,22 +41,23 @@ public class EconListener implements Listener {
     
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
-        if (!event.getEntity().hasPermission("econ.death")) {
-            return;
-        }
+        //if (!event.getEntity().hasPermission("econ.death")) {
+        //    return;
+        //}
         final Player died = event.getEntity();
         final double deathTax = getDropAmountMultiple();
         final double carrying = VaultUtil.getBalance(died.getName());
         final double drop = carrying - (carrying * deathTax);
         VaultUtil.add(died.getName(), -drop);
-        died.sendMessage("You dropped: " + ChatColor.RED + NUMBER_FORMAT.format(drop) + "!");        
+        double remaining = dropAmount(died,drop);
+        
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (player.getName().equalsIgnoreCase(event.getEntity().getName())) {
                 continue;
-            }
-            player.sendMessage(ChatColor.AQUA + died.getDisplayName() + " died and dropped: " + ChatColor.GOLD + NUMBER_FORMAT.format(drop) + "!");
-            dropAmount(player,drop);
+            }            
+            player.sendMessage(ChatColor.AQUA + died.getDisplayName() + " died and dropped: " + ChatColor.GOLD + NUMBER_FORMAT.format(drop-remaining) + "!");
         }
+        died.sendMessage("You dropped: " + ChatColor.RED + NUMBER_FORMAT.format(drop-remaining) + "!");
     }
     
     public double getDropAmountMultiple() {
@@ -61,13 +81,58 @@ public class EconListener implements Listener {
         return (lower + (upper - lower) * this.RANDOM.nextDouble()) / 100;
     }
     
-    public void dropAmount(Player player, double amount) {
+    public double dropAmount(Player player, double amount) {
         
-        ItemStack platinumCoin = new ItemStack(Material.getMaterial("ALMURACOIN_PLATINUMCOIN"), 1, (short) 0); // $1,000,000
-        ItemStack goldCoin = new ItemStack(Material.getMaterial("ALMURACOIN_GOLDCOIN"), 1, (short) 0); // $100,000
-        ItemStack silverCoin = new ItemStack(Material.getMaterial("ALMURACOIN_SILVERCOIN"), 1, (short) 0); // $1,000
-        ItemStack copperCoin = new ItemStack(Material.getMaterial("ALMURACOIN_COPPERCOIN"), 1, (short) 0); // $100
+        double remainingMoney = amount;
+        int platinum = (int) (remainingMoney / 1000000);
+        remainingMoney -= platinum * 1000000;
+        int gold = (int) (remainingMoney / 100000);
+        remainingMoney -= gold * 100000;
+        int silver = (int) (remainingMoney / 1000);
+        remainingMoney -= silver * 1000;
+        int copper = (int) (remainingMoney / 100);
+        remainingMoney -= copper * 100;
+        
+        while (platinum > 0) {
+            if (platinum > 64) {            
+                player.getWorld().dropItemNaturally(player.getLocation(), new ItemStack(Material.getMaterial("ALMURA_CURRENCYPLATINUMCOIN"), 64, (short) 0)); // $100,000
+                platinum-=64;
+            } else {
+                player.getWorld().dropItemNaturally(player.getLocation(), new ItemStack(Material.getMaterial("ALMURA_CURRENCYPLATINUMCOIN"), platinum, (short) 0)); // $100,000
+                break;
+            }                
+        }
+        
+        while (gold > 0) {
+            if (gold > 64) {            
+                player.getWorld().dropItemNaturally(player.getLocation(), new ItemStack(Material.getMaterial("ALMURA_CURRENCYGOLDCOIN"), 64, (short) 0)); // $100,000
+                gold-=64;
+            } else {
+                player.getWorld().dropItemNaturally(player.getLocation(), new ItemStack(Material.getMaterial("ALMURA_CURRENCYGOLDCOIN"), gold, (short) 0)); // $100,000
+                break;
+            }                
+        }
+        
+        while (silver > 0) {
+            if (silver > 64) {            
+                player.getWorld().dropItemNaturally(player.getLocation(), new ItemStack(Material.getMaterial("ALMURA_CURRENCYSILVERCOIN"), 64, (short) 0)); // $100,000
+                silver-=64;
+            } else {
+                player.getWorld().dropItemNaturally(player.getLocation(), new ItemStack(Material.getMaterial("ALMURA_CURRENCYSILVERCOIN"), silver, (short) 0)); // $100,000
+                break;
+            }                
+        }
+        
+        while (copper > 0) {
+            if (copper > 64) {            
+                player.getWorld().dropItemNaturally(player.getLocation(), new ItemStack(Material.getMaterial("ALMURA_CURRENCYCOPPERCOIN"), 64, (short) 0)); // $100,000
+                copper-=64;
+            } else {
+                player.getWorld().dropItemNaturally(player.getLocation(), new ItemStack(Material.getMaterial("ALMURA_CURRENCYCOPPERCOIN"), copper, (short) 0)); // $100,000
+                break;
+            }                
+        }
 
-        // player.getWorld().dropItemNaturally(player.getLocation(), stacks???);
+        return remainingMoney;
     }
 }

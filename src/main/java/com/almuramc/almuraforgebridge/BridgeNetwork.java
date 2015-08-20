@@ -38,7 +38,6 @@
  */
 package com.almuramc.almuraforgebridge;
 
-import com.almuradev.almura.extension.entity.IExtendedEntityLivingBase;
 import com.google.common.base.Charsets;
 import com.greatmancode.craftconomy3.tools.events.bukkit.events.EconomyChangeEvent;
 
@@ -91,7 +90,189 @@ public class BridgeNetwork implements Listener {
             economy = economyProvider.getProvider();
         }
     }
-    
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onPlayerJoin(final PlayerJoinEvent event) {
+        event.setJoinMessage("");
+
+        Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
+            @Override
+            public void run() {
+                final ClaimedResidence res = Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation());
+                sendResidenceInfo(event.getPlayer(), res);
+                // Broadcast Login
+                BridgePlugin.broadcastLogin(event.getPlayer());
+                // Send Title                    
+
+                for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+                    sendAdditionalWorldInfo(player, player.getWorld().getName(), Bukkit.getOnlinePlayers().size(), Bukkit.getMaxPlayers());
+                    sendDisplayName(player, player.getName(), ChatColor.stripColor(player.getDisplayName()) + "\n" + BridgePlugin.getCustomTitle(player));
+                    if (!player.getName().equalsIgnoreCase(event.getPlayer().getName())) {                            
+                        sendDisplayName(event.getPlayer(), player.getName(), ChatColor.stripColor(event.getPlayer().getDisplayName()) + "\n" + BridgePlugin.getCustomTitle(event.getPlayer()));
+                    }
+                }
+            }
+        }, 20L);
+
+        sendCurrencyAmount(event.getPlayer(), economy.getBalance(event.getPlayer().getName()));
+
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onPlayerQuit(final PlayerQuitEvent event) {
+        event.setQuitMessage("");
+        Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
+            @Override
+            public void run() {
+                for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+                    sendAdditionalWorldInfo(player, player.getWorld().getName(), Bukkit.getOnlinePlayers().size(), Bukkit.getMaxPlayers());
+                }
+            }
+        }, 20L);
+        BridgePlugin.broadcastLogout(event.getPlayer());
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onPlayerChangedWorld(final PlayerChangedWorldEvent event) {
+
+        Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
+            @Override
+            public void run() {
+                final ClaimedResidence res = Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation());
+                sendResidenceInfo(event.getPlayer(), res);
+
+                for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+                    sendAdditionalWorldInfo(player, player.getWorld().getName(), Bukkit.getOnlinePlayers().size(), Bukkit.getMaxPlayers());
+                    sendDisplayName(player, player.getName(), ChatColor.stripColor(player.getDisplayName()) + "\n" + BridgePlugin.getCustomTitle(player));
+                    if (!player.getName().equalsIgnoreCase(event.getPlayer().getName())) {                            
+                        sendDisplayName(event.getPlayer(), player.getName(), ChatColor.stripColor(event.getPlayer().getDisplayName()) + "\n" + BridgePlugin.getCustomTitle(event.getPlayer()));
+                    }
+                }
+            }
+        }, 10L);
+
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onNickChanged(NickChangeEvent event) {
+        final Player p = Bukkit.getPlayer(event.getController().getName());
+        if (p == null) {
+            return;
+        }
+
+        Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
+            @Override
+            public void run() {
+                for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+                    sendAdditionalWorldInfo(player, player.getWorld().getName(), Bukkit.getOnlinePlayers().size(), Bukkit.getMaxPlayers());
+                    sendDisplayName(player, player.getName(), ChatColor.stripColor(player.getDisplayName()) + "\n" + BridgePlugin.getCustomTitle(player));                        
+                }
+            }
+        }, 10L);
+
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onGMUserEvent(GMUserEvent userEvent) {
+        final Player p = Bukkit.getPlayer(userEvent.getUserName());
+        if (p == null) {
+            return;
+        }        
+        Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
+            @Override
+            public void run() {
+                for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+                    sendAdditionalWorldInfo(player, player.getWorld().getName(), Bukkit.getOnlinePlayers().size(), Bukkit.getMaxPlayers());
+                    sendDisplayName(player, player.getName(), ChatColor.stripColor(player.getDisplayName()) + "\n" + BridgePlugin.getCustomTitle(player));                        
+                }
+            }
+        }, 20L);        
+    }    
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onPlayerTeleport(final PlayerTeleportEvent event) {        
+        Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
+            @Override
+            public void run() {
+                final ClaimedResidence res = Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation());
+                sendResidenceInfo(event.getPlayer(), res);
+
+                for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+                    sendAdditionalWorldInfo(player, player.getWorld().getName(), Bukkit.getOnlinePlayers().size(), Bukkit.getMaxPlayers());
+                    sendDisplayName(player, player.getName(), ChatColor.stripColor(event.getPlayer().getDisplayName()) + "\n" + BridgePlugin.getCustomTitle(player));
+                    if (!player.getName().equalsIgnoreCase(event.getPlayer().getName())) {                            
+                        sendDisplayName(event.getPlayer(), player.getName(), ChatColor.stripColor(event.getPlayer().getDisplayName()) + "\n" + BridgePlugin.getCustomTitle(event.getPlayer()));
+                    }
+                }
+            }
+        }, 10L);
+
+    }
+
+    @EventHandler
+    public void onEconomyChange(EconomyChangeEvent event) {
+        Player player = Bukkit.getPlayer(event.getAccount());
+        if (player != null) {
+            sendCurrencyAmount(player, event.getAmount());
+        }
+    }
+
+    @EventHandler
+    public void onResidenceFlagChangeEvent(final ResidenceFlagChangeEvent event) {
+        Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
+            public void run() {
+                if (event.getPlayer() == null) return;
+                ClaimedResidence res = Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation());
+                for (Player player : res.getPlayersInResidence()) {
+                    sendResidenceInfo(player, res);
+                }
+            }
+        }, 20L);
+    }
+
+    @EventHandler
+    public void onResidenceChangedEvent(final ResidenceChangedEvent event) {
+        Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
+            public void run() {
+                if (event.getPlayer() == null) return;
+                ClaimedResidence res = Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation());
+                sendResidenceInfo(event.getPlayer(), res);
+            }
+        }, 20L);
+    }
+
+    @EventHandler
+    public void onResidenceCreationEvent(final ResidenceCreationEvent event) {
+        Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
+            public void run() {
+                if (event.getPlayer() == null) return;
+                ClaimedResidence res = Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation());
+                if (res == null) return;
+                for (Player player : res.getPlayersInResidence()) {
+                    sendResidenceInfo(player, res);
+                }
+            }
+        }, 20L);
+    }
+
+    @EventHandler
+    public void onResidenceDeleteEvent(final ResidenceDeleteEvent event) {
+        Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
+            public void run() {
+                if (Residence.getResidenceManager() == null)
+                    System.out.println("BridgeNetwork.java - Debug2 - Residence Manager Null");
+                if (event.getPlayer() == null)
+                    System.out.println("BridgeNetwork.java - Debug2 - Player is  Null");
+                if (event.getPlayer() != null && event.getPlayer().getLocation() == null)
+                    System.out.println("BridgeNetwork.java - Debug2 - Player Location is  Null");
+                ClaimedResidence res = Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation());
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    sendResidenceInfo(player, res);
+                }
+            }
+        }, 20L);
+    }
+
     public static void sendDisplayName(Player player, String username, String displayName) {
         final ByteBuffer buf = ByteBuffer.allocate(username.getBytes(Charsets.UTF_8).length + displayName.getBytes(Charsets.UTF_8).length + 4);
         writeUTF8String(buf, username);
@@ -264,27 +445,27 @@ public class BridgeNetwork implements Listener {
         StringBuilder sb = new StringBuilder();
         int[] types = new int[]
                 {
-                        Calendar.YEAR,
-                        Calendar.MONTH,
-                        Calendar.DAY_OF_MONTH,
-                        Calendar.HOUR_OF_DAY,
-                        Calendar.MINUTE,
-                        //Calendar.SECOND
+                Calendar.YEAR,
+                Calendar.MONTH,
+                Calendar.DAY_OF_MONTH,
+                Calendar.HOUR_OF_DAY,
+                Calendar.MINUTE,
+                //Calendar.SECOND
                 };
         String[] names = new String[]
                 {
-                        ("year"),
-                        ("years"),
-                        ("month"),
-                        ("months"),
-                        ("day"),
-                        ("days"),
-                        ("hour"),
-                        ("hours"),
-                        ("minute"),
-                        ("minutes"),
-                        //("second"),
-                        //("seconds")
+                ("year"),
+                ("years"),
+                ("month"),
+                ("months"),
+                ("day"),
+                ("days"),
+                ("hour"),
+                ("hours"),
+                ("minute"),
+                ("minutes"),
+                //("second"),
+                //("seconds")
                 };
         for (int i = 0; i < types.length; i++) {
             int diff = dateDiff(types[i], fromDate, toDate, future);
@@ -311,226 +492,5 @@ public class BridgeNetwork implements Listener {
         return diff;
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
-    public void onPlayerJoin(final PlayerJoinEvent event) {
-        event.setJoinMessage("");
-        if (((CraftPlayer) event.getPlayer()).getHandle() instanceof IExtendedEntityLivingBase) {
-            Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
-                @Override
-                public void run() {
-                    final ClaimedResidence res = Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation());
-                    sendResidenceInfo(event.getPlayer(), res);
-                    // Broadcast Login
-                    BridgePlugin.broadcastLogin(event.getPlayer());
-                    // Send Title
-                    BridgePlugin.setCustomTitle(event.getPlayer());
-                    
-                    for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-                        IExtendedEntityLivingBase extendedPlayer = (IExtendedEntityLivingBase) ((CraftPlayer) event.getPlayer()).getHandle();
 
-                        sendAdditionalWorldInfo(player, player.getWorld().getName(), Bukkit.getOnlinePlayers().size(), Bukkit.getMaxPlayers());
-
-                        String displayName = extendedPlayer.getTitle() == null ? ChatColor.stripColor(event.getPlayer().getDisplayName()) : ChatColor.stripColor(event.getPlayer().getDisplayName()) + "\n" + extendedPlayer.getTitle();
-
-                        sendDisplayName(player, event.getPlayer().getName(), displayName);
-
-                        // Send all other players display names to the joining player
-                        if (!player.getName().equalsIgnoreCase(event.getPlayer().getName())) {
-                            extendedPlayer = (IExtendedEntityLivingBase) ((CraftPlayer) player).getHandle();
-                            displayName = extendedPlayer.getTitle() == null ? ChatColor.stripColor(player.getDisplayName()) : ChatColor.stripColor(player.getDisplayName()) + "\n" + extendedPlayer.getTitle();
-                            sendDisplayName(event.getPlayer(), player.getName(), displayName);
-                        }
-                    }
-                }
-            }, 20L);
-
-            sendCurrencyAmount(event.getPlayer(), economy.getBalance(event.getPlayer().getName()));
-        }
-    }
-    
-    @EventHandler(priority = EventPriority.LOWEST)
-    public void onPlayerQuit(final PlayerQuitEvent event) {
-        event.setQuitMessage("");
-        Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
-            @Override
-            public void run() {
-                for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-                    sendAdditionalWorldInfo(player, player.getWorld().getName(), Bukkit.getOnlinePlayers().size(), Bukkit.getMaxPlayers());
-                }
-            }
-        }, 20L);
-        BridgePlugin.broadcastLogout(event.getPlayer());
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onPlayerChangedWorld(final PlayerChangedWorldEvent event) {
-        if (((CraftPlayer) event.getPlayer()).getHandle() instanceof IExtendedEntityLivingBase) {
-            Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
-                @Override
-                public void run() {
-                    final ClaimedResidence res = Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation());
-                    sendResidenceInfo(event.getPlayer(), res);
-
-                    for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-                        IExtendedEntityLivingBase extendedPlayer = (IExtendedEntityLivingBase) ((CraftPlayer) event.getPlayer()).getHandle();
-
-                        sendAdditionalWorldInfo(player, player.getWorld().getName(), Bukkit.getOnlinePlayers().size(), Bukkit.getMaxPlayers());
-
-                        String displayName = extendedPlayer.getTitle() == null ? ChatColor.WHITE + ChatColor.stripColor(event.getPlayer().getDisplayName()) : ChatColor.WHITE + ChatColor.stripColor(event.getPlayer().getDisplayName()) + "\n" + extendedPlayer.getTitle();
-
-                        sendDisplayName(player, event.getPlayer().getName(), displayName);
-
-                        if (!player.getName().equalsIgnoreCase(event.getPlayer().getName())) {
-                            extendedPlayer = (IExtendedEntityLivingBase) ((CraftPlayer) player).getHandle();
-                            displayName = extendedPlayer.getTitle() == null ? ChatColor.WHITE + ChatColor.stripColor(player.getDisplayName()) : ChatColor.WHITE + ChatColor.stripColor(player.getDisplayName()) + "\n" + extendedPlayer.getTitle();
-                            sendDisplayName(event.getPlayer(), player.getName(), displayName);
-                        }
-                    }
-                }
-            }, 10L);
-        }
-    }
-    
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onNickChanged(NickChangeEvent event) {
-        final Player p = Bukkit.getPlayer(event.getController().getName());
-        if (p == null) {
-            return;
-        }
-
-        if (((CraftPlayer) p).getHandle() instanceof IExtendedEntityLivingBase) {
-            Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
-                @Override
-                public void run() {
-                    for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-                        IExtendedEntityLivingBase extendedPlayer = (IExtendedEntityLivingBase) ((CraftPlayer) p).getHandle();
-
-                        sendAdditionalWorldInfo(player, player.getWorld().getName(), Bukkit.getOnlinePlayers().size(), Bukkit.getMaxPlayers());
-
-                        String displayName = extendedPlayer.getTitle() == null ? ChatColor.WHITE + ChatColor.stripColor(p.getDisplayName()) : ChatColor.WHITE + ChatColor.stripColor(p.getDisplayName()) + "\n" + extendedPlayer.getTitle();
-
-                        sendDisplayName(player, p.getName(), displayName);
-                    }
-                }
-            }, 10L);
-        }
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onGMUserEvent(GMUserEvent userEvent) {
-        final Player p = Bukkit.getPlayer(userEvent.getUserName());
-        if (p == null) {
-            return;
-        }
-
-        if (((CraftPlayer) p).getHandle() instanceof IExtendedEntityLivingBase) {
-            Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
-                @Override
-                public void run() {
-                    for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-                        IExtendedEntityLivingBase extendedPlayer = (IExtendedEntityLivingBase) ((CraftPlayer) p).getHandle();
-
-                        sendAdditionalWorldInfo(player, player.getWorld().getName(), Bukkit.getOnlinePlayers().size(), Bukkit.getMaxPlayers());
-
-                        String displayName = extendedPlayer.getTitle() == null ? ChatColor.WHITE + ChatColor.stripColor(p.getDisplayName()) : ChatColor.WHITE + ChatColor.stripColor(p.getDisplayName()) + "\n" + extendedPlayer.getTitle();
-
-                        sendDisplayName(player, p.getName(), displayName);
-                    }
-                }
-            }, 20L);
-        }
-    }    
-
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onPlayerTeleport(final PlayerTeleportEvent event) {
-        if (((CraftPlayer) event.getPlayer()).getHandle() instanceof IExtendedEntityLivingBase) {
-            Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
-                @Override
-                public void run() {
-                    final ClaimedResidence res = Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation());
-                    sendResidenceInfo(event.getPlayer(), res);
-
-                    for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-                        IExtendedEntityLivingBase extendedPlayer = (IExtendedEntityLivingBase) ((CraftPlayer) event.getPlayer()).getHandle();
-
-                        sendAdditionalWorldInfo(player, player.getWorld().getName(), Bukkit.getOnlinePlayers().size(), Bukkit.getMaxPlayers());
-
-                        String displayName = extendedPlayer.getTitle() == null ? ChatColor.WHITE + ChatColor.stripColor(event.getPlayer().getDisplayName()) : ChatColor.WHITE + ChatColor.stripColor(event.getPlayer().getDisplayName()) + "\n" + extendedPlayer.getTitle();
-
-                        sendDisplayName(player, event.getPlayer().getName(), displayName);
-
-                        if (!player.getName().equalsIgnoreCase(event.getPlayer().getName())) {
-                            extendedPlayer = (IExtendedEntityLivingBase) ((CraftPlayer) player).getHandle();
-                            displayName = extendedPlayer.getTitle() == null ? ChatColor.WHITE + ChatColor.stripColor(player.getDisplayName()) : ChatColor.WHITE + ChatColor.stripColor(player.getDisplayName()) + "\n" + extendedPlayer.getTitle();
-                            sendDisplayName(event.getPlayer(), player.getName(), displayName);
-                        }
-                    }
-                }
-            }, 10L);
-        }
-    }
-
-    @EventHandler
-    public void onEconomyChange(EconomyChangeEvent event) {
-        Player player = Bukkit.getPlayer(event.getAccount());
-        if (player != null) {
-            sendCurrencyAmount(player, event.getAmount());
-        }
-    }
-
-    @EventHandler
-    public void onResidenceFlagChangeEvent(final ResidenceFlagChangeEvent event) {
-        Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
-            public void run() {
-                if (event.getPlayer() == null) return;
-                ClaimedResidence res = Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation());
-                for (Player player : res.getPlayersInResidence()) {
-                    sendResidenceInfo(player, res);
-                }
-            }
-        }, 20L);
-    }
-
-    @EventHandler
-    public void onResidenceChangedEvent(final ResidenceChangedEvent event) {
-        Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
-            public void run() {
-                if (event.getPlayer() == null) return;
-                ClaimedResidence res = Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation());
-                sendResidenceInfo(event.getPlayer(), res);
-            }
-        }, 20L);
-    }
-
-    @EventHandler
-    public void onResidenceCreationEvent(final ResidenceCreationEvent event) {
-        Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
-            public void run() {
-                if (event.getPlayer() == null) return;
-                ClaimedResidence res = Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation());
-                if (res == null) return;
-                for (Player player : res.getPlayersInResidence()) {
-                    sendResidenceInfo(player, res);
-                }
-            }
-        }, 20L);
-    }
-
-    @EventHandler
-    public void onResidenceDeleteEvent(final ResidenceDeleteEvent event) {
-        Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
-            public void run() {
-                if (Residence.getResidenceManager() == null)
-                    System.out.println("BridgeNetwork.java - Debug2 - Residence Manager Null");
-                if (event.getPlayer() == null)
-                    System.out.println("BridgeNetwork.java - Debug2 - Player is  Null");
-                if (event.getPlayer() != null && event.getPlayer().getLocation() == null)
-                    System.out.println("BridgeNetwork.java - Debug2 - Player Location is  Null");
-                ClaimedResidence res = Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation());
-                    for (Player player : Bukkit.getOnlinePlayers()) {
-                        sendResidenceInfo(player, res);
-                    }
-                }
-        }, 20L);
-    }
 }

@@ -57,7 +57,7 @@
  */
 package com.almuramc.almuraforgebridge;
 
-import com.almuradev.almura.extension.entity.IExtendedEntityLivingBase;
+import com.almuradev.almura.econ.EconListener;
 
 import org.anjocaido.groupmanager.events.GMUserEvent;
 import org.bukkit.Bukkit;
@@ -149,6 +149,7 @@ public class BridgePlugin extends JavaPlugin implements Listener {
         PluginManager pm = getServer().getPluginManager();
         pm.registerEvents(this, this);
         pm.registerEvents(new BridgeNetwork(), this);
+        pm.registerEvents(new EconListener(), this);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -156,8 +157,7 @@ public class BridgePlugin extends JavaPlugin implements Listener {
         final GMUserEvent event = userEvent;
         final Player player = event.getUser().getBukkitPlayer();
         Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
-            public void run() {
-                setCustomTitle(player);
+            public void run() {                
                 if ((GMUserEvent.Action.USER_GROUP_CHANGED == event.getAction()) && (event.getUser().getGroupName().equalsIgnoreCase("contributor"))) {
                     Bukkit.broadcastMessage(
                             ChatColor.DARK_PURPLE + player.getDisplayName() + ChatColor.WHITE + " has been granted: [" + ChatColor.GOLD + event
@@ -383,73 +383,54 @@ public class BridgePlugin extends JavaPlugin implements Listener {
         }
     }
 
-    public static String getCustomTitle(Player player) {
-        if (((CraftPlayer) player).getHandle() instanceof IExtendedEntityLivingBase) {
-            final IExtendedEntityLivingBase extendedPlayer = (IExtendedEntityLivingBase) ((CraftPlayer) player).getHandle();
-            return extendedPlayer.getTitle();
+    public static String getCustomTitle(Player player) {        
+        if (player.getName().equalsIgnoreCase("ninjazidane")) {
+            return (spongeleaderColor1 + "Sponge " + spongeleaderColor2 + "Leader");            
         }
-        return "No title";
-    }
 
-    public static void setCustomTitle(Player player) {
-        if (((CraftPlayer) player).getHandle() instanceof IExtendedEntityLivingBase) {
-            final IExtendedEntityLivingBase extendedPlayer = (IExtendedEntityLivingBase) ((CraftPlayer) player).getHandle();
-            if (player.getName().equalsIgnoreCase("ninjazidane")) {
-                extendedPlayer.setTitle(spongeleaderColor1 + "Sponge " + spongeleaderColor2 + "Leader");
-                return;
-            }
+        if (player.hasPermission("admin.title") && player.isOp()) {
+            return (superadminColor + "SuperAdmin");
+        }
 
-            if (player.hasPermission("admin.title") && player.isOp()) {
-                extendedPlayer.setTitle(superadminColor + "SuperAdmin");
-                return;
-            }
-
-            if (player.hasPermission("admin.title") && !player.isOp()) {
-                if (player.getName().equalsIgnoreCase("wifee")) {
-                    extendedPlayer.setTitle(ChatColor.GOLD + "Destroyer of Worlds");
-                } else if (player.getName().equalsIgnoreCase("wolfeyeamd0")) {
-                    extendedPlayer.setTitle(ChatColor.GOLD + "Harbinger");
-                } else {
-                    extendedPlayer.setTitle(adminColor + "Admin");
-                }
-                return;
-            }
-
-            if (player.hasPermission("moderator.title") && !player.hasPermission("Admin.title")) {
-                extendedPlayer.setTitle(moderatorColor + "Moderator");
-                return;
-            }
-
-            if (player.hasPermission("veteran.title") && !player.hasPermission("moderator.title")) {
-                extendedPlayer.setTitle(veteranColor + "Veteran");
-                return;
-            }
-
-            if (player.hasPermission("contributor.title") && !player.hasPermission("veteran.title")) {
-                extendedPlayer.setTitle(contributorColor + "Contributor");
-                return;
-            }
-
-            if (player.hasPermission("member.title") && !player.hasPermission("contributor.title")) {
-                extendedPlayer.setTitle(memberColor + "Member");
-                return;
-            }
-
-            if (!player.hasPlayedBefore()) {
-                extendedPlayer.setTitle(newbieColor + "Newbie");
-                return;
-            }
-
-            if (player.hasPermission("guest.title") && !player.hasPermission("member.title")) {
-                extendedPlayer.setTitle(guestColor + "Guest");
-                return;
-            }
-
-            if (player.hasPermission("survival.title") && !player.hasPermission("member.title")) {
-                extendedPlayer.setTitle(survivalColor + "Survival");
-                return;
+        if (player.hasPermission("admin.title") && !player.isOp()) {
+            if (player.getName().equalsIgnoreCase("wifee")) {
+                return (ChatColor.GOLD + "Destroyer of Worlds");
+            } else if (player.getName().equalsIgnoreCase("wolfeyeamd0")) {
+                return (ChatColor.GOLD + "Harbinger");
+            } else {
+                return (adminColor + "Admin");
             }
         }
+
+        if (player.hasPermission("moderator.title") && !player.hasPermission("Admin.title")) {
+            return (moderatorColor + "Moderator");            
+        }
+
+        if (player.hasPermission("veteran.title") && !player.hasPermission("moderator.title")) {
+            return (veteranColor + "Veteran");            
+        }
+
+        if (player.hasPermission("contributor.title") && !player.hasPermission("veteran.title")) {
+            return (contributorColor + "Contributor");            
+        }
+
+        if (player.hasPermission("member.title") && !player.hasPermission("contributor.title")) {
+            return (memberColor + "Member");            
+        }
+
+        if (!player.hasPlayedBefore()) {
+            return (newbieColor + "Newbie");            
+        }
+
+        if (player.hasPermission("guest.title") && !player.hasPermission("member.title")) {
+            return (guestColor + "Guest");            
+        }
+
+        if (player.hasPermission("survival.title") && !player.hasPermission("member.title")) {
+            return (survivalColor + "Survival");            
+        }
+        return null;
+
     }
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
