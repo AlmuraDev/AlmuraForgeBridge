@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License. If not,
  * see <http://www.gnu.org/licenses/> for the GNU General Public License.
  */
-package com.almuradev.almura.econ;
+package com.almuramc.forgebridge.listeners;
 
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -32,34 +32,34 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
 
+import com.almuramc.forgebridge.utils.VaultUtil;
+
 public class EconListener implements Listener {
-    
+
     public static final Locale CURRENCY_LOCALE = new Locale("en", "US");
     public static final NumberFormat NUMBER_FORMAT = NumberFormat.getCurrencyInstance(CURRENCY_LOCALE);
     public static final String INPUT_REGEX = "([a-zA-Z-\\s0-9]+)";
     public static final Random RANDOM = new Random();
-    
+
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
-        //if (!event.getEntity().hasPermission("econ.death")) {
-        //    return;
-        //}
         final Player died = event.getEntity();
         final double deathTax = getDropAmountMultiple();
         final double carrying = VaultUtil.getBalance(died.getName());
         final double drop = carrying - (carrying * deathTax);
         VaultUtil.add(died.getName(), -drop);
         double remaining = dropAmount(died,drop);
-        
+
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (player.getName().equalsIgnoreCase(event.getEntity().getName())) {
                 continue;
             }            
             player.sendMessage(ChatColor.AQUA + died.getDisplayName() + " died and dropped: " + ChatColor.GOLD + NUMBER_FORMAT.format(drop-remaining) + "!");
         }
+        Bukkit.getLogger().info("[Bridge Economy] - Player: " + died.getName() + " / " + died.getDisplayName() + " dropped: " + (drop-remaining));
         died.sendMessage("You dropped: " + ChatColor.RED + NUMBER_FORMAT.format(drop-remaining) + "!");
     }
-    
+
     public double getDropAmountMultiple() {
         final String raw = "25-75";
         final String[] parsed = raw.split("-");
@@ -78,11 +78,10 @@ public class EconListener implements Listener {
             }
         }
         //Pick random from range
-        return (lower + (upper - lower) * this.RANDOM.nextDouble()) / 100;
+        return (lower + (upper - lower) * EconListener.RANDOM.nextDouble()) / 100;
     }
-    
+
     public double dropAmount(Player player, double amount) {
-        
         double remainingMoney = amount;
         int platinum = (int) (remainingMoney / 1000000);
         remainingMoney -= platinum * 1000000;
@@ -92,7 +91,7 @@ public class EconListener implements Listener {
         remainingMoney -= silver * 1000;
         int copper = (int) (remainingMoney / 100);
         remainingMoney -= copper * 100;
-        
+
         while (platinum > 0) {
             if (platinum > 64) {            
                 player.getWorld().dropItemNaturally(player.getLocation(), new ItemStack(Material.getMaterial("ALMURA_CURRENCYPLATINUMCOIN"), 64, (short) 0)); // $100,000
@@ -102,7 +101,7 @@ public class EconListener implements Listener {
                 break;
             }                
         }
-        
+
         while (gold > 0) {
             if (gold > 64) {            
                 player.getWorld().dropItemNaturally(player.getLocation(), new ItemStack(Material.getMaterial("ALMURA_CURRENCYGOLDCOIN"), 64, (short) 0)); // $100,000
@@ -112,7 +111,7 @@ public class EconListener implements Listener {
                 break;
             }                
         }
-        
+
         while (silver > 0) {
             if (silver > 64) {            
                 player.getWorld().dropItemNaturally(player.getLocation(), new ItemStack(Material.getMaterial("ALMURA_CURRENCYSILVERCOIN"), 64, (short) 0)); // $100,000
@@ -122,7 +121,7 @@ public class EconListener implements Listener {
                 break;
             }                
         }
-        
+
         while (copper > 0) {
             if (copper > 64) {            
                 player.getWorld().dropItemNaturally(player.getLocation(), new ItemStack(Material.getMaterial("ALMURA_CURRENCYCOPPERCOIN"), 64, (short) 0)); // $100,000

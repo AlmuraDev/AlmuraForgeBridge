@@ -1,17 +1,19 @@
 name: AlmuraForgeBridge
-main: com.almuramc.almuraforgebridge.BridgePlugin
-version: 1.0
+main: com.almuramc.forgebridge.BridgePlugin
+version: 2.0
 authors: [AlmuraDev]
 commands:
-    bridge-info:
-        description: The general command of Bridge Info
+    bridge:
+        description: The general command of Bridge.
         aliases: 
-        usage: /bridge-info
-    bridge-info-debug:
-        description: The general command of Bridge Info Debug
-        aliases: 
-        usage: /bridge-info-debug
-    bridge-clear-items:
-        description: The general command of Bridge Clear Items Method
-        aliases: 
-        usage: /bridge-clear-items
+        usage: /bridge [arguments]
+permissions:
+    bridge.info:
+        description: Allows users to view chunk inforatmion.
+        default: op
+    bridge.debug:
+        description: Allows users to view chunk debug inforatmion.
+        default: op
+    bridge.clearitems:
+        description: Allows users to clear items on the server.
+        default: op        
