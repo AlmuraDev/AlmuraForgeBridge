@@ -24,6 +24,7 @@ import net.ess3.api.events.NickChangeEvent;
 import org.anjocaido.groupmanager.events.GMUserEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -93,17 +94,23 @@ public class PlayerListener implements Listener {
                 event.getPlayer().sendMessage(ChatColor.WHITE + "Biome: " + ChatColor.LIGHT_PURPLE + event.getClickedBlock().getBiome() + "\n");
             }
         }
-        
+
         // Banking System
-        if (event.getClickedBlock() != null && event.getPlayer().getItemInHand() != null) {
-            if ((EconUtil.coinValue(event.getPlayer().getItemInHand())>0) && EconUtil.isBankingBlock(event.getClickedBlock())) {                
-                int quantity = event.getPlayer().getItemInHand().getAmount();
-                double value = EconUtil.coinValue(event.getPlayer().getItemInHand());
-                double amountToDeposit = quantity * value;                
-                EconUtil.add(event.getPlayer().getName(), amountToDeposit);
-                event.getPlayer().setItemInHand(new ItemStack(Material.AIR));
-                event.getPlayer().sendMessage("[Bank Deposit] - Deposited coins in the amount of: " + EconListener.NUMBER_FORMAT.format(amountToDeposit));
-                Bukkit.getLogger().info("Deposited coins in the amount of: " + EconListener.NUMBER_FORMAT.format(amountToDeposit) + " for player: " + event.getPlayer().getName());
+        if (!event.getPlayer().getWorld().getName().equalsIgnoreCase("Othala") && event.getPlayer().getGameMode() != GameMode.CREATIVE && event.getClickedBlock() != null) {
+            if (EconUtil.isBankingBlock(event.getClickedBlock())) {
+                if (event.getPlayer().getItemInHand() == null || EconUtil.getCoinValue(event.getPlayer().getItemInHand())==0) {
+                    event.getPlayer().sendMessage("[" + ChatColor.DARK_AQUA + "Bank Deposit" + ChatColor.WHITE + "] - please put your coins in your hand to deposit them. ");
+                } else {                
+                    if ((EconUtil.getCoinValue(event.getPlayer().getItemInHand())>0) && EconUtil.isBankingBlock(event.getClickedBlock())) {                
+                        int quantity = event.getPlayer().getItemInHand().getAmount();
+                        double value = EconUtil.getCoinValue(event.getPlayer().getItemInHand());
+                        double amountToDeposit = quantity * value;                
+                        EconUtil.add(event.getPlayer().getName(), amountToDeposit);
+                        event.getPlayer().setItemInHand(new ItemStack(Material.AIR));
+                        event.getPlayer().sendMessage("[" + ChatColor.DARK_AQUA + "Bank Deposit" + ChatColor.WHITE + "] - Deposited coins in the amount of: " + ChatColor.GOLD + EconListener.NUMBER_FORMAT.format(amountToDeposit));
+                        Bukkit.getLogger().info("Deposited coins in the amount of: " + EconListener.NUMBER_FORMAT.format(amountToDeposit) + " for player: " + event.getPlayer().getName());
+                    } 
+                }
             }
         }
     }

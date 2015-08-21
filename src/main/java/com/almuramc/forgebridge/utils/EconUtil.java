@@ -110,7 +110,7 @@ public final class EconUtil {
         return permission != null;
     }
     
-    public static double coinValue(ItemStack item) {
+    public static double getCoinValue(ItemStack item) {
             if (item.getType() == Material.getMaterial("ALMURA_CURRENCYCOPPERCOIN")) {
                 return 100;
             }
