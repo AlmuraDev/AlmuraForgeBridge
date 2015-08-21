@@ -34,10 +34,12 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.inventory.ItemStack;
+
 import com.almuramc.forgebridge.BridgePlugin;
 import com.almuramc.forgebridge.utils.ServerWorldUtil;
 import com.almuramc.forgebridge.utils.TitleUtil;
-import com.almuramc.forgebridge.utils.VaultUtil;
+import com.almuramc.forgebridge.utils.EconUtil;
 import com.bekvon.bukkit.residence.Residence;
 import com.bekvon.bukkit.residence.event.ResidenceChangedEvent;
 import com.bekvon.bukkit.residence.event.ResidenceCreationEvent;
@@ -77,10 +79,11 @@ public class PlayerListener implements Listener {
         }, 5L); //Delayed so this Group Manager has time to change the players group.
     }
 
-    // AlmuraMod's Information Wand.  Prints additional information from Bukkit side of server about the block that was just clicked to client's chat window.
+    // AlmuraMod's Player Interact, many things happen here.
     @SuppressWarnings("deprecation")
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
+        // AlmuraMod's Information Wand - Additional Chat information.
         if (event.getPlayer().getItemInHand().getType() == Material.getMaterial("ALMURA_WANDINFORMATION")) {
             if (event.getClickedBlock() != null) {
                 event.getPlayer().sendMessage(ChatColor.ITALIC + "Block Information:");
@@ -88,6 +91,19 @@ public class PlayerListener implements Listener {
                 event.getPlayer().sendMessage(ChatColor.WHITE + "Material: " + ChatColor.GOLD + event.getClickedBlock().getType());
                 event.getPlayer().sendMessage(ChatColor.WHITE + "MetaData: " + ChatColor.AQUA + event.getClickedBlock().getData());
                 event.getPlayer().sendMessage(ChatColor.WHITE + "Biome: " + ChatColor.LIGHT_PURPLE + event.getClickedBlock().getBiome() + "\n");
+            }
+        }
+        
+        // Banking System
+        if (event.getClickedBlock() != null && event.getPlayer().getItemInHand() != null) {
+            if ((EconUtil.coinValue(event.getPlayer().getItemInHand())>0) && EconUtil.isBankingBlock(event.getClickedBlock())) {                
+                int quantity = event.getPlayer().getItemInHand().getAmount();
+                double value = EconUtil.coinValue(event.getPlayer().getItemInHand());
+                double amountToDeposit = quantity * value;                
+                EconUtil.add(event.getPlayer().getName(), amountToDeposit);
+                event.getPlayer().setItemInHand(new ItemStack(Material.AIR));
+                event.getPlayer().sendMessage("[Bank Deposit] - Deposited coins in the amount of: " + EconListener.NUMBER_FORMAT.format(amountToDeposit));
+                Bukkit.getLogger().info("Deposited coins in the amount of: " + EconListener.NUMBER_FORMAT.format(amountToDeposit) + " for player: " + event.getPlayer().getName());
             }
         }
     }
@@ -115,7 +131,7 @@ public class PlayerListener implements Listener {
                 }
             }
         }, 20L);
-        VaultUtil.sendCurrencyAmount(event.getPlayer(), VaultUtil.economy.getBalance(event.getPlayer().getName()));
+        EconUtil.sendCurrencyAmount(event.getPlayer(), EconUtil.economy.getBalance(event.getPlayer().getName()));
     }
     // Player Quit event, send critical player/world/display name information to client for AlmuraMod's GUI
     @EventHandler(priority = EventPriority.LOWEST)
@@ -199,7 +215,7 @@ public class PlayerListener implements Listener {
     public void onEconomyChange(EconomyChangeEvent event) {
         Player player = Bukkit.getPlayer(event.getAccount());
         if (player != null) {
-            VaultUtil.sendCurrencyAmount(player, event.getAmount());
+            EconUtil.sendCurrencyAmount(player, event.getAmount());
         }
     }
 

@@ -44,13 +44,16 @@ import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
 import com.almuramc.forgebridge.BridgePlugin;
 
 @SuppressWarnings("deprecation")
-public final class VaultUtil {
+public final class EconUtil {
 
     public static final Economy economy;
     public static final Permission permission;
@@ -105,5 +108,28 @@ public final class VaultUtil {
 
     public static boolean hasPermissions() {
         return permission != null;
+    }
+    
+    public static double coinValue(ItemStack item) {
+            if (item.getType() == Material.getMaterial("ALMURA_CURRENCYCOPPERCOIN")) {
+                return 100;
+            }
+            if (item.getType() == Material.getMaterial("ALMURA_CURRENCYSILVERCOIN")) {
+                return 1000;
+            }
+            if (item.getType() == Material.getMaterial("ALMURA_CURRENCYGOLDCOIN")) {
+                return 100000;
+            }
+            if (item.getType() == Material.getMaterial("ALMURA_CURRENCYPLATINUMCOIN")) {
+                return 1000000;
+            }
+        return 0;        
+    }
+    
+    public static boolean isBankingBlock(Block block) {
+        if (block.getType() == Material.getMaterial("ALMURA_CURRENCYDEPOSITBOX")) {
+            return true;        
+        }
+        return false;
     }
 }

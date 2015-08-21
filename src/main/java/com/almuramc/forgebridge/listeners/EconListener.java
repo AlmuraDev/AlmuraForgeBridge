@@ -32,7 +32,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
 
-import com.almuramc.forgebridge.utils.VaultUtil;
+import com.almuramc.forgebridge.utils.EconUtil;
 
 public class EconListener implements Listener {
 
@@ -45,9 +45,9 @@ public class EconListener implements Listener {
     public void onPlayerDeath(PlayerDeathEvent event) {
         final Player died = event.getEntity();
         final double deathTax = getDropAmountMultiple();
-        final double carrying = VaultUtil.getBalance(died.getName());
+        final double carrying = EconUtil.getBalance(died.getName());
         final double drop = carrying - (carrying * deathTax);
-        VaultUtil.add(died.getName(), -drop);
+        EconUtil.add(died.getName(), -drop);
         double remaining = dropAmount(died,drop);
 
         for (Player player : Bukkit.getOnlinePlayers()) {
@@ -56,7 +56,7 @@ public class EconListener implements Listener {
             }            
             player.sendMessage(ChatColor.AQUA + died.getDisplayName() + " died and dropped: " + ChatColor.GOLD + NUMBER_FORMAT.format(drop-remaining) + "!");
         }
-        Bukkit.getLogger().info("[Bridge Economy] - Player: " + died.getName() + " / " + died.getDisplayName() + " dropped: " + (drop-remaining));
+        Bukkit.getLogger().info("[Bridge Economy] - Player: " + died.getName() + " / " + died.getDisplayName() + " dropped: " + NUMBER_FORMAT.format(drop-remaining));
         died.sendMessage("You dropped: " + ChatColor.RED + NUMBER_FORMAT.format(drop-remaining) + "!");
     }
 
