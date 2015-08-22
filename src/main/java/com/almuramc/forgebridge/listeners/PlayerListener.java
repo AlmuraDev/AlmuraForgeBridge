@@ -99,7 +99,7 @@ public class PlayerListener implements Listener {
         if (!event.getPlayer().getWorld().getName().equalsIgnoreCase("Othala") && event.getPlayer().getGameMode() != GameMode.CREATIVE && event.getClickedBlock() != null) {
             if (EconUtil.isBankingBlock(event.getClickedBlock())) {
                 if (event.getPlayer().getItemInHand() == null || EconUtil.getCoinValue(event.getPlayer().getItemInHand())==0) {
-                    event.getPlayer().sendMessage("[" + ChatColor.DARK_AQUA + "Bank Deposit" + ChatColor.WHITE + "] - please put your coins in your hand to deposit them. ");
+                    event.getPlayer().sendMessage("[" + ChatColor.DARK_AQUA + "Coin Exchange" + ChatColor.WHITE + "] - please put your coins in your hand to deposit them. ");
                 } else {                
                     if ((EconUtil.getCoinValue(event.getPlayer().getItemInHand())>0) && EconUtil.isBankingBlock(event.getClickedBlock())) {                
                         int quantity = event.getPlayer().getItemInHand().getAmount();
@@ -107,7 +107,7 @@ public class PlayerListener implements Listener {
                         double amountToDeposit = quantity * value;                
                         EconUtil.add(event.getPlayer().getName(), amountToDeposit);
                         event.getPlayer().setItemInHand(new ItemStack(Material.AIR));
-                        event.getPlayer().sendMessage("[" + ChatColor.DARK_AQUA + "Bank Deposit" + ChatColor.WHITE + "] - Deposited coins in the amount of: " + ChatColor.GOLD + EconListener.NUMBER_FORMAT.format(amountToDeposit));
+                        event.getPlayer().sendMessage("[" + ChatColor.DARK_AQUA + "Coin Exchange" + ChatColor.WHITE + "] - Deposited coins in the amount of: " + ChatColor.GOLD + EconListener.NUMBER_FORMAT.format(amountToDeposit));
                         Bukkit.getLogger().info("Deposited coins in the amount of: " + EconListener.NUMBER_FORMAT.format(amountToDeposit) + " for player: " + event.getPlayer().getName());
                     } 
                 }
