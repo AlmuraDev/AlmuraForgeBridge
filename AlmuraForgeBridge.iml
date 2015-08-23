@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module org.jetbrains.idea.maven.project.MavenProjectsManager.isMavenModule="true" type="JAVA_MODULE" version="4">
-  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_7" inherit-compiler-output="false">
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_6" inherit-compiler-output="false">
     <output url="file://$MODULE_DIR$/target/classes" />
     <output-test url="file://$MODULE_DIR$/target/test-classes" />
     <content url="file://$MODULE_DIR$">
@@ -11,76 +11,19 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module-library">
-      <library name="Maven: org.bukkit:bukkit:1.7.10">
+      <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/libs/bukkit-1.7.10.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library name="Maven: org.bukkit:craftbukkit:1.7.10">
-        <CLASSES>
+          <root url="jar://$MODULE_DIR$/libs/Jobs-2.11.5.jar!/" />
+          <root url="jar://$MODULE_DIR$/libs/Residence-2.7.jar!/" />
+          <root url="jar://$MODULE_DIR$/libs/Essentials.jar!/" />
+          <root url="jar://$MODULE_DIR$/libs/EssentialsGroupManager.jar!/" />
+          <root url="jar://$MODULE_DIR$/libs/Vault-1.4.1.jar!/" />
           <root url="jar://$MODULE_DIR$/libs/craftbukkit-1.7.10.jar!/" />
         </CLASSES>
         <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library name="Maven: net.ess3:api:unknown">
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/libs/Essentials.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library name="Maven: com.earth2me:essentials:unknown">
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/libs/Essentials.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library name="Maven: org.anjocaido:groupmanager:unknown">
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/libs/EssentialsGroupManager.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library name="Maven: me.zford:jobs:2.11.5">
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/libs/Jobs-2.11.5.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="library" scope="PROVIDED" name="Maven: com.greatmancode:craftconomy3:3.1.4-SNAPSHOT" level="project" />
-    <orderEntry type="module-library">
-      <library name="Maven: net.milkbowl:vault:1.2.12">
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/libs/Vault-1.4.1.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library name="Maven: com.bekvon:residence:2.7">
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/libs/Residence-2.7.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/libs/craftbukkit-1.7.10.jar!/" />
+        </SOURCES>
       </library>
     </orderEntry>
   </component>

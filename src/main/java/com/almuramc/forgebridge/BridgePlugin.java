@@ -22,9 +22,15 @@ package com.almuramc.forgebridge;
 import com.almuramc.forgebridge.listeners.EconListener;
 import com.almuramc.forgebridge.listeners.EntityListener;
 import com.almuramc.forgebridge.listeners.PlayerListener;
+import com.almuramc.forgebridge.message.IPluginMessage;
+import com.almuramc.forgebridge.message.IPluginMessageHandler;
+import com.almuramc.forgebridge.message.MessageRegistar;
+import com.almuramc.forgebridge.message.impl.B00PlayerDeathConfirmation;
 import com.almuramc.forgebridge.utils.PacketUtil;
 import com.almuramc.forgebridge.utils.ServerWorldUtil;
-
+import com.google.common.base.Optional;
+import net.minecraft.util.io.netty.buffer.ByteBuf;
+import net.minecraft.util.io.netty.buffer.Unpooled;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -32,8 +38,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.plugin.messaging.PluginMessageListener;
 
-public class BridgePlugin extends JavaPlugin implements Listener {
+import java.util.logging.Level;
+
+public class BridgePlugin extends JavaPlugin implements Listener, PluginMessageListener {
 
     private static BridgePlugin instance;
 
@@ -48,10 +57,12 @@ public class BridgePlugin extends JavaPlugin implements Listener {
     public void onEnable() {
         instance = this;
         Bukkit.getMessenger().registerOutgoingPluginChannel(this, PacketUtil.CHANNEL);
+        Bukkit.getMessenger().registerIncomingPluginChannel(this, PacketUtil.CHANNEL, this);
         PluginManager pm = getServer().getPluginManager();
         pm.registerEvents(new PlayerListener(), this);
         pm.registerEvents(new EntityListener(), this);
         pm.registerEvents(new EconListener(), this);
+        MessageRegistar.registerMessage(B00PlayerDeathConfirmation.class, B00PlayerDeathConfirmation.class, 0);
     }
 
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -98,5 +109,47 @@ public class BridgePlugin extends JavaPlugin implements Listener {
             }
         }
         return false;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void onPluginMessageReceived(String s, Player player, byte[] bytes) {
+        Bukkit.getLogger().info("Channel message received [" + s + "]");
+        for (byte b : bytes) {
+            System.out.println(b);
+        }
+        if ("AM|BUK".equalsIgnoreCase(s)) {
+            final ByteBuf buf = Unpooled.wrappedBuffer(bytes);
+            byte discriminator;
+            try {
+                discriminator = buf.readByte();
+            } catch (IndexOutOfBoundsException ignored) {
+                Bukkit.getLogger().log(Level.SEVERE, "Channel [AM|BUK] was sent message in-which has no discriminator!");
+                return;
+            }
+            Bukkit.getLogger().info("Discriminator [" + discriminator + "] provided.");
+            final Optional<IPluginMessage> optPluginMessage = MessageRegistar.fromDiscriminator(discriminator);
+            if (optPluginMessage.isPresent()) {
+                final IPluginMessage message = optPluginMessage.get();
+                try {
+                    message.fromBytes(buf);
+                } catch (Exception e) {
+                    getLogger().log(Level.SEVERE, "Could not decode Plugin Message [" + message.getClass().getSimpleName() + "]", e);
+                    return;
+                }
+
+                final Optional<IPluginMessageHandler<?, ?>> optPluginMessageHandler = MessageRegistar.getHandler(message.getClass());
+                if (optPluginMessage.isPresent()) {
+                    final IPluginMessageHandler pluginMessageHandler = optPluginMessageHandler.get();
+                    try {
+                        pluginMessageHandler.onMessage(message, player);
+                    } catch (Exception e) {
+                        getLogger().log(Level.SEVERE, "Could not handle Plugin Message [" + message.getClass().getSimpleName() + " in Plugin "
+                                + "Message Handler [" + pluginMessageHandler.getClass().getSimpleName() + "]", e);
+
+                    }
+                }
+            }
+        }
     }
 }
