@@ -19,9 +19,10 @@
  */
 package com.almuramc.forgebridge.listeners;
 
+import org.bukkit.Location;
+
 import org.bukkit.entity.Entity;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-
 import org.bukkit.event.entity.EntityDamageEvent;
 import com.bekvon.bukkit.residence.event.ResidenceCommandEvent;
 import net.ess3.api.events.NickChangeEvent;
@@ -63,6 +64,40 @@ public class PlayerListener implements Listener {
         if (event instanceof EntityDamageByEntityEvent) {
             EntityDamageByEntityEvent attackevent = (EntityDamageByEntityEvent) event;            
             if (attackevent != null) {
+                Entity damageSource = attackevent.getDamager();
+                if (damageSource instanceof Player) {
+                    Player attacker = (Player) damageSource;            
+                    if (event.getEntity() instanceof Player && attacker instanceof Player) {
+                        Player victim = (Player) event.getEntity();
+                        if (victim.getWorld() != Bukkit.getServer().getWorld("WORLD")) {
+                            return;
+                        }
+
+                        Location location = victim.getLocation();
+                        boolean withinX = false;
+                        boolean withinZ = false;
+
+                        if (location.getX() >= 1259 && location.getX() <= 1868) {
+                            withinX = true;
+                        }
+
+                        if (location.getZ() >=7650 && location.getZ() <= 8046) {
+                            withinZ = true;
+                        }
+
+                        if (withinX && withinZ) {
+                            event.setCancelled(true);
+                            victim.sendMessage("["+ChatColor.DARK_AQUA + "Newbie Protection" + ChatColor.WHITE + "] - You have been protected against PVP damage because you are within the Newbie Area.");
+                            attacker.sendMessage("["+ChatColor.DARK_AQUA + "Newbie Protection" + ChatColor.WHITE + "] - " + victim.getDisplayName() + " has been protected against PVP damage because they are within the Newbie Area.");
+                        }
+                    }
+                }
+            }
+        }
+
+        /*if (event instanceof EntityDamageByEntityEvent) {
+            EntityDamageByEntityEvent attackevent = (EntityDamageByEntityEvent) event;            
+            if (attackevent != null) {
                 Entity attacker = attackevent.getDamager();
                 if (attacker instanceof Player) { 
                     Player victim = (Player) event.getEntity();
@@ -73,7 +108,7 @@ public class PlayerListener implements Listener {
                     }
                 }
             }
-        }
+        } */
     }
 
     // Group Manager's Change Event Listener
@@ -216,7 +251,6 @@ public class PlayerListener implements Listener {
             public void run() {
                 for (Player player : Bukkit.getServer().getOnlinePlayers()) {
                     ServerWorldUtil.sendAdditionalWorldInfo(player, player.getWorld().getName(), Bukkit.getOnlinePlayers().size(), Bukkit.getMaxPlayers());
-                    //TitleUtil.sendDisplayName(player, player.getName(), ChatColor.stripColor(player.getDisplayName()) + "\n" + TitleUtil.getCustomTitle(player));
                     TitleUtil.sendDisplayName(player, p.getName(), ChatColor.stripColor(p.getDisplayName()) + "\n" + TitleUtil.getCustomTitle(p));
                 }
             }
@@ -275,16 +309,12 @@ public class PlayerListener implements Listener {
     // Player Change Residence event, send critical player/world/display name information to client for AlmuraMod's GUI
     @EventHandler
     public void onResidenceChangedEvent(final ResidenceChangedEvent event) {
-        Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
-            public void run() {
-                if (event.getPlayer() != null) {
-                    ClaimedResidence res = Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation());
-                    if (res != null) {
-                        ServerWorldUtil.sendResidenceInfo(event.getPlayer(), res);
-                    }
-                }
-            }
-        }, 20L);
+        final Location location = event.getPlayer().getLocation();
+        if (event.getPlayer() != null) {
+            ClaimedResidence res = Residence.getResidenceManager().getByLoc(location);
+            ServerWorldUtil.sendResidenceInfo(event.getPlayer(), res);                    
+        }
+
     }
 
     // Residence Command event, send critical player/world/display name information to client for AlmuraMod's GUI
@@ -303,7 +333,7 @@ public class PlayerListener implements Listener {
                     }
                 }
             }
-        }, 20L);
+        }, 10L);
     }
 
     // Player Change Residence event, send critical player/world/display name information to client for AlmuraMod's GUI
@@ -336,6 +366,8 @@ public class PlayerListener implements Listener {
                         ServerWorldUtil.sendResidenceInfo(player, res);
                     }
                 }
+            } else {
+                ServerWorldUtil.sendResidenceInfo(event.getPlayer(), res);
             }
         }
     }
