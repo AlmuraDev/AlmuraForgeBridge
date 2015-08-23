@@ -19,8 +19,10 @@
  */
 package com.almuramc.forgebridge.listeners;
 
-import org.bukkit.Location;
+import com.bekvon.bukkit.residence.event.ResidenceRenameEvent;
 
+import com.bekvon.bukkit.residence.event.ResidenceOwnerChangeEvent;
+import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -315,6 +317,26 @@ public class PlayerListener implements Listener {
             ServerWorldUtil.sendResidenceInfo(event.getPlayer(), res);                    
         }
 
+    }
+
+ // Residence Owner Changed event, send critical player/world/display name information to client for AlmuraMod's GUI
+    @EventHandler
+    public void onResidenceRenameEvent(final ResidenceRenameEvent event) {
+        for (Player player : event.getResidence().getPlayersInResidence()) {
+            if (player != null) {
+                ServerWorldUtil.sendResidenceInfo(player, event.getResidence());
+            }
+        }
+    }
+    
+    // Residence Owner Changed event, send critical player/world/display name information to client for AlmuraMod's GUI
+    @EventHandler
+    public void onResidenceOwnerChangeEvent(final ResidenceOwnerChangeEvent event) {
+        for (Player player : event.getResidence().getPlayersInResidence()) {
+            if (player != null) {
+                ServerWorldUtil.sendResidenceInfo(player, event.getResidence());
+            }
+        }
     }
 
     // Residence Command event, send critical player/world/display name information to client for AlmuraMod's GUI
