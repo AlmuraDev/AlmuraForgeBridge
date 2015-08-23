@@ -19,8 +19,12 @@
  */
 package com.almuramc.forgebridge.listeners;
 
-import net.ess3.api.events.NickChangeEvent;
+import org.bukkit.entity.Entity;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
+import org.bukkit.event.entity.EntityDamageEvent;
+import com.bekvon.bukkit.residence.event.ResidenceCommandEvent;
+import net.ess3.api.events.NickChangeEvent;
 import org.anjocaido.groupmanager.events.GMUserEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -36,7 +40,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
-
 import com.almuramc.forgebridge.BridgePlugin;
 import com.almuramc.forgebridge.utils.ServerWorldUtil;
 import com.almuramc.forgebridge.utils.TitleUtil;
@@ -51,30 +54,53 @@ import com.greatmancode.craftconomy3.tools.events.bukkit.events.EconomyChangeEve
 
 public class PlayerListener implements Listener {
 
+    // Protect all guests from PVP damage regardless of location
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onEntityDamage(EntityDamageEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
+        if (event instanceof EntityDamageByEntityEvent) {
+            EntityDamageByEntityEvent attackevent = (EntityDamageByEntityEvent) event;            
+            if (attackevent != null) {
+                Entity attacker = attackevent.getDamager();
+                if (attacker instanceof Player) { 
+                    Player victim = (Player) event.getEntity();
+                    if (victim instanceof Player) {
+                        if (victim.hasPermission("guest.title") && !victim.hasPermission("member.title")) {
+                            event.setCancelled(true);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     // Group Manager's Change Event Listener
     @EventHandler(priority = EventPriority.LOWEST)
     public void onGMUserEvent(GMUserEvent userEvent) {
         final GMUserEvent event = userEvent;
-        final Player player = event.getUser().getBukkitPlayer();
+        final Player resPlayer = event.getUser().getBukkitPlayer();
         Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
             public void run() {                
                 if ((GMUserEvent.Action.USER_GROUP_CHANGED == event.getAction()) && (event.getUser().getGroupName().equalsIgnoreCase("contributor"))) {
                     Bukkit.broadcastMessage(
-                            ChatColor.DARK_PURPLE + player.getDisplayName() + ChatColor.WHITE + " has been granted: [" + ChatColor.GOLD + event
+                            ChatColor.DARK_PURPLE + resPlayer.getDisplayName() + ChatColor.WHITE + " has been granted: [" + ChatColor.GOLD + event
                             .getUser().getGroupName() + ChatColor.WHITE + "]");
-                    Bukkit.broadcastMessage(ChatColor.WHITE + "Almura Thanks " + ChatColor.GOLD + player.getDisplayName() + ChatColor.WHITE
+                    Bukkit.broadcastMessage(ChatColor.WHITE + "Almura Thanks " + ChatColor.GOLD + resPlayer.getDisplayName() + ChatColor.WHITE
                             + " for their donation.  It is very much appreciated.");
                 }
 
                 if ((GMUserEvent.Action.USER_GROUP_CHANGED == event.getAction()) && (event.getUser().getGroupName().equalsIgnoreCase("member"))) {
                     Bukkit.broadcastMessage(
-                            ChatColor.DARK_PURPLE + player.getDisplayName() + ChatColor.WHITE + " has been promoted to: [" + ChatColor.GOLD
+                            ChatColor.DARK_PURPLE + resPlayer.getDisplayName() + ChatColor.WHITE + " has been promoted to: [" + ChatColor.GOLD
                             + event.getUser().getGroupName() + ChatColor.WHITE + "]");
                 }
 
                 for (Player player : Bukkit.getServer().getOnlinePlayers()) {
                     ServerWorldUtil.sendAdditionalWorldInfo(player, player.getWorld().getName(), Bukkit.getOnlinePlayers().size(), Bukkit.getMaxPlayers());
-                    TitleUtil.sendDisplayName(player, player.getName(), ChatColor.stripColor(player.getDisplayName()) + "\n" + TitleUtil.getCustomTitle(player));                        
+                    TitleUtil.sendDisplayName(player, player.getName(), ChatColor.stripColor(player.getDisplayName()) + "\n" + TitleUtil.getCustomTitle(player));
+                    TitleUtil.sendDisplayName(player, resPlayer.getName(), ChatColor.stripColor(resPlayer.getDisplayName()) + "\n" + TitleUtil.getCustomTitle(resPlayer));
                 }
             }
         }, 5L); //Delayed so this Group Manager has time to change the players group.
@@ -131,9 +157,9 @@ public class PlayerListener implements Listener {
 
                 for (Player player : Bukkit.getServer().getOnlinePlayers()) {
                     ServerWorldUtil.sendAdditionalWorldInfo(player, player.getWorld().getName(), Bukkit.getOnlinePlayers().size(), Bukkit.getMaxPlayers());
-                    TitleUtil.sendDisplayName(player, player.getName(), ChatColor.stripColor(player.getDisplayName()) + "\n" + TitleUtil.getCustomTitle(player));
+                    TitleUtil.sendDisplayName(player, event.getPlayer().getName(), ChatColor.stripColor(event.getPlayer().getDisplayName()) + "\n" + TitleUtil.getCustomTitle(event.getPlayer()));
                     if (!player.getName().equalsIgnoreCase(event.getPlayer().getName())) {                            
-                        TitleUtil.sendDisplayName(event.getPlayer(), player.getName(), ChatColor.stripColor(event.getPlayer().getDisplayName()) + "\n" + TitleUtil.getCustomTitle(event.getPlayer()));
+                        TitleUtil.sendDisplayName(event.getPlayer(), player.getName(), ChatColor.stripColor(player.getDisplayName()) + "\n" + TitleUtil.getCustomTitle(player));
                     }
                 }
             }
@@ -167,9 +193,9 @@ public class PlayerListener implements Listener {
 
                 for (Player player : Bukkit.getServer().getOnlinePlayers()) {
                     ServerWorldUtil.sendAdditionalWorldInfo(player, player.getWorld().getName(), Bukkit.getOnlinePlayers().size(), Bukkit.getMaxPlayers());
-                    TitleUtil.sendDisplayName(player, player.getName(), ChatColor.stripColor(player.getDisplayName()) + "\n" + TitleUtil.getCustomTitle(player));
+                    TitleUtil.sendDisplayName(player, event.getPlayer().getName(), ChatColor.stripColor(event.getPlayer().getDisplayName()) + "\n" + TitleUtil.getCustomTitle(event.getPlayer()));
                     if (!player.getName().equalsIgnoreCase(event.getPlayer().getName())) {                            
-                        TitleUtil.sendDisplayName(event.getPlayer(), player.getName(), ChatColor.stripColor(event.getPlayer().getDisplayName()) + "\n" + TitleUtil.getCustomTitle(event.getPlayer()));
+                        TitleUtil.sendDisplayName(event.getPlayer(), player.getName(), ChatColor.stripColor(player.getDisplayName()) + "\n" + TitleUtil.getCustomTitle(player));
                     }
                 }
             }
@@ -190,7 +216,8 @@ public class PlayerListener implements Listener {
             public void run() {
                 for (Player player : Bukkit.getServer().getOnlinePlayers()) {
                     ServerWorldUtil.sendAdditionalWorldInfo(player, player.getWorld().getName(), Bukkit.getOnlinePlayers().size(), Bukkit.getMaxPlayers());
-                    TitleUtil.sendDisplayName(player, player.getName(), ChatColor.stripColor(player.getDisplayName()) + "\n" + TitleUtil.getCustomTitle(player));                        
+                    //TitleUtil.sendDisplayName(player, player.getName(), ChatColor.stripColor(player.getDisplayName()) + "\n" + TitleUtil.getCustomTitle(player));
+                    TitleUtil.sendDisplayName(player, p.getName(), ChatColor.stripColor(p.getDisplayName()) + "\n" + TitleUtil.getCustomTitle(p));
                 }
             }
         }, 10L);
@@ -207,9 +234,9 @@ public class PlayerListener implements Listener {
 
                 for (Player player : Bukkit.getServer().getOnlinePlayers()) {
                     ServerWorldUtil.sendAdditionalWorldInfo(player, player.getWorld().getName(), Bukkit.getOnlinePlayers().size(), Bukkit.getMaxPlayers());
-                    TitleUtil.sendDisplayName(player, player.getName(), ChatColor.stripColor(event.getPlayer().getDisplayName()) + "\n" + TitleUtil.getCustomTitle(player));
+                    TitleUtil.sendDisplayName(player, event.getPlayer().getName(), ChatColor.stripColor(event.getPlayer().getDisplayName()) + "\n" + TitleUtil.getCustomTitle(event.getPlayer()));
                     if (!player.getName().equalsIgnoreCase(event.getPlayer().getName())) {                            
-                        TitleUtil.sendDisplayName(event.getPlayer(), player.getName(), ChatColor.stripColor(event.getPlayer().getDisplayName()) + "\n" + TitleUtil.getCustomTitle(event.getPlayer()));
+                        TitleUtil.sendDisplayName(event.getPlayer(), player.getName(), ChatColor.stripColor(player.getDisplayName()) + "\n" + TitleUtil.getCustomTitle(player));
                     }
                 }
             }
@@ -254,6 +281,25 @@ public class PlayerListener implements Listener {
                     ClaimedResidence res = Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation());
                     if (res != null) {
                         ServerWorldUtil.sendResidenceInfo(event.getPlayer(), res);
+                    }
+                }
+            }
+        }, 20L);
+    }
+
+    // Residence Command event, send critical player/world/display name information to client for AlmuraMod's GUI
+    @EventHandler
+    public void onResidenceCommandEvent(final ResidenceCommandEvent event) {
+        Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
+            public void run() {
+                if (event.getSender() != null) {
+                    @SuppressWarnings("deprecation")
+                    Player player = Bukkit.getPlayer(event.getSender().getName());                    
+                    if (player != null) {
+                        ClaimedResidence res = Residence.getResidenceManager().getByLoc(player.getLocation());
+                        if (res != null) {
+                            ServerWorldUtil.sendResidenceInfo(player, res);
+                        }
                     }
                 }
             }
