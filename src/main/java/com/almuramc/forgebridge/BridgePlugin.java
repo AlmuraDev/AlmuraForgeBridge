@@ -114,10 +114,6 @@ public class BridgePlugin extends JavaPlugin implements Listener, PluginMessageL
     @Override
     @SuppressWarnings("unchecked")
     public void onPluginMessageReceived(String s, Player player, byte[] bytes) {
-        Bukkit.getLogger().info("Channel message received [" + s + "]");
-        for (byte b : bytes) {
-            System.out.println(b);
-        }
         if ("AM|BUK".equalsIgnoreCase(s)) {
             final ByteBuf buf = Unpooled.wrappedBuffer(bytes);
             byte discriminator;
