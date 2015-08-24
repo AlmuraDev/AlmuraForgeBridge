@@ -6,7 +6,7 @@ commands:
     bridge:
         description: The general command of Bridge.
         aliases: 
-        usage: /bridge [arguments]
+        usage: /bridge [command] [arguments]
 permissions:
     bridge.info:
         description: Allows users to view chunk inforatmion.

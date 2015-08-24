@@ -59,42 +59,49 @@ public class BridgePlugin extends JavaPlugin implements Listener {
             sender.sendMessage("[Almura Bridge] - missing arguments.");
             return false;
         }
-        if (args.length > 1 && args[0].equalsIgnoreCase("info")) {        
+
+        if (args.length > 0 && args[0].equalsIgnoreCase("info")) {
             if (sender instanceof Player) {
                 if (sender.hasPermission("bridge.info")) {
                     ServerWorldUtil.displayInfo((Player) sender, false, false);
                     return true;
                 } else {
                     sender.sendMessage("[Almura Bridge] - Insufficient Permissions.");
+                    return false;
                 }
             } else {
-                ServerWorldUtil.displayInfo(null, true, false);            
+                ServerWorldUtil.displayInfo(null, true, false);
+                return true;
             }
         }
 
-        if (args.length > 1 && args[0].equalsIgnoreCase("debug")) {        
+        if (args.length > 0 && args[0].equalsIgnoreCase("debug")) {
             if (sender instanceof Player) {
-                if (sender.hasPermission("bridge.debug")) {            
+                if (sender.hasPermission("bridge.debug")) {
                     ServerWorldUtil.displayInfo((Player) sender, false, false);
                     return true;
                 } else {
                     sender.sendMessage("[Almura Bridge] - Insufficient Permissions.");
+                    return false;
                 }
             } else {
                 ServerWorldUtil.displayInfo(null, true, true);
+                return true;
             }
         }
 
-        if (args.length > 1 && args[0].equalsIgnoreCase("clearitems")) {
+        if (args.length > 0 && args[0].equalsIgnoreCase("clearitems")) {
             if (sender instanceof Player) {
-                if (sender.hasPermission("bridge.clearitems")) {                
+                if (sender.hasPermission("bridge.clearitems")) {
                     ServerWorldUtil.clearItems((Player) sender, false);
                     return true;
                 } else {
                     sender.sendMessage("[Almura Bridge] - Insufficient Permissions.");
+                    return false;
                 }
             } else {
                 ServerWorldUtil.displayInfo(null, true, false);
+                return true;
             }
         }
         return false;
