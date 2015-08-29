@@ -43,6 +43,10 @@ public class EconListener implements Listener {
 
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
+        if (!areCoinsLoaded()) {
+            Bukkit.getLogger().info("[Bridge] - Skipping death coin drop, coins not loaded");
+            return;
+        }
         final Player died = event.getEntity();
         final double deathTax = getDropAmountMultiple();
         final double carrying = EconUtil.getBalance(died.getName());
@@ -133,5 +137,17 @@ public class EconListener implements Listener {
         }
 
         return remainingMoney;
+    }
+    
+    public boolean areCoinsLoaded() {
+        if (Material.getMaterial("ALMURA_CURRENCYPLATINUMCOIN") == null)
+            return false;
+        if (Material.getMaterial("ALMURA_CURRENCYGOLDCOIN") == null)
+            return false;
+        if (Material.getMaterial("ALMURA_CURRENCYSILVERCOIN") == null)
+            return false;
+        if (Material.getMaterial("ALMURA_CURRENCYCOPPERCOIN") == null)
+            return false;
+        return true;
     }
 }

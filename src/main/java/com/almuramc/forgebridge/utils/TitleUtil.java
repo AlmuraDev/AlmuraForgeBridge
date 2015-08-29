@@ -250,4 +250,44 @@ public class TitleUtil {
         PacketUtil.writeUTF8String(buf, displayName);       
         player.sendPluginMessage(BridgePlugin.getInstance(), PacketUtil.CHANNEL, buf.array());
     }
+    
+    public static int permissionsLevel(Player player) {       
+        
+        if (player.hasPermission("admin.title") && player.isOp()) {
+            return 1; // OP
+        }
+
+        if (player.hasPermission("admin.title") && !player.isOp()) {
+            return 2; // Admin
+        }
+
+        if (player.hasPermission("moderator.title") && !player.hasPermission("Admin.title")) {
+            return 3; // Moderator            
+        }
+
+        if (player.hasPermission("dev.title") && !player.hasPermission("veteran.title")) {
+            return 4; // Developer            
+        }
+        
+        if (player.hasPermission("veteran.title") && !player.hasPermission("moderator.title")) {
+            return 5; // Veteran or Contributor            
+        }        
+        
+        if (player.hasPermission("contributor.title") && !player.hasPermission("veteran.title")) {
+            return 5; // Contributor
+        }
+
+        if (player.hasPermission("member.title") && !player.hasPermission("contributor.title")) {
+            return 6; // Member  
+        }
+
+        if (player.hasPermission("guest.title") && !player.hasPermission("member.title")) {
+            return 7; // Guest
+        }
+
+        if (player.hasPermission("survival.title") && !player.hasPermission("member.title")) {
+            return 8; // Survival
+        }
+        return 8;
+    }
 }

@@ -128,6 +128,7 @@ public class ServerWorldUtil {
         PacketUtil.writeUTF8String(buf, worldName);
         buf.writeInt(currentPlayers);
         buf.writeInt(maxPlayers);
+        buf.writeInt(TitleUtil.permissionsLevel(player));
         player.sendPluginMessage(BridgePlugin.getInstance(), PacketUtil.CHANNEL, buf.array());
     }
     
