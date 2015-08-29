@@ -19,17 +19,13 @@
  */
 package com.almuramc.forgebridge.message.impl;
 
-import net.minecraft.util.io.netty.buffer.ByteBufUtil;
-
-import java.nio.charset.Charset;
-
-import org.bukkit.Location;
 import com.almuramc.forgebridge.BridgePlugin;
-import com.almuramc.forgebridge.utils.ServerWorldUtil;
 import com.almuramc.forgebridge.message.IPluginMessage;
 import com.almuramc.forgebridge.message.IPluginMessageHandler;
+import com.almuramc.forgebridge.utils.PacketUtil;
 import net.minecraft.util.io.netty.buffer.ByteBuf;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 /**
@@ -51,7 +47,7 @@ public class B00PlayerDeathConfirmation implements IPluginMessage, IPluginMessag
         this.x = buf.readInt();
         this.y = buf.readInt();
         this.z = buf.readInt();       
-        this.world = new String(buf.array(), Charset.forName("UTF-8"));
+        this.world = PacketUtil.readUTF8String(buf);
     }
 
     @Override
@@ -61,6 +57,7 @@ public class B00PlayerDeathConfirmation implements IPluginMessage, IPluginMessag
 
     @Override
     public B00PlayerDeathConfirmation onMessage(B00PlayerDeathConfirmation message, Player source) {
+        Bukkit.getLogger().info("Accepted Respawn Penalty? " + message.acceptsRespawnPenalty);
         // TODO Player accepted the respawn penalty, what do?
         if (message.acceptsRespawnPenalty) {
             this.player = source;
@@ -68,19 +65,18 @@ public class B00PlayerDeathConfirmation implements IPluginMessage, IPluginMessag
             this.y = message.y;
             this.z = message.z;
             this.world = message.world;
-            Bukkit.getLogger().info("Accepted Respawn Penalty? " + message.acceptsRespawnPenalty);
-            
+
             Bukkit.getLogger().info("X: " + message.x + " Y: " + message.y + " Z: " + message.z + " World: " + message.world);
             Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
                 @Override
                 public void run() {
                     if (world.equalsIgnoreCase("Dakara")) {
-                        Location location = new Location(Bukkit.getWorld("world"),x, y, z);
+                        Location location = new Location(Bukkit.getWorld("world"), x, y, z);
                         player.teleport(location);
                     } else {
-                        Location location = new Location(Bukkit.getWorld(world),x, y, z);
+                        Location location = new Location(Bukkit.getWorld(world), x, y, z);
                         player.teleport(location);
-                    }                   
+                    }
                 }
             }, 10L);      
         }

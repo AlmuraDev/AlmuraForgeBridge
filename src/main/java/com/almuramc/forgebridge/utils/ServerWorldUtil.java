@@ -19,12 +19,12 @@
  */
 package com.almuramc.forgebridge.utils;
 
-import java.nio.ByteBuffer;
-import java.text.NumberFormat;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.Locale;
-
+import com.almuramc.forgebridge.BridgePlugin;
+import com.bekvon.bukkit.residence.Residence;
+import com.bekvon.bukkit.residence.protection.ClaimedResidence;
+import com.bekvon.bukkit.residence.protection.CuboidArea;
+import com.bekvon.bukkit.residence.protection.ResidencePermissions;
+import net.minecraft.util.io.netty.buffer.ByteBuf;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -35,12 +35,10 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 
-import com.almuramc.forgebridge.BridgePlugin;
-import com.bekvon.bukkit.residence.Residence;
-import com.bekvon.bukkit.residence.protection.ClaimedResidence;
-import com.bekvon.bukkit.residence.protection.CuboidArea;
-import com.bekvon.bukkit.residence.protection.ResidencePermissions;
-import com.google.common.base.Charsets;
+import java.text.NumberFormat;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.Locale;
 
 public class ServerWorldUtil {
 
@@ -125,11 +123,11 @@ public class ServerWorldUtil {
     }
 
     public static void sendAdditionalWorldInfo(Player player, String worldName, int currentPlayers, int maxPlayers) {
-        final ByteBuffer buf = ByteBuffer.allocate(getFormattedWorldName(worldName).getBytes(Charsets.UTF_8).length + 10);
+        final ByteBuf buf = PacketUtil.createPacketBuffer(PacketUtil.DISCRIMINATOR_ADDITIONAL_WORLD_INFORMATION);
         PacketUtil.writeUTF8String(buf, getFormattedWorldName(worldName));
-        buf.putInt(currentPlayers);
-        buf.putInt(maxPlayers);
-        player.sendPluginMessage(BridgePlugin.getInstance(), PacketUtil.CHANNEL, PacketUtil.prefixDiscriminator(PacketUtil.DISCRIMINATOR_ADDITIONAL_WORLD_INFORMATION, ((ByteBuffer) buf.flip()).array()));
+        buf.writeInt(currentPlayers);
+        buf.writeInt(maxPlayers);
+        player.sendPluginMessage(BridgePlugin.getInstance(), PacketUtil.CHANNEL, buf.array());
     }
     
     public static String getFormattedWorldName(String worldName) {
@@ -209,10 +207,11 @@ public class ServerWorldUtil {
 
     @SuppressWarnings("deprecation")
     public static void sendResidenceInfo(Player player, ClaimedResidence res) {
+        final ByteBuf buf = PacketUtil.createPacketBuffer(PacketUtil.DISCRIMINATOR_RESIDENCE_INFO);
+        
         if (res == null) {
-            final ByteBuffer buf = ByteBuffer.allocate(1);
-            buf.put((byte) 0);
-            player.sendPluginMessage(BridgePlugin.getInstance(), PacketUtil.CHANNEL, PacketUtil.prefixDiscriminator(PacketUtil.DISCRIMINATOR_RESIDENCE_INFO, ((ByteBuffer) buf.flip()).array()));
+            buf.writeBoolean(false);
+            player.sendPluginMessage(BridgePlugin.getInstance(), PacketUtil.CHANNEL, buf.array());
             return;
         }
 
@@ -266,9 +265,8 @@ public class ServerWorldUtil {
 
         String bankVault;
         bankVault = "" + ChatColor.GOLD + FORMAT_NUMBER_EN.format(res.getBank().getStoredMoney());
-
-        final ByteBuffer buf = ByteBuffer.allocate(resName.getBytes(Charsets.UTF_8).length + ownersName.getBytes(Charsets.UTF_8).length + lastOnline.getBytes(Charsets.UTF_8).length + resLeaseCost.getBytes(Charsets.UTF_8).length + leaseExpires.getBytes(Charsets.UTF_8).length + resBoundsValue.getBytes(Charsets.UTF_8).length + resSize.getBytes(Charsets.UTF_8).length + bankVault.getBytes(Charsets.UTF_8).length + 55);
-        buf.put((byte) 1);
+        
+        buf.writeBoolean(true);
         PacketUtil.writeUTF8String(buf, resName);
         PacketUtil.writeUTF8String(buf, ownersName);
         PacketUtil.writeUTF8String(buf, lastOnline);
@@ -278,47 +276,47 @@ public class ServerWorldUtil {
         PacketUtil.writeUTF8String(buf, resSize);
         PacketUtil.writeUTF8String(buf, bankVault);
 
-        buf.put((byte) (resperms.playerHas(player.getName(), "move", true) ? 1 : 0));
-        buf.put((byte) (resperms.playerHas(player.getName(), "build", true) ? 1 : 0));
-        buf.put((byte) (resperms.playerHas(player.getName(), "bank", true) ? 1 : 0));
-        buf.put((byte) (resperms.playerHas(player.getName(), "place", true) ? 1 : 0));
-        buf.put((byte) (resperms.playerHas(player.getName(), "destroy", true) ? 1 : 0));
-        buf.put((byte) (resperms.playerHas(player.getName(), "use", true) ? 1 : 0));
-        buf.put((byte) (resperms.playerHas(player.getName(), "admin", true) ? 1 : 0));
-        buf.put((byte) (resperms.playerHas(player.getName(), "butcher", true) ? 1 : 0));
-        buf.put((byte) (resperms.playerHas(player.getName(), "mayor", true) ? 1 : 0));
-        buf.put((byte) (resperms.playerHas(player.getName(), "container", true) ? 1 : 0));
-        buf.put((byte) (resperms.playerHas(player.getName(), "pvp", true) ? 1 : 0));
-        buf.put((byte) (resperms.playerHas(player.getName(), "tp", true) ? 1 : 0));
-        buf.put((byte) (resperms.playerHas(player.getName(), "melt", true) ? 1 : 0));
-        buf.put((byte) (resperms.playerHas(player.getName(), "ignite", true) ? 1 : 0));
-        buf.put((byte) (resperms.playerHas(player.getName(), "firespread", true) ? 1 : 0));
-        buf.put((byte) (resperms.playerHas(player.getName(), "bucket", true) ? 1 : 0));
-        buf.put((byte) (resperms.playerHas(player.getName(), "form", true) ? 1 : 0));
-        buf.put((byte) (resperms.playerHas(player.getName(), "lavaflow", true) ? 1 : 0));
-        buf.put((byte) (resperms.playerHas(player.getName(), "waterflow", true) ? 1 : 0));
-        buf.put((byte) (resperms.playerHas(player.getName(), "creeper", true) ? 1 : 0));
-        buf.put((byte) (resperms.playerHas(player.getName(), "tnt", true) ? 1 : 0));
-        buf.put((byte) (resperms.playerHas(player.getName(), "monsters", true) ? 1 : 0));
-        buf.put((byte) (resperms.playerHas(player.getName(), "animals", true) ? 1 : 0));
-        buf.put((byte) (resperms.playerHas(player.getName(), "fly", true) ? 1 : 0));
-        buf.put((byte) (resperms.playerHas(player.getName(), "subzone", true) ? 1 : 0));
-        buf.put((byte) (resperms.playerHas(player.getName(), "healing", true) ? 1 : 0));
-        buf.put((byte) (resperms.playerHas(player.getName(), "piston", true) ? 1 : 0));
-        buf.put((byte) (resperms.playerHas(player.getName(), "shear", true) ? 1 : 0));
-        buf.put((byte) (resperms.playerHas(player.getName(), "egghatch", true) ? 1 : 0));
-        buf.put((byte) (resperms.playerHas(player.getName(), "trample", true) ? 1 : 0));
-        buf.put((byte) (resperms.playerHas(player.getName(), "soil", true) ? 1 : 0));
-        buf.put((byte) (resperms.playerHas(player.getName(), "stormdamage", true) ? 1 : 0));
-        buf.put((byte) (resperms.playerHas(player.getName(), "chat", true) ? 1 : 0));
-        buf.put((byte) (resperms.playerHas(player.getName(), "safezone", true) ? 1 : 0));
-        buf.put((byte) (resperms.playerHas(player.getName(), "mo-ambient", true) ? 1 : 0));
-        buf.put((byte) (resperms.playerHas(player.getName(), "mo-aquatic", true) ? 1 : 0));
-        buf.put((byte) (resperms.playerHas(player.getName(), "mo-monsters", true) ? 1 : 0));
-        buf.put((byte) (resperms.playerHas(player.getName(), "mo-passive", true) ? 1 : 0));
-        buf.put((byte) (resperms.playerHas(player.getName(), "thaumcraft-monsters", true) ? 1 : 0));
+        buf.writeBoolean(resperms.playerHas(player.getName(), "move", true));
+        buf.writeBoolean(resperms.playerHas(player.getName(), "build", true));
+        buf.writeBoolean(resperms.playerHas(player.getName(), "bank", true));
+        buf.writeBoolean(resperms.playerHas(player.getName(), "place", true));
+        buf.writeBoolean(resperms.playerHas(player.getName(), "destroy", true));
+        buf.writeBoolean(resperms.playerHas(player.getName(), "use", true));
+        buf.writeBoolean(resperms.playerHas(player.getName(), "admin", true));
+        buf.writeBoolean(resperms.playerHas(player.getName(), "butcher", true));
+        buf.writeBoolean(resperms.playerHas(player.getName(), "mayor", true));
+        buf.writeBoolean(resperms.playerHas(player.getName(), "container", true));
+        buf.writeBoolean(resperms.playerHas(player.getName(), "pvp", true));
+        buf.writeBoolean(resperms.playerHas(player.getName(), "tp", true));
+        buf.writeBoolean(resperms.playerHas(player.getName(), "melt", true));
+        buf.writeBoolean(resperms.playerHas(player.getName(), "ignite", true));
+        buf.writeBoolean(resperms.playerHas(player.getName(), "firespread", true));
+        buf.writeBoolean(resperms.playerHas(player.getName(), "bucket", true));
+        buf.writeBoolean(resperms.playerHas(player.getName(), "form", true));
+        buf.writeBoolean(resperms.playerHas(player.getName(), "lavaflow", true));
+        buf.writeBoolean(resperms.playerHas(player.getName(), "waterflow", true));
+        buf.writeBoolean(resperms.playerHas(player.getName(), "creeper", true));
+        buf.writeBoolean(resperms.playerHas(player.getName(), "tnt", true));
+        buf.writeBoolean(resperms.playerHas(player.getName(), "monsters", true));
+        buf.writeBoolean(resperms.playerHas(player.getName(), "animals", true));
+        buf.writeBoolean(resperms.playerHas(player.getName(), "fly", true));
+        buf.writeBoolean(resperms.playerHas(player.getName(), "subzone", true));
+        buf.writeBoolean(resperms.playerHas(player.getName(), "healing", true));
+        buf.writeBoolean(resperms.playerHas(player.getName(), "piston", true));
+        buf.writeBoolean(resperms.playerHas(player.getName(), "shear", true));
+        buf.writeBoolean(resperms.playerHas(player.getName(), "egghatch", true));
+        buf.writeBoolean(resperms.playerHas(player.getName(), "trample", true));
+        buf.writeBoolean(resperms.playerHas(player.getName(), "soil", true));
+        buf.writeBoolean(resperms.playerHas(player.getName(), "stormdamage", true));
+        buf.writeBoolean(resperms.playerHas(player.getName(), "chat", true));
+        buf.writeBoolean(resperms.playerHas(player.getName(), "safezone", true));
+        buf.writeBoolean(resperms.playerHas(player.getName(), "mo-ambient", true));
+        buf.writeBoolean(resperms.playerHas(player.getName(), "mo-aquatic", true));
+        buf.writeBoolean(resperms.playerHas(player.getName(), "mo-monsters", true));
+        buf.writeBoolean(resperms.playerHas(player.getName(), "mo-passive", true));
+        buf.writeBoolean(resperms.playerHas(player.getName(), "thaumcraft-monsters", true));
 
-        player.sendPluginMessage(BridgePlugin.getInstance(), PacketUtil.CHANNEL, PacketUtil.prefixDiscriminator(PacketUtil.DISCRIMINATOR_RESIDENCE_INFO, ((ByteBuffer) buf.flip()).array()));
+        player.sendPluginMessage(BridgePlugin.getInstance(), PacketUtil.CHANNEL, buf.array());
     }
 
     private static String formatDateDiff(long date) {

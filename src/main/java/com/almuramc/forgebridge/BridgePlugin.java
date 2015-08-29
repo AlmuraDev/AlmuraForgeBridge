@@ -121,16 +121,21 @@ public class BridgePlugin extends JavaPlugin implements Listener, PluginMessageL
     @Override
     @SuppressWarnings("unchecked")
     public void onPluginMessageReceived(String s, Player player, byte[] bytes) {
+//        System.out.println("Channel received! " + s);
+//        System.out.println("Dumping payload...");
+//        for (byte b : bytes) {
+//            System.out.println(b);
+//        }
         if ("AM|BUK".equalsIgnoreCase(s)) {
             final ByteBuf buf = Unpooled.wrappedBuffer(bytes);
             byte discriminator;
             try {
                 discriminator = buf.readByte();
             } catch (IndexOutOfBoundsException ignored) {
-                Bukkit.getLogger().log(Level.SEVERE, "Channel [AM|BUK] was sent message in-which has no discriminator!");
+                Bukkit.getLogger().log(Level.SEVERE, "Channel [AM|BUK] sent message with no discriminator!");
                 return;
             }
-            Bukkit.getLogger().info("Discriminator [" + discriminator + "] provided.");
+            //Bukkit.getLogger().info("Discriminator [" + discriminator + "] provided.");
             final Optional<IPluginMessage> optPluginMessage = MessageRegistar.fromDiscriminator(discriminator);
             if (optPluginMessage.isPresent()) {
                 final IPluginMessage message = optPluginMessage.get();

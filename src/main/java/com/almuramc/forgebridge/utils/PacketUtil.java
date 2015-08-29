@@ -19,9 +19,9 @@
  */
 package com.almuramc.forgebridge.utils;
 
-import java.nio.ByteBuffer;
-
 import com.google.common.base.Charsets;
+import net.minecraft.util.io.netty.buffer.ByteBuf;
+import net.minecraft.util.io.netty.buffer.Unpooled;
 
 public class PacketUtil {
     public static final String CHANNEL = "AM|BUK";
@@ -29,23 +29,58 @@ public class PacketUtil {
     public static final byte DISCRIMINATOR_ADDITIONAL_WORLD_INFORMATION = 2;
     public static final byte DISCRIMINATOR_RESIDENCE_INFO = 3;
 
-    public static byte[] prefixDiscriminator(byte discriminator, byte[] value) {
-        return ((ByteBuffer) ByteBuffer.allocate(value.length + 1).put(discriminator).put(value).flip()).array();
+    public static ByteBuf createPacketBuffer(byte discriminator) {
+        final ByteBuf buf = Unpooled.buffer();
+        buf.writeByte(discriminator);
+        return buf;
     }
 
-    public static void writeVarInt(ByteBuffer buf, int value) {
-        while ((value & -128) != 0)
+    public static int varIntByteCount(int toCount) {
+        return (toCount & 0xFFFFFF80) == 0 ? 1 : ((toCount & 0xFFFFC000) == 0 ? 2 : ((toCount & 0xFFE00000) == 0 ? 3 : ((toCount & 0xF0000000) == 0 ? 4 : 5)));
+    }
+
+    public static void writeVarInt(ByteBuf to, int toWrite, int maxSize) {
+
+        while ((toWrite & -128) != 0)
         {
-            buf.put((byte) (value & 127 | 128));
-            value >>>= 7;
+            to.writeByte(toWrite & 127 | 128);
+            toWrite >>>= 7;
         }
 
-        buf.put((byte) value);
+        to.writeByte(toWrite);
     }
 
-    public static void writeUTF8String(ByteBuffer buf, String value) {
-        byte[] utf8Bytes = value.getBytes(Charsets.UTF_8);
-        writeVarInt(buf, utf8Bytes.length);
-        buf.put(utf8Bytes);
+    public static void writeUTF8String(ByteBuf to, String string) {
+        byte[] utf8Bytes = string.getBytes(Charsets.UTF_8);
+        writeVarInt(to, utf8Bytes.length, 2);
+        to.writeBytes(utf8Bytes);
+    }
+
+    public static int readVarInt(ByteBuf buf, int maxSize) {
+
+        int i = 0;
+        int j = 0;
+        byte b0;
+
+        do
+        {
+            b0 = buf.readByte();
+            i |= (b0 & 127) << j++ * 7;
+
+            if (j > maxSize)
+            {
+                throw new RuntimeException("VarInt too big");
+            }
+        }
+        while ((b0 & 128) == 128);
+
+        return i;
+    }
+
+    public static String readUTF8String(ByteBuf from) {
+        int len = readVarInt(from, 2);
+        String str = from.toString(from.readerIndex(), len, Charsets.UTF_8);
+        from.readerIndex(from.readerIndex() + len);
+        return str;
     }
 }

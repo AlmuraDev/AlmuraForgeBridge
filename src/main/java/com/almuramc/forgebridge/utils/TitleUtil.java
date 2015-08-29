@@ -19,14 +19,11 @@
  */
 package com.almuramc.forgebridge.utils;
 
-import java.nio.ByteBuffer;
-
+import com.almuramc.forgebridge.BridgePlugin;
+import net.minecraft.util.io.netty.buffer.ByteBuf;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
-
-import com.almuramc.forgebridge.BridgePlugin;
-import com.google.common.base.Charsets;
 
 public class TitleUtil {
 
@@ -248,9 +245,9 @@ public class TitleUtil {
     }
 
     public static void sendDisplayName(Player player, String username, String displayName) {
-        final ByteBuffer buf = ByteBuffer.allocate(username.getBytes(Charsets.UTF_8).length + displayName.getBytes(Charsets.UTF_8).length + 4);
+        final ByteBuf buf = PacketUtil.createPacketBuffer(PacketUtil.DISCRIMINATOR_DISPLAY_NAME);
         PacketUtil.writeUTF8String(buf, username);
         PacketUtil.writeUTF8String(buf, displayName);       
-        player.sendPluginMessage(BridgePlugin.getInstance(), PacketUtil.CHANNEL, PacketUtil.prefixDiscriminator(PacketUtil.DISCRIMINATOR_DISPLAY_NAME, ((ByteBuffer) buf.flip()).array()));
+        player.sendPluginMessage(BridgePlugin.getInstance(), PacketUtil.CHANNEL, buf.array());
     }
 }

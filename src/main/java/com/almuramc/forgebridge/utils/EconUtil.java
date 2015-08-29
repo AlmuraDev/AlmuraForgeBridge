@@ -38,19 +38,16 @@
  */
 package com.almuramc.forgebridge.utils;
 
-import java.nio.ByteBuffer;
-
+import com.almuramc.forgebridge.BridgePlugin;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
-
+import net.minecraft.util.io.netty.buffer.ByteBuf;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.RegisteredServiceProvider;
-
-import com.almuramc.forgebridge.BridgePlugin;
 
 @SuppressWarnings("deprecation")
 public final class EconUtil {
@@ -67,7 +64,9 @@ public final class EconUtil {
     }
 
     public static void sendCurrencyAmount(Player player, double amount) {
-        player.sendPluginMessage(BridgePlugin.getInstance(), PacketUtil.CHANNEL, PacketUtil.prefixDiscriminator(DISCRIMINATOR_CURRENCY, ((ByteBuffer) ByteBuffer.allocate(8).putDouble(amount).flip()).array()));
+        final ByteBuf buf = PacketUtil.createPacketBuffer(DISCRIMINATOR_CURRENCY);
+        buf.writeDouble(amount);
+        player.sendPluginMessage(BridgePlugin.getInstance(), PacketUtil.CHANNEL, buf.array());
     }
 
     public static double getBalance(String name) {
