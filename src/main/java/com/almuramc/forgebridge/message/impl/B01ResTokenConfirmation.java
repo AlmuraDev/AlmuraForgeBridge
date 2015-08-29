@@ -37,34 +37,26 @@ import org.bukkit.entity.Player;
  * Sent from Almura when a Player dies and has made a decision on accepting the death penalty.
  */
 public class B01ResTokenConfirmation implements IPluginMessage, IPluginMessageHandler<B01ResTokenConfirmation, B01ResTokenConfirmation> {
-    public boolean acceptsRespawnPenalty = false;
-    private int x, y, z;
-    private String world;
-    private Player player;
-
+    public boolean useToken = false;
+    
     public B01ResTokenConfirmation() {
 
     }
 
     @Override
     public void fromBytes(ByteBuf buf) {
-        acceptsRespawnPenalty = buf.readBoolean();
-        this.x = buf.readInt();
-        this.y = buf.readInt();
-        this.z = buf.readInt();       
-        this.world = PacketUtil.readUTF8String(buf);
+        useToken = buf.readBoolean();    
     }
 
     @Override
     public void toBytes(ByteBuf buf) {
-        buf.writeBoolean(acceptsRespawnPenalty);
+        buf.writeBoolean(useToken);
     }
 
     @Override
-    public B01ResTokenConfirmation onMessage(B01ResTokenConfirmation message, Player source) {
-        Bukkit.getLogger().info("Accepted Respawn Penalty? " + message.acceptsRespawnPenalty);
-        // TODO Player accepted the respawn penalty, what do?
-        if (source.getItemInHand().getType() == Material.getMaterial("ALMURA_CURRENCYRESTOKEN")) {
+    public B01ResTokenConfirmation onMessage(B01ResTokenConfirmation message, Player source) {        
+        // TODO Player accepted the respawn penalty, what do?        
+        if (useToken && source.getItemInHand().getType() == Material.getMaterial("ALMURA_CURRENCYRESTOKEN")) {
             ClaimedResidence res = Residence.getResidenceManager().getByLoc(source.getLocation());
             if (res == null) {
                 source.sendMessage("[Residence] - There is no residence at this location.");
