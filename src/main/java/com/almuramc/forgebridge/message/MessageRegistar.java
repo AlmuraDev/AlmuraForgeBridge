@@ -35,13 +35,14 @@ public class MessageRegistar {
         HANDLERS_BY_CLASSES.put(requestMessageType, messageHandler);
     }
 
+    @SuppressWarnings("unchecked")
     public static Optional<IPluginMessage> fromDiscriminator(byte disciminator) {
         Optional<IPluginMessage> optPluginMessage = Optional.absent();
 
         for (Map.Entry<Class<? extends IPluginMessage>, Byte> entry : CLASSES_WITH_DISCRIMINATOR.entrySet()) {
             if (entry.getValue().equals(disciminator)) {
                 try {
-                    optPluginMessage = Optional.of(entry.getKey().newInstance());
+                    optPluginMessage = (Optional<IPluginMessage>) Optional.of(entry.getKey().newInstance());
                 } catch (Exception e) {
                     break;
                 }

@@ -118,6 +118,9 @@ public class PlayerListener implements Listener {
     public void onGMUserEvent(GMUserEvent userEvent) {
         final GMUserEvent event = userEvent;
         final Player resPlayer = event.getUser().getBukkitPlayer();
+        if (resPlayer == null) { // Is null for offline players
+            return;
+        }
         Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
             public void run() {                
                 if ((GMUserEvent.Action.USER_GROUP_CHANGED == event.getAction()) && (event.getUser().getGroupName().equalsIgnoreCase("contributor"))) {
@@ -136,11 +139,11 @@ public class PlayerListener implements Listener {
 
                 for (Player player : Bukkit.getServer().getOnlinePlayers()) {
                     ServerWorldUtil.sendAdditionalWorldInfo(player, player.getWorld().getName(), Bukkit.getOnlinePlayers().size(), Bukkit.getMaxPlayers());
-                    TitleUtil.sendDisplayName(player, player.getName(), ChatColor.stripColor(player.getDisplayName()) + "\n" + TitleUtil.getCustomTitle(player));
                     TitleUtil.sendDisplayName(player, resPlayer.getName(), ChatColor.stripColor(resPlayer.getDisplayName()) + "\n" + TitleUtil.getCustomTitle(resPlayer));
+                    TitleUtil.sendDisplayName(resPlayer, player.getName(), ChatColor.stripColor(player.getDisplayName()) + "\n" + TitleUtil.getCustomTitle(player));
                 }
             }
-        }, 5L); //Delayed so this Group Manager has time to change the players group.
+        }, 20L); //Delayed so this Group Manager has time to change the players group.
     }
 
     // AlmuraMod's Player Interact, many things happen here.
@@ -194,10 +197,8 @@ public class PlayerListener implements Listener {
 
                 for (Player player : Bukkit.getServer().getOnlinePlayers()) {
                     ServerWorldUtil.sendAdditionalWorldInfo(player, player.getWorld().getName(), Bukkit.getOnlinePlayers().size(), Bukkit.getMaxPlayers());
-                    TitleUtil.sendDisplayName(player, event.getPlayer().getName(), ChatColor.stripColor(event.getPlayer().getDisplayName()) + "\n" + TitleUtil.getCustomTitle(event.getPlayer()));
-                    if (!player.getName().equalsIgnoreCase(event.getPlayer().getName())) {                            
-                        TitleUtil.sendDisplayName(event.getPlayer(), player.getName(), ChatColor.stripColor(player.getDisplayName()) + "\n" + TitleUtil.getCustomTitle(player));
-                    }
+                    TitleUtil.sendDisplayName(player, event.getPlayer().getName(), ChatColor.stripColor(event.getPlayer().getDisplayName()) + "\n" + TitleUtil.getCustomTitle(event.getPlayer()));                                                
+                    TitleUtil.sendDisplayName(event.getPlayer(), player.getName(), ChatColor.stripColor(player.getDisplayName()) + "\n" + TitleUtil.getCustomTitle(player));
                 }
             }
         }, 20L);
@@ -217,28 +218,7 @@ public class PlayerListener implements Listener {
             }
         }, 20L);        
     }
-
-    // Player Change World event, send critical player/world/display name information to client for AlmuraMod's GUI
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onPlayerChangedWorld(final PlayerChangedWorldEvent event) {
-
-        Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
-            @Override
-            public void run() {
-                final ClaimedResidence res = Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation());
-                ServerWorldUtil.sendResidenceInfo(event.getPlayer(), res);
-
-                for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-                    ServerWorldUtil.sendAdditionalWorldInfo(player, player.getWorld().getName(), Bukkit.getOnlinePlayers().size(), Bukkit.getMaxPlayers());
-                    TitleUtil.sendDisplayName(player, event.getPlayer().getName(), ChatColor.stripColor(event.getPlayer().getDisplayName()) + "\n" + TitleUtil.getCustomTitle(event.getPlayer()));
-                    if (!player.getName().equalsIgnoreCase(event.getPlayer().getName())) {                            
-                        TitleUtil.sendDisplayName(event.getPlayer(), player.getName(), ChatColor.stripColor(player.getDisplayName()) + "\n" + TitleUtil.getCustomTitle(player));
-                    }
-                }
-            }
-        }, 10L);
-    }
-
+    
     // Player Change Nickname event, send critical player/world/display name information to client for AlmuraMod's GUI
     @SuppressWarnings("deprecation")
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -256,28 +236,8 @@ public class PlayerListener implements Listener {
                     TitleUtil.sendDisplayName(player, p.getName(), ChatColor.stripColor(p.getDisplayName()) + "\n" + TitleUtil.getCustomTitle(p));
                 }
             }
-        }, 10L);
+        }, 20L);
     }    
-
-    // Player Teleport event, send critical player/world/display name information to client for AlmuraMod's GUI
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onPlayerTeleport(final PlayerTeleportEvent event) {        
-        Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
-            @Override
-            public void run() {
-                final ClaimedResidence res = Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation());
-                ServerWorldUtil.sendResidenceInfo(event.getPlayer(), res);
-
-                for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-                    ServerWorldUtil.sendAdditionalWorldInfo(player, player.getWorld().getName(), Bukkit.getOnlinePlayers().size(), Bukkit.getMaxPlayers());
-                    TitleUtil.sendDisplayName(player, event.getPlayer().getName(), ChatColor.stripColor(event.getPlayer().getDisplayName()) + "\n" + TitleUtil.getCustomTitle(event.getPlayer()));
-                    if (!player.getName().equalsIgnoreCase(event.getPlayer().getName())) {                            
-                        TitleUtil.sendDisplayName(event.getPlayer(), player.getName(), ChatColor.stripColor(player.getDisplayName()) + "\n" + TitleUtil.getCustomTitle(player));
-                    }
-                }
-            }
-        }, 10L);
-    }
 
     // CraftConomies Player balance event listener, send critical player/world/display name information to client for AlmuraMod's GUI
     @SuppressWarnings("deprecation")

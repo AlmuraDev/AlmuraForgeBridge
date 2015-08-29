@@ -125,11 +125,86 @@ public class ServerWorldUtil {
     }
 
     public static void sendAdditionalWorldInfo(Player player, String worldName, int currentPlayers, int maxPlayers) {
-        final ByteBuffer buf = ByteBuffer.allocate(worldName.getBytes(Charsets.UTF_8).length + 10);
-        PacketUtil.writeUTF8String(buf, worldName);
+        final ByteBuffer buf = ByteBuffer.allocate(getFormattedWorldName(worldName).getBytes(Charsets.UTF_8).length + 10);
+        PacketUtil.writeUTF8String(buf, getFormattedWorldName(worldName));
         buf.putInt(currentPlayers);
         buf.putInt(maxPlayers);
         player.sendPluginMessage(BridgePlugin.getInstance(), PacketUtil.CHANNEL, PacketUtil.prefixDiscriminator(PacketUtil.DISCRIMINATOR_ADDITIONAL_WORLD_INFORMATION, ((ByteBuffer) buf.flip()).array()));
+    }
+    
+    public static String getFormattedWorldName(String worldName) {
+        if (worldName.equalsIgnoreCase("world")) {
+            return "Dakara";
+        }
+
+        if (worldName.equalsIgnoreCase("atlantis")) {
+            return "Atlantis";
+        }
+        
+        if (worldName.equalsIgnoreCase("celestis")) {
+            return "Celestis";
+        }
+        
+        if (worldName.equalsIgnoreCase("dim1")) {
+            return "The End";
+        }
+        
+        if (worldName.equalsIgnoreCase("dim-1")) {
+            return "The Nether";
+        }
+        
+        if (worldName.equalsIgnoreCase("dim-42")) {
+            return "Outer";
+        }
+        
+        if (worldName.equalsIgnoreCase("dim17")) {
+            return "Wyverned";
+        }
+        
+        if (worldName.equalsIgnoreCase("faerun")) {
+            return "Faerun";
+        }
+        
+        if (worldName.equalsIgnoreCase("netu")) {
+            return "Netu";
+        }
+        
+        if (worldName.equalsIgnoreCase("avalon")) {
+            return "Avalon";
+        }
+        
+        if (worldName.equalsIgnoreCase("keystone")) {
+            return "Keystone";
+        }
+        
+        if (worldName.equalsIgnoreCase("othala")) {
+            return "Othala";
+        }
+        
+        if (worldName.equalsIgnoreCase("redrock")) {
+            return "Redrock";
+        }
+        
+        if (worldName.equalsIgnoreCase("redrock_nether")) {
+            return "Redrock Nether";
+        }
+        
+        if (worldName.equalsIgnoreCase("tollana")) {
+            return "Tollana";
+        }
+        
+        if (worldName.equalsIgnoreCase("zeal")) {
+            return "Zeal";
+        }
+        
+        if (worldName.equalsIgnoreCase("asgard")) {
+            return "Asgard";
+        }
+        
+        if (worldName.equalsIgnoreCase("othala")) {
+            return "Othala";
+        }
+        return "unknown";
     }
 
     @SuppressWarnings("deprecation")

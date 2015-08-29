@@ -32,35 +32,38 @@ public class TitleUtil {
 
     // Color setups for membership levels 
     private static String superadminColor = "" + ChatColor.DARK_RED;
-    private static String superadmin = ChatColor.WHITE + "[" + superadminColor + "Super-Admin" + ChatColor.WHITE + "] -  ";
+    private static String superadmin = ChatColor.WHITE + "[" + superadminColor + "Super-Admin" + ChatColor.WHITE + "] ";
 
     private static String adminColor = "" + ChatColor.RED;
-    private static String admin = ChatColor.WHITE + "[" + adminColor + "Admin" + ChatColor.WHITE + "] -  ";
+    private static String admin = ChatColor.WHITE + "[" + adminColor + "Admin" + ChatColor.WHITE + "] ";
 
     private static String spongeleaderColor1 = "" + ChatColor.GOLD;
     private static String spongeleaderColor2 = "" + ChatColor.BLUE;
-    private static String spongeleader = ChatColor.WHITE + "[" + spongeleaderColor1 + "Sponge " + spongeleaderColor2 + "Leader" + ChatColor.WHITE + "] - ";
+    private static String spongeleader = ChatColor.WHITE + "[" + spongeleaderColor1 + "Sponge " + spongeleaderColor2 + "Leader" + ChatColor.WHITE + "] ";
 
     private static String moderatorColor = "" + ChatColor.BLUE;
-    private static String moderator = ChatColor.WHITE + "[" + moderatorColor + "Moderator" + ChatColor.WHITE + "] -  ";
+    private static String moderator = ChatColor.WHITE + "[" + moderatorColor + "Moderator" + ChatColor.WHITE + "] ";
+    
+    private static String devColor = "" + ChatColor.DARK_PURPLE;
+    private static String dev = ChatColor.WHITE + "[" + devColor + "SpongeDev" + ChatColor.WHITE + "] ";
 
     private static String veteranColor = "" + ChatColor.GOLD;
-    private static String veteran = ChatColor.WHITE + "[" + veteranColor + "Veteran" + ChatColor.WHITE + "] -  ";
+    private static String veteran = ChatColor.WHITE + "[" + veteranColor + "Veteran" + ChatColor.WHITE + "] ";
 
     private static String contributorColor = "" + ChatColor.DARK_AQUA;
-    private static String contributor = ChatColor.WHITE + "[" + contributorColor + "Contributor" + ChatColor.WHITE + "] -  ";
+    private static String contributor = ChatColor.WHITE + "[" + contributorColor + "Contributor" + ChatColor.WHITE + "] ";
 
     private static String memberColor = "" + ChatColor.DARK_GREEN;
-    private static String member = ChatColor.WHITE + "[" + memberColor + "Member" + ChatColor.WHITE + "] -  ";
+    private static String member = ChatColor.WHITE + "[" + memberColor + "Member" + ChatColor.WHITE + "] ";
 
     private static String guestColor = "" + ChatColor.GRAY;
-    private static String guest = ChatColor.WHITE + "[" + guestColor + "Guest" + ChatColor.WHITE + "] -  ";
+    private static String guest = ChatColor.WHITE + "[" + guestColor + "Guest" + ChatColor.WHITE + "] ";
 
     private static String survivalColor = "" + ChatColor.LIGHT_PURPLE;
-    private static String survival = ChatColor.WHITE + "[" + survivalColor + "Survival" + ChatColor.WHITE + "] -  ";
+    private static String survival = ChatColor.WHITE + "[" + survivalColor + "Survival" + ChatColor.WHITE + "] ";
 
     private static String newbieColor = "" + ChatColor.LIGHT_PURPLE;
-    private static String newbie = ChatColor.WHITE + "[" + newbieColor + "Newbie" + ChatColor.WHITE + "] -  ";
+    private static String newbie = ChatColor.WHITE + "[" + newbieColor + "Newbie" + ChatColor.WHITE + "] ";
 
     // Enter and Leave messages
     private static String enterMessage = ", has joined the server.";
@@ -85,9 +88,9 @@ public class TitleUtil {
 
         if (player.hasPermission("admin.title") && !player.isOp()) {
             if (player.getName().equalsIgnoreCase("wifee")) {
-                Bukkit.broadcastMessage(ChatColor.WHITE + "[" + ChatColor.GOLD + "The Destroyer of Worlds..." + ChatColor.WHITE + "] -  " + player.getDisplayName() + enterMessage);
+                Bukkit.broadcastMessage(ChatColor.WHITE + "[" + ChatColor.GOLD + "The Destroyer of Worlds..." + ChatColor.WHITE + "] " + player.getDisplayName() + enterMessage);
             } else if (player.getName().equalsIgnoreCase("wolfeyeamd0")) {
-                Bukkit.broadcastMessage(ChatColor.WHITE + "[" + ChatColor.GOLD + "The Harbinger..." + ChatColor.WHITE + "] -  " + player.getDisplayName() + enterMessage);
+                Bukkit.broadcastMessage(ChatColor.WHITE + "[" + ChatColor.GOLD + "The Harbinger..." + ChatColor.WHITE + "] " + player.getDisplayName() + enterMessage);
             } else {
                 Bukkit.broadcastMessage(admin + player.getDisplayName() + enterMessage);
             }
@@ -104,6 +107,11 @@ public class TitleUtil {
             return;
         }
 
+        if (player.hasPermission("dev.title") && !player.hasPermission("veteran.title")) {
+            Bukkit.broadcastMessage(dev + player.getDisplayName() + enterMessage);
+            return;
+        }
+        
         if (player.hasPermission("contributor.title") && !player.hasPermission("veteran.title")) {
             Bukkit.broadcastMessage(contributor + player.getDisplayName() + enterMessage);
             return;
@@ -158,6 +166,11 @@ public class TitleUtil {
             Bukkit.broadcastMessage(veteran + player.getDisplayName() + leaveMessage);
             return;
         }
+        
+        if (player.hasPermission("dev.title") && !player.hasPermission("veteran.title")) {
+            Bukkit.broadcastMessage(dev + player.getDisplayName() + leaveMessage);
+            return;
+        }
 
         if (player.hasPermission("contributor.title") && !player.hasPermission("veteran.title")) {
             Bukkit.broadcastMessage(contributor + player.getDisplayName() + leaveMessage);
@@ -207,6 +220,10 @@ public class TitleUtil {
             return (veteranColor + "Veteran");            
         }
 
+        if (player.hasPermission("dev.title") && !player.hasPermission("veteran.title")) {
+            return (contributorColor + "SpongeDev");            
+        }
+        
         if (player.hasPermission("contributor.title") && !player.hasPermission("veteran.title")) {
             return (contributorColor + "Contributor");            
         }
