@@ -19,6 +19,8 @@
  */
 package com.almuramc.forgebridge;
 
+import com.almuramc.forgebridge.message.impl.B01ResTokenConfirmation;
+
 import com.almuramc.forgebridge.listeners.EconListener;
 import com.almuramc.forgebridge.listeners.EntityListener;
 import com.almuramc.forgebridge.listeners.PlayerListener;
@@ -63,6 +65,7 @@ public class BridgePlugin extends JavaPlugin implements Listener, PluginMessageL
         pm.registerEvents(new EntityListener(), this);
         pm.registerEvents(new EconListener(), this);
         MessageRegistar.registerMessage(B00PlayerDeathConfirmation.class, B00PlayerDeathConfirmation.class, 0);
+        MessageRegistar.registerMessage(B01ResTokenConfirmation.class, B01ResTokenConfirmation.class, 1);
     }
 
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {

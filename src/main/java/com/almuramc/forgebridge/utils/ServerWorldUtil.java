@@ -125,6 +125,7 @@ public class ServerWorldUtil {
     public static void sendAdditionalWorldInfo(Player player, String worldName, int currentPlayers, int maxPlayers) {
         final ByteBuf buf = PacketUtil.createPacketBuffer(PacketUtil.DISCRIMINATOR_ADDITIONAL_WORLD_INFORMATION);
         PacketUtil.writeUTF8String(buf, getFormattedWorldName(worldName));
+        PacketUtil.writeUTF8String(buf, worldName);
         buf.writeInt(currentPlayers);
         buf.writeInt(maxPlayers);
         player.sendPluginMessage(BridgePlugin.getInstance(), PacketUtil.CHANNEL, buf.array());

@@ -25,7 +25,8 @@ import net.minecraft.util.io.netty.buffer.Unpooled;
 
 public class PacketUtil {
     public static final String CHANNEL = "AM|BUK";
-    public static final byte DISCRIMINATOR_DISPLAY_NAME = 0;    
+    public static final byte DISCRIMINATOR_DISPLAY_NAME = 0;  
+    public static final byte DISCRIMINATOR_CURRENCY = 1;
     public static final byte DISCRIMINATOR_ADDITIONAL_WORLD_INFORMATION = 2;
     public static final byte DISCRIMINATOR_RESIDENCE_INFO = 3;
 

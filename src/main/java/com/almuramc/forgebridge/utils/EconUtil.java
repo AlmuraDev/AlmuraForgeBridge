@@ -54,7 +54,7 @@ public final class EconUtil {
 
     public static final Economy economy;
     public static final Permission permission;
-    public static final byte DISCRIMINATOR_CURRENCY = 1;
+    
 
     static {
         final RegisteredServiceProvider<Economy> ersp = Bukkit.getServer().getServicesManager().getRegistration(Economy.class);
@@ -64,7 +64,7 @@ public final class EconUtil {
     }
 
     public static void sendCurrencyAmount(Player player, double amount) {
-        final ByteBuf buf = PacketUtil.createPacketBuffer(DISCRIMINATOR_CURRENCY);
+        final ByteBuf buf = PacketUtil.createPacketBuffer(PacketUtil.DISCRIMINATOR_CURRENCY);
         buf.writeDouble(amount);
         player.sendPluginMessage(BridgePlugin.getInstance(), PacketUtil.CHANNEL, buf.array());
     }
