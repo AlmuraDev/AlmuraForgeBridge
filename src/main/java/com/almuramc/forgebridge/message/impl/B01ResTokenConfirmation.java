@@ -19,8 +19,9 @@
  */
 package com.almuramc.forgebridge.message.impl;
 
-import org.bukkit.inventory.ItemStack;
+import me.zford.jobs.util.ChatColor;
 
+import org.bukkit.inventory.ItemStack;
 import com.bekvon.bukkit.residence.Residence;
 import com.bekvon.bukkit.residence.protection.ClaimedResidence;
 import org.bukkit.Material;
@@ -54,24 +55,23 @@ public class B01ResTokenConfirmation implements IPluginMessage, IPluginMessageHa
     }
 
     @Override
-    public B01ResTokenConfirmation onMessage(B01ResTokenConfirmation message, Player source) {        
-        // TODO Player accepted the respawn penalty, what do?        
-        if (useToken && source.getItemInHand().getType() == Material.getMaterial("ALMURA_CURRENCYRESTOKEN")) {
+    public B01ResTokenConfirmation onMessage(B01ResTokenConfirmation message, Player source) {
+       if (message.useToken && source.getItemInHand().getType() == Material.getMaterial("ALMURA_CURRENCYRESTOKEN")) {
             ClaimedResidence res = Residence.getResidenceManager().getByLoc(source.getLocation());
             if (res == null) {
-                source.sendMessage("[Residence] - There is no residence at this location.");
+                source.sendMessage("[" + ChatColor.DARK_AQUA + "Residence" + ChatColor.WHITE + "] - There is no residence at this location.");
 
             } else {
                 if (Residence.getLeaseManager().leaseExpires(res.getName())) {
                     Residence.getLeaseManager().removeExpireTime(res.getName());
-                    source.sendMessage("[Residence] - Lease Removed.");
+                    source.sendMessage("[" + ChatColor.DARK_AQUA + "Residence" + ChatColor.WHITE + "] - Lease Removed.");
                     if (source.getItemInHand().getAmount() == 1) {
                         source.setItemInHand(new ItemStack(Material.AIR));
                     } else {
                         source.getItemInHand().setAmount(source.getItemInHand().getAmount()-1);
                     }
                 } else {
-                    source.sendMessage("[Residence] - There is no lease on the current residence.");
+                    source.sendMessage("[" + ChatColor.DARK_AQUA + "Residence" + ChatColor.WHITE + "] - There is no lease on the current residence.");
                 }
             }
         } 
