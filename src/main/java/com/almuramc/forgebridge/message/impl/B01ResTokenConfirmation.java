@@ -19,19 +19,16 @@
  */
 package com.almuramc.forgebridge.message.impl;
 
-import me.zford.jobs.util.ChatColor;
+import org.bukkit.Bukkit;
 
+import me.zford.jobs.util.ChatColor;
 import org.bukkit.inventory.ItemStack;
 import com.bekvon.bukkit.residence.Residence;
 import com.bekvon.bukkit.residence.protection.ClaimedResidence;
 import org.bukkit.Material;
-import com.almuramc.forgebridge.BridgePlugin;
 import com.almuramc.forgebridge.message.IPluginMessage;
 import com.almuramc.forgebridge.message.IPluginMessageHandler;
-import com.almuramc.forgebridge.utils.PacketUtil;
 import net.minecraft.util.io.netty.buffer.ByteBuf;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 /**
@@ -64,6 +61,7 @@ public class B01ResTokenConfirmation implements IPluginMessage, IPluginMessageHa
             } else {
                 if (Residence.getLeaseManager().leaseExpires(res.getName())) {
                     Residence.getLeaseManager().removeExpireTime(res.getName());
+                    Bukkit.getLogger().info("[Res Tokens] - Player: " + source.getName() + " / " + source.getDisplayName() + " has attempted to use a res token at: " + source.getLocation());
                     source.sendMessage("[" + ChatColor.DARK_AQUA + "Residence" + ChatColor.WHITE + "] - Lease Removed.");
                     if (source.getItemInHand().getAmount() == 1) {
                         source.setItemInHand(new ItemStack(Material.AIR));
