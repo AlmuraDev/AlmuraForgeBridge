@@ -19,8 +19,9 @@
  */
 package com.almuramc.forgebridge.listeners;
 
-import com.bekvon.bukkit.residence.event.ResidenceRenameEvent;
+import com.almuramc.forgebridge.utils.GuiUtil;
 
+import com.bekvon.bukkit.residence.event.ResidenceRenameEvent;
 import com.bekvon.bukkit.residence.event.ResidenceOwnerChangeEvent;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -159,6 +160,12 @@ public class PlayerListener implements Listener {
                 event.getPlayer().sendMessage(ChatColor.WHITE + "MetaData: " + ChatColor.AQUA + event.getClickedBlock().getData());
                 event.getPlayer().sendMessage(ChatColor.WHITE + "Biome: " + ChatColor.LIGHT_PURPLE + event.getClickedBlock().getBiome() + "\n");
             }
+        }
+        
+        // Force open the Res Token Confirmation GUI @ the client.
+        if (event.getPlayer().getItemInHand().getType() == Material.getMaterial("ALMURA_CURRENCYRESTOKEN")) {
+            Bukkit.getLogger().info("[Res Tokens] - Player: " + event.getPlayer().getName() + " / " + event.getPlayer().getDisplayName() + " has attempted to use a res token at: " + event.getPlayer().getLocation());
+            GuiUtil.openGui(event.getPlayer(), 1, 0);
         }
 
         // Banking System

@@ -29,6 +29,8 @@ public class PacketUtil {
     public static final byte DISCRIMINATOR_CURRENCY = 1;
     public static final byte DISCRIMINATOR_ADDITIONAL_WORLD_INFORMATION = 2;
     public static final byte DISCRIMINATOR_RESIDENCE_INFO = 3;
+    //public static final byte [PlayerAccessory] = 4;
+    public static final byte DISCRIMINATOR_GUI_CONTROLLER = 5;
 
     public static ByteBuf createPacketBuffer(byte discriminator) {
         final ByteBuf buf = Unpooled.buffer();
