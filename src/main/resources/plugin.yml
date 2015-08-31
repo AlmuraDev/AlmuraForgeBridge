@@ -8,11 +8,14 @@ commands:
         aliases: 
         usage: /bridge [command] [arguments]
 permissions:
+    bridge.title:
+        description: sends title packets to players
+        default: op
     bridge.info:
-        description: Allows users to view chunk inforatmion.
+        description: Allows users to view chunk information.
         default: op
     bridge.debug:
-        description: Allows users to view chunk debug inforatmion.
+        description: Allows users to view chunk debug information.
         default: op
     bridge.clearitems:
         description: Allows users to clear items on the server.

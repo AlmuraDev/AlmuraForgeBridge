@@ -161,7 +161,7 @@ public class PlayerListener implements Listener {
                 event.getPlayer().sendMessage(ChatColor.WHITE + "Biome: " + ChatColor.LIGHT_PURPLE + event.getClickedBlock().getBiome() + "\n");
             }
         }
-        
+
         // Force open the Res Token Confirmation GUI @ the client.
         if (event.getPlayer().getItemInHand().getType() == Material.getMaterial("ALMURA_CURRENCYRESTOKEN")) {
             Bukkit.getLogger().info("[Res Tokens] - Player: " + event.getPlayer().getName() + " / " + event.getPlayer().getDisplayName() + " has attempted to use a res token at: " + event.getPlayer().getLocation());
@@ -174,10 +174,10 @@ public class PlayerListener implements Listener {
                 if (event.getPlayer().getItemInHand() == null || EconUtil.getCoinValue(event.getPlayer().getItemInHand())==0) {
                     event.getPlayer().sendMessage("[" + ChatColor.DARK_AQUA + "Coin Exchange" + ChatColor.WHITE + "] - please put your coins in your hand to deposit them. ");
                 } else {                
-                    if ((EconUtil.getCoinValue(event.getPlayer().getItemInHand())>0) && EconUtil.isBankingBlock(event.getClickedBlock())) {                
+                    if ((EconUtil.getCoinValue(event.getPlayer().getItemInHand())>0) && EconUtil.isBankingBlock(event.getClickedBlock())) {
                         int quantity = event.getPlayer().getItemInHand().getAmount();
                         double value = EconUtil.getCoinValue(event.getPlayer().getItemInHand());
-                        double amountToDeposit = quantity * value;                
+                        double amountToDeposit = quantity * value;
                         EconUtil.add(event.getPlayer().getName(), amountToDeposit);
                         event.getPlayer().setItemInHand(new ItemStack(Material.AIR));
                         event.getPlayer().sendMessage("[" + ChatColor.DARK_AQUA + "Coin Exchange" + ChatColor.WHITE + "] - Deposited coins in the amount of: " + ChatColor.GOLD + EconListener.NUMBER_FORMAT.format(amountToDeposit));
@@ -186,6 +186,27 @@ public class PlayerListener implements Listener {
                 }
             }
         }
+    }
+
+    // Player Change World event, send critical player/world/display name information to client for AlmuraMod's GUI
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onPlayerChangedWorld(final PlayerChangedWorldEvent event) {
+
+        Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
+            @Override
+            public void run() {
+                final ClaimedResidence res = Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation());
+                ServerWorldUtil.sendResidenceInfo(event.getPlayer(), res);
+
+                for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+                    ServerWorldUtil.sendAdditionalWorldInfo(player, player.getWorld().getName(), Bukkit.getOnlinePlayers().size(), Bukkit.getMaxPlayers());
+                    TitleUtil.sendDisplayName(player, event.getPlayer().getName(), ChatColor.stripColor(event.getPlayer().getDisplayName()) + "\n" + TitleUtil.getCustomTitle(event.getPlayer()));
+                    if (!player.getName().equalsIgnoreCase(event.getPlayer().getName())) {
+                        TitleUtil.sendDisplayName(event.getPlayer(), player.getName(), ChatColor.stripColor(player.getDisplayName()) + "\n" + TitleUtil.getCustomTitle(player));
+                    }
+                }
+            }
+        }, 10L);
     }
 
     // Player Join event, send critical player/world/display name information to client for AlmuraMod's GUI
@@ -200,7 +221,7 @@ public class PlayerListener implements Listener {
                 ServerWorldUtil.sendResidenceInfo(event.getPlayer(), res);
                 // Broadcast Login
                 TitleUtil.broadcastLogin(event.getPlayer());
-                // Send Title                    
+                // Send Title
 
                 for (Player player : Bukkit.getServer().getOnlinePlayers()) {
                     ServerWorldUtil.sendAdditionalWorldInfo(player, player.getWorld().getName(), Bukkit.getOnlinePlayers().size(), Bukkit.getMaxPlayers());
@@ -223,9 +244,9 @@ public class PlayerListener implements Listener {
                     ServerWorldUtil.sendAdditionalWorldInfo(player, player.getWorld().getName(), Bukkit.getOnlinePlayers().size(), Bukkit.getMaxPlayers());
                 }
             }
-        }, 20L);        
+        }, 20L);
     }
-    
+
     // Player Change Nickname event, send critical player/world/display name information to client for AlmuraMod's GUI
     @SuppressWarnings("deprecation")
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -261,7 +282,7 @@ public class PlayerListener implements Listener {
     public void onResidenceFlagChangeEvent(final ResidenceFlagChangeEvent event) {
         Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
             public void run() {
-                if (event.getPlayer() != null) {                    
+                if (event.getPlayer() != null) {
                     ClaimedResidence res = Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation());
                     if (res != null) {                   
                         for (Player player : res.getPlayersInResidence()) {
@@ -286,7 +307,7 @@ public class PlayerListener implements Listener {
 
     }
 
- // Residence Owner Changed event, send critical player/world/display name information to client for AlmuraMod's GUI
+    // Residence Owner Changed event, send critical player/world/display name information to client for AlmuraMod's GUI
     @EventHandler
     public void onResidenceRenameEvent(final ResidenceRenameEvent event) {
         for (Player player : event.getResidence().getPlayersInResidence()) {
@@ -295,7 +316,7 @@ public class PlayerListener implements Listener {
             }
         }
     }
-    
+
     // Residence Owner Changed event, send critical player/world/display name information to client for AlmuraMod's GUI
     @EventHandler
     public void onResidenceOwnerChangeEvent(final ResidenceOwnerChangeEvent event) {

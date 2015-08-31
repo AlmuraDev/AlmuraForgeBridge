@@ -19,8 +19,11 @@
  */
 package com.almuramc.forgebridge;
 
-import com.almuramc.forgebridge.message.impl.B01ResTokenConfirmation;
+import org.bukkit.OfflinePlayer;
 
+import com.almuramc.forgebridge.utils.TitleUtil;
+import org.bukkit.ChatColor;
+import com.almuramc.forgebridge.message.impl.B01ResTokenConfirmation;
 import com.almuramc.forgebridge.listeners.EconListener;
 import com.almuramc.forgebridge.listeners.EntityListener;
 import com.almuramc.forgebridge.listeners.PlayerListener;
@@ -64,8 +67,15 @@ public class BridgePlugin extends JavaPlugin implements Listener, PluginMessageL
         pm.registerEvents(new PlayerListener(), this);
         pm.registerEvents(new EntityListener(), this);
         pm.registerEvents(new EconListener(), this);
-        MessageRegistar.registerMessage(B00PlayerDeathConfirmation.class, B00PlayerDeathConfirmation.class, 0);
-        MessageRegistar.registerMessage(B01ResTokenConfirmation.class, B01ResTokenConfirmation.class, 1);
+        // These packets have to be unique to the envirionment they are not coded per side.
+        // DISCRIMINATOR_DISPLAY_NAME = 0;  
+        // DISCRIMINATOR_CURRENCY = 1;
+        // DISCRIMINATOR_ADDITIONAL_WORLD_INFORMATION = 2;
+        // DISCRIMINATOR_RESIDENCE_INFO = 3;
+        // [PlayerAccessory] = 4;
+        // DISCRIMINATOR_GUI_CONTROLLER = 5;
+        MessageRegistar.registerMessage(B00PlayerDeathConfirmation.class, B00PlayerDeathConfirmation.class, 6);
+        MessageRegistar.registerMessage(B01ResTokenConfirmation.class, B01ResTokenConfirmation.class, 7);
     }
 
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -74,6 +84,28 @@ public class BridgePlugin extends JavaPlugin implements Listener, PluginMessageL
             return false;
         }
 
+        if (args.length > 0 && args[0].equalsIgnoreCase("title")) {
+            if (sender instanceof Player) {
+                if (sender.hasPermission("bridge.info")) {
+
+                    for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+                        ServerWorldUtil.sendAdditionalWorldInfo(player, player.getWorld().getName(), Bukkit.getOnlinePlayers().size(), Bukkit.getMaxPlayers());
+                        TitleUtil.sendDisplayName(player, sender.getName(), ChatColor.stripColor(((OfflinePlayer) sender).getPlayer().getDisplayName()) + "\n" + TitleUtil.getCustomTitle(((OfflinePlayer) sender).getPlayer()));                                                
+                        TitleUtil.sendDisplayName(((OfflinePlayer) sender).getPlayer(), player.getName(), ChatColor.stripColor(player.getDisplayName()) + "\n" + TitleUtil.getCustomTitle(player));
+                    }
+                    Bukkit.getLogger().info("[Almura Bridge] - Sent Titles and World Info");
+                    sender.sendMessage("[Almura Bridge] - Sent Titles");
+                    return true;
+                } else {
+                    sender.sendMessage("[Almura Bridge] - Insufficient Permissions.");
+                    return false;
+                }
+            } else {
+                ServerWorldUtil.displayInfo(null, true, false);
+                return true;
+            }
+        }
+        
         if (args.length > 0 && args[0].equalsIgnoreCase("info")) {
             if (sender instanceof Player) {
                 if (sender.hasPermission("bridge.info")) {
