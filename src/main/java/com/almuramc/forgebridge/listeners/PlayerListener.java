@@ -234,7 +234,7 @@ public class PlayerListener implements Listener {
             }
         }, 20L);
         TitleUtil.sendClientDetailsRequest(event.getPlayer());
-        //EconUtil.sendCurrencyAmount(event.getPlayer(), EconUtil.economy.getBalance(event.getPlayer().getName()));
+        EconUtil.sendCurrencyAmount(event.getPlayer(), EconUtil.economy.getBalance(event.getPlayer().getName()));
     }
     // Player Quit event, send critical player/world/display name information to client for AlmuraMod's GUI
     @EventHandler(priority = EventPriority.LOWEST)
