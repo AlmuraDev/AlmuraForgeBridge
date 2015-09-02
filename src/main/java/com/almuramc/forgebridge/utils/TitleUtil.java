@@ -290,4 +290,9 @@ public class TitleUtil {
         }
         return 8;
     }
+
+    public static void sendClientDetailsRequest(Player player) {
+        final ByteBuf buf = PacketUtil.createPacketBuffer(PacketUtil.DISCRIMINATOR_CLIENT_DETAILS_REQUEST);
+        player.sendPluginMessage(BridgePlugin.getInstance(), PacketUtil.CHANNEL, buf.array());
+    }
 }

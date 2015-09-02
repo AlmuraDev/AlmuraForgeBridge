@@ -31,7 +31,7 @@ public class PacketUtil {
     public static final byte DISCRIMINATOR_RESIDENCE_INFO = 3;
     //public static final byte [PlayerAccessory] = 4;
     public static final byte DISCRIMINATOR_GUI_CONTROLLER = 5;
-
+    public static final byte DISCRIMINATOR_CLIENT_DETAILS_REQUEST = 8;
     public static ByteBuf createPacketBuffer(byte discriminator) {
         final ByteBuf buf = Unpooled.buffer();
         buf.writeByte(discriminator);

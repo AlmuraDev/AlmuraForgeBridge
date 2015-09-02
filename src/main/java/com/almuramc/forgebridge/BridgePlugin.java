@@ -19,6 +19,7 @@
  */
 package com.almuramc.forgebridge;
 
+import com.almuramc.forgebridge.message.impl.B02ClientDetailsResponse;
 import org.bukkit.OfflinePlayer;
 
 import com.almuramc.forgebridge.utils.TitleUtil;
@@ -67,7 +68,7 @@ public class BridgePlugin extends JavaPlugin implements Listener, PluginMessageL
         pm.registerEvents(new PlayerListener(), this);
         pm.registerEvents(new EntityListener(), this);
         pm.registerEvents(new EconListener(), this);
-        // These packets have to be unique to the envirionment they are not coded per side.
+        // These packets have to be unique to the environment they are not coded per side.
         // DISCRIMINATOR_DISPLAY_NAME = 0;  
         // DISCRIMINATOR_CURRENCY = 1;
         // DISCRIMINATOR_ADDITIONAL_WORLD_INFORMATION = 2;
@@ -76,6 +77,7 @@ public class BridgePlugin extends JavaPlugin implements Listener, PluginMessageL
         // DISCRIMINATOR_GUI_CONTROLLER = 5;
         MessageRegistar.registerMessage(B00PlayerDeathConfirmation.class, B00PlayerDeathConfirmation.class, 6);
         MessageRegistar.registerMessage(B01ResTokenConfirmation.class, B01ResTokenConfirmation.class, 7);
+        MessageRegistar.registerMessage(B02ClientDetailsResponse.class, B02ClientDetailsResponse.class, 9);
     }
 
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {

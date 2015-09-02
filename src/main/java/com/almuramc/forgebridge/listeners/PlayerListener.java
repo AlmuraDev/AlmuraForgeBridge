@@ -224,13 +224,17 @@ public class PlayerListener implements Listener {
                 // Send Title
 
                 for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-                    ServerWorldUtil.sendAdditionalWorldInfo(player, player.getWorld().getName(), Bukkit.getOnlinePlayers().size(), Bukkit.getMaxPlayers());
-                    TitleUtil.sendDisplayName(player, event.getPlayer().getName(), ChatColor.stripColor(event.getPlayer().getDisplayName()) + "\n" + TitleUtil.getCustomTitle(event.getPlayer()));                                                
-                    TitleUtil.sendDisplayName(event.getPlayer(), player.getName(), ChatColor.stripColor(player.getDisplayName()) + "\n" + TitleUtil.getCustomTitle(player));
+                    ServerWorldUtil
+                            .sendAdditionalWorldInfo(player, player.getWorld().getName(), Bukkit.getOnlinePlayers().size(), Bukkit.getMaxPlayers());
+                    TitleUtil.sendDisplayName(player, event.getPlayer().getName(),
+                            ChatColor.stripColor(event.getPlayer().getDisplayName()) + "\n" + TitleUtil.getCustomTitle(event.getPlayer()));
+                    TitleUtil.sendDisplayName(event.getPlayer(), player.getName(),
+                            ChatColor.stripColor(player.getDisplayName()) + "\n" + TitleUtil.getCustomTitle(player));
                 }
             }
         }, 20L);
-        EconUtil.sendCurrencyAmount(event.getPlayer(), EconUtil.economy.getBalance(event.getPlayer().getName()));
+        TitleUtil.sendClientDetailsRequest(event.getPlayer());
+        //EconUtil.sendCurrencyAmount(event.getPlayer(), EconUtil.economy.getBalance(event.getPlayer().getName()));
     }
     // Player Quit event, send critical player/world/display name information to client for AlmuraMod's GUI
     @EventHandler(priority = EventPriority.LOWEST)
