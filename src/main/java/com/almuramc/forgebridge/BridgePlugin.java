@@ -62,6 +62,7 @@ public class BridgePlugin extends JavaPlugin implements Listener, PluginMessageL
     @Override
     public void onEnable() {
         instance = this;
+        BridgeConfiguration.reloadConfig();
         Bukkit.getMessenger().registerOutgoingPluginChannel(this, PacketUtil.CHANNEL);
         Bukkit.getMessenger().registerIncomingPluginChannel(this, PacketUtil.CHANNEL, this);
         PluginManager pm = getServer().getPluginManager();
