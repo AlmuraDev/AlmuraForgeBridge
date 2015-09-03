@@ -19,6 +19,8 @@
  */
 package com.almuramc.forgebridge.message.impl;
 
+import com.almuramc.forgebridge.BridgeConfiguration;
+
 import com.almuramc.forgebridge.message.IPluginMessage;
 import com.almuramc.forgebridge.message.IPluginMessageHandler;
 import com.almuramc.forgebridge.utils.PacketUtil;
@@ -69,13 +71,34 @@ public class B02ClientDetailsResponse implements IPluginMessage, IPluginMessageH
     public B02ClientDetailsResponse onMessage(B02ClientDetailsResponse message, Player source) {
         if (message.names != null) {
             for (String name : message.names) {
-                Bukkit.getLogger().info("[" + source.getName() + "] Has Tweaker: " + name);
+                System.out.println("[Bridge] - Tweaker: " + name);
+                if (!BridgeConfiguration.isTweakerAllowed(name.toLowerCase())) {
+                    Bukkit.getLogger().severe("Player: " + source.getName() + " tried to use mod" + name);
+                    for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+                        if (player.hasPermission("admin.title")) {
+                            player.sendMessage("Player: " + source.getName() + " attempted to join while using tweaker: " + name);
+                        }
+                    }
+                    source.kickPlayer("You are not allowed to use tweaker: " + name) ;
+                    return null;
+                }
+
             }
         }
 
         if (message.modNames != null) {
             for (String name : message.modNames) {
-                Bukkit.getLogger().info("[" + source.getName() + "] Has Mod: " + name);
+                System.out.println("[Bridge] - Mods: " + name);
+                if (!BridgeConfiguration.isModAllowed(name.toLowerCase())) {
+                    Bukkit.getLogger().severe("Player: " + source.getName() + " tried to use mod: " + name);
+                    for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+                        if (player.hasPermission("admin.title")) {
+                            player.sendMessage("Player: " + source.getName() + " attempted to join while using mod: " + name);
+                        }
+                    }
+                    source.kickPlayer("You are not allowed to use mod: " + name) ;
+                    return null;
+                }
             }
         }
         return null;

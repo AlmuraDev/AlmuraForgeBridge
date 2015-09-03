@@ -20,3 +20,6 @@ permissions:
     bridge.clearitems:
         description: Allows users to clear items on the server.
         default: op        
+    bridge.config:
+        description: Allows admins to reload configuration.
+        default: op      

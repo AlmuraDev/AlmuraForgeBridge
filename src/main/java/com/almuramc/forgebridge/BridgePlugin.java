@@ -153,6 +153,21 @@ public class BridgePlugin extends JavaPlugin implements Listener, PluginMessageL
                 return true;
             }
         }
+        
+        if (args.length > 0 && args[0].equalsIgnoreCase("config")) {
+            if (sender instanceof Player) {
+                if (sender.hasPermission("bridge.config")) {
+                    BridgeConfiguration.reloadConfig();
+                    return true;
+                } else {
+                    sender.sendMessage("[Almura Bridge] - Insufficient Permissions.");
+                    return false;
+                }
+            } else {
+                BridgeConfiguration.reloadConfig();
+                return true;
+            }
+        }
         return false;
     }
 

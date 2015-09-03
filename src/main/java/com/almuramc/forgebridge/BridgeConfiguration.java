@@ -32,11 +32,11 @@ public class BridgeConfiguration {
 
     private BridgeConfiguration() {}
 
-    public boolean isTweakerAllowed(String tweaker) {
+    public static boolean isTweakerAllowed(String tweaker) {
         return ALLOWED_TWEAKERS.contains(tweaker);
     }
 
-    public boolean isModAllowed(String mod) {
+    public static boolean isModAllowed(String mod) {
         return ALLOWED_MODS.contains(mod);
     }
 
@@ -45,6 +45,7 @@ public class BridgeConfiguration {
             BridgePlugin.getInstance().saveDefaultConfig();
         }
         config = BridgePlugin.getInstance().getConfig();
+        BridgePlugin.getInstance().reloadConfig();
 
         ALLOWED_TWEAKERS.clear();
         ALLOWED_MODS.clear();
