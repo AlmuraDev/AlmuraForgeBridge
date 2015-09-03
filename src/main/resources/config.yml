@@ -3,6 +3,8 @@ allowed-tweakers:
     - cpw.mods.fml.common.launcher.fmlinjectionandsortingtweaker
     - cpw.mods.fml.common.launcher.fmldeobftweaker
     - cpw.mods.fml.common.launcher.terminaltweaker
+    - optifine.optifineforgetweaker
+    - shadersmodcore.loading.smctweaker
 allowed-mods:
     - almura
     - almurasdk
@@ -51,3 +53,4 @@ allowed-mods:
     - thermalexpansion
     - thermalfoundation
     - tconstruct
+    - waila
