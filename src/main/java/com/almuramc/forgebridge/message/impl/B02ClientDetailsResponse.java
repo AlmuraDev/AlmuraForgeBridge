@@ -69,11 +69,13 @@ public class B02ClientDetailsResponse implements IPluginMessage, IPluginMessageH
 
     @Override
     public B02ClientDetailsResponse onMessage(B02ClientDetailsResponse message, Player source) {
+        if (source.isOp()) {
+            return null;
+        }
         if (message.names != null) {
             for (String name : message.names) {
-                System.out.println("[Bridge] - Tweaker: " + name);
                 if (!BridgeConfiguration.isTweakerAllowed(name.toLowerCase())) {
-                    Bukkit.getLogger().severe("Player: " + source.getName() + " tried to use mod" + name);
+                    Bukkit.getLogger().warning("Player: " + source.getName() + " tried to use mod" + name);
                     for (Player player : Bukkit.getServer().getOnlinePlayers()) {
                         if (player.hasPermission("admin.title")) {
                             player.sendMessage("Player: " + source.getName() + " attempted to join while using tweaker: " + name);
@@ -88,9 +90,8 @@ public class B02ClientDetailsResponse implements IPluginMessage, IPluginMessageH
 
         if (message.modNames != null) {
             for (String name : message.modNames) {
-                System.out.println("[Bridge] - Mods: " + name);
                 if (!BridgeConfiguration.isModAllowed(name.toLowerCase())) {
-                    Bukkit.getLogger().severe("Player: " + source.getName() + " tried to use mod: " + name);
+                    Bukkit.getLogger().warning("Player: " + source.getName() + " tried to use mod: " + name);
                     for (Player player : Bukkit.getServer().getOnlinePlayers()) {
                         if (player.hasPermission("admin.title")) {
                             player.sendMessage("Player: " + source.getName() + " attempted to join while using mod: " + name);

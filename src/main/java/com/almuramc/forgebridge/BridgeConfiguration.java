@@ -44,8 +44,8 @@ public class BridgeConfiguration {
         if (!new File(BridgePlugin.getInstance().getDataFolder(), "config.yml").exists()) {
             BridgePlugin.getInstance().saveDefaultConfig();
         }
-        config = BridgePlugin.getInstance().getConfig();
         BridgePlugin.getInstance().reloadConfig();
+        config = BridgePlugin.getInstance().getConfig();
 
         ALLOWED_TWEAKERS.clear();
         ALLOWED_MODS.clear();

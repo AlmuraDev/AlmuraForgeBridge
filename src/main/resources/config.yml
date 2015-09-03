@@ -1,51 +1,53 @@
 allowed-tweakers:
-    - cpw.mods.fml.common.launcher.FMLTweaker
-    - cpw.mods.fml.common.launcher.FMLInjectionAndSortingTweaker
-    - cpw.mods.fml.common.launcher.FMLDeobfTweaker
-    - cpw.mods.fml.common.launcher.TerminalTweaker
+    - cpw.mods.fml.common.launcher.fmltweaker
+    - cpw.mods.fml.common.launcher.fmlinjectionandsortingtweaker
+    - cpw.mods.fml.common.launcher.fmldeobftweaker
+    - cpw.mods.fml.common.launcher.terminaltweaker
 allowed-mods:
     - almura
     - almurasdk
-    - Baubles
-    - BiblioCraft
-    - BuildCraft|Builders
-    - BuildCraft|Robotics
-    - BuildCraft|Silicon
-    - BuildCraft|Energy
-    - BuildCraft|Factory
-    - BuildCraft|Transport
-    - CarpentersBlocks
-    - CoFHCore
-    - CustomSpawner
+    - baubles
+    - bibliocraft
+    - buildcraft|builders
+    - buildcraft|core
+    - buildcraft|robotics
+    - buildcraft|silicon
+    - buildcraft|energy
+    - buildcraft|factory
+    - buildcraft|transport
+    - carpentersblocks
+    - cofhcore
+    - customspawner
     - guide
-    - IC2
+    - ic2
     - inventorytweaks
-    - IronChest    
+    - ironchest    
     - malisiscore
     - malisisdoors
-    - Mantle
-    - MineFactoryReloaded
-    - MineFactoryReloaded|CompatBackTools
-    - MineFactoryReloaded|CompatExtraBiomes
-    - MineFactoryReloaded|CompatTwilightForest
-    - MineFactoryReloaded|CompatChococraft
-    - MineFactoryReloaded|CompatProjRed
-    - MineFactoryReloaded|CompatMystcraft
-    - MineFactoryReloaded|CompatIC2
-    - MineFactoryReloaded|CompatAtum
-    - MineFactoryReloaded|CompatTConstruct
-    - MineFactoryReloaded|CompatAppliedEnergistics
-    - MineFactoryReloaded|CompatBuildCraft
-    - MineFactoryReloaded|CompatThaumcraft
-    - MineFactoryReloaded|CompatRailcraft
-    - MineFactoryReloaded|CompatForestry
-    - MineFactoryReloaded|CompatSufficientBiomes
-    - MineFactoryReloaded|CompatVanilla
-    - MineFactoryReloaded|CompatForgeMicroblock
-    - MoCreatures
-    - Railcraft
-    - Thaumcraft
-    - ThermalDynamics
-    - ThermalExpansion
-    - ThermalFoundation
-    - TConstruct
+    - mantle
+    - minefactoryreloaded
+    - minefactoryreloaded|compatbacktools
+    - minefactoryreloaded|compatextrabiomes
+    - minefactoryreloaded|compattwilightforest
+    - minefactoryreloaded|compatchococraft
+    - minefactoryreloaded|compatprojred
+    - minefactoryreloaded|compatmystcraft
+    - minefactoryreloaded|compatic2
+    - minefactoryreloaded|compatatum
+    - minefactoryreloaded|compattconstruct
+    - minefactoryreloaded|compatappliedenergistics
+    - minefactoryreloaded|compatbuildcraft
+    - minefactoryreloaded|compatthaumcraft
+    - minefactoryreloaded|compatrailcraft
+    - minefactoryreloaded|compatforestry
+    - minefactoryreloaded|compatsufficientbiomes
+    - minefactoryreloaded|compatvanilla
+    - minefactoryreloaded|compatforgemicroblock
+    - minefactoryreloaded|compatthermalexpansion
+    - mocreatures
+    - railcraft
+    - thaumcraft
+    - thermaldynamics
+    - thermalexpansion
+    - thermalfoundation
+    - tconstruct
