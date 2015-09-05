@@ -19,8 +19,10 @@
  */
 package com.almuramc.forgebridge.listeners;
 
-import com.almuramc.forgebridge.utils.GuiUtil;
+import org.bukkit.event.inventory.InventoryClickEvent;
 
+import org.bukkit.event.inventory.CraftItemEvent;
+import com.almuramc.forgebridge.utils.GuiUtil;
 import com.bekvon.bukkit.residence.event.ResidenceRenameEvent;
 import com.bekvon.bukkit.residence.event.ResidenceOwnerChangeEvent;
 import org.bukkit.Location;
@@ -42,7 +44,6 @@ import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
 import com.almuramc.forgebridge.BridgePlugin;
 import com.almuramc.forgebridge.utils.ServerWorldUtil;
@@ -57,7 +58,7 @@ import com.bekvon.bukkit.residence.protection.ClaimedResidence;
 import com.greatmancode.craftconomy3.tools.events.bukkit.events.EconomyChangeEvent;
 
 public class PlayerListener implements Listener {
-
+        
     // Protect all guests from PVP damage regardless of location
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onEntityDamage(EntityDamageEvent event) {

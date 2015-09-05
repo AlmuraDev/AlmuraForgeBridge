@@ -19,9 +19,10 @@
  */
 package com.almuramc.forgebridge;
 
+import net.minecraft.server.v1_7_R4.BiomeBase;
+
 import com.almuramc.forgebridge.message.impl.B02ClientDetailsResponse;
 import org.bukkit.OfflinePlayer;
-
 import com.almuramc.forgebridge.utils.TitleUtil;
 import org.bukkit.ChatColor;
 import com.almuramc.forgebridge.message.impl.B01ResTokenConfirmation;
@@ -142,14 +143,21 @@ public class BridgePlugin extends JavaPlugin implements Listener, PluginMessageL
         if (args.length > 0 && args[0].equalsIgnoreCase("clearitems")) {
             if (sender instanceof Player) {
                 if (sender.hasPermission("bridge.clearitems")) {
-                    ServerWorldUtil.clearItems((Player) sender, false);
+                    //ServerWorldUtil.clearItems((Player) sender, false);
+                    for (BiomeBase biome : BiomeBase.getBiomes()) {
+                        if (biome == null) {
+                            continue;
+                        }
+                        String biomeName = biome.af == null ? "unknown" : biome.af;
+                        System.out.println("Biome -> ID : [" + biome.id + "] | Name [" + biomeName + "] | Object Print [" + biome.toString() + "].");
+                    }
                     return true;
                 } else {
                     sender.sendMessage("[Almura Bridge] - Insufficient Permissions.");
                     return false;
                 }
             } else {
-                ServerWorldUtil.displayInfo(null, true, false);
+                //ServerWorldUtil.displayInfo(null, true, false);
                 return true;
             }
         }
