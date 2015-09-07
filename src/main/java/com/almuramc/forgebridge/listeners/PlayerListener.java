@@ -257,8 +257,6 @@ public class PlayerListener implements Listener {
             public void run() {
                 final ClaimedResidence res = Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation());
                 ServerWorldUtil.sendResidenceInfo(event.getPlayer(), res);
-                // Broadcast Login
-                TitleUtil.broadcastLogin(event.getPlayer());
                 // Send Title
 
                 for (Player player : Bukkit.getServer().getOnlinePlayers()) {
@@ -268,7 +266,6 @@ public class PlayerListener implements Listener {
                 }
             }
         }, 20L);
-        TitleUtil.sendClientDetailsRequest(event.getPlayer());
         EconUtil.sendCurrencyAmount(event.getPlayer(), EconUtil.economy.getBalance(event.getPlayer().getName()));
     }
     
@@ -279,8 +276,6 @@ public class PlayerListener implements Listener {
             public void run() {
                 final ClaimedResidence res = Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation());
                 ServerWorldUtil.sendResidenceInfo(event.getPlayer(), res);
-                // Broadcast Login
-                TitleUtil.broadcastLogin(event.getPlayer());
                 // Send Title
 
                 for (Player player : Bukkit.getServer().getOnlinePlayers()) {
@@ -290,7 +285,6 @@ public class PlayerListener implements Listener {
                 }
             }
         }, 20L);
-        TitleUtil.sendClientDetailsRequest(event.getPlayer());
         EconUtil.sendCurrencyAmount(event.getPlayer(), EconUtil.economy.getBalance(event.getPlayer().getName()));
     }
     
@@ -301,8 +295,6 @@ public class PlayerListener implements Listener {
             public void run() {
                 final ClaimedResidence res = Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation());
                 ServerWorldUtil.sendResidenceInfo(event.getPlayer(), res);
-                // Broadcast Login
-                TitleUtil.broadcastLogin(event.getPlayer());
                 // Send Title
 
                 for (Player player : Bukkit.getServer().getOnlinePlayers()) {
@@ -312,7 +304,6 @@ public class PlayerListener implements Listener {
                 }
             }
         }, 20L);
-        TitleUtil.sendClientDetailsRequest(event.getPlayer());
         EconUtil.sendCurrencyAmount(event.getPlayer(), EconUtil.economy.getBalance(event.getPlayer().getName()));
     }
 
