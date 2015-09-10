@@ -63,8 +63,8 @@ public class TitleUtil {
     private static String newbie = ChatColor.WHITE + "[" + newbieColor + "Newbie" + ChatColor.WHITE + "] ";
 
     // Enter and Leave messages
-    private static String enterMessage = ", has joined the server.";
-    private static String leaveMessage = ", has left the server.";
+    private static String enterMessage = " has joined the server.";
+    private static String leaveMessage = " has left the server.";
 
     public static void broadcastLogin(Player player) {
 
@@ -74,7 +74,7 @@ public class TitleUtil {
         }
 
         if (!player.hasPlayedBefore()) {
-            Bukkit.broadcastMessage(newbie + player.getDisplayName() + ", has joined the server for the First Time!");
+            Bukkit.broadcastMessage(newbie + player.getDisplayName() + " has joined the server for the first time!");
             return;
         }
 
@@ -145,9 +145,9 @@ public class TitleUtil {
 
         if (player.hasPermission("admin.title") && !player.isOp()) {
             if (player.getName().equalsIgnoreCase("wifee")) {
-                Bukkit.broadcastMessage(ChatColor.WHITE + "[" + ChatColor.GOLD + "The Destroyer of Worlds..." + ChatColor.WHITE + "] -  " + player.getDisplayName() + leaveMessage);
+                Bukkit.broadcastMessage(ChatColor.WHITE + "[" + ChatColor.GOLD + "The Destroyer of Worlds..." + ChatColor.WHITE + "] " + player.getDisplayName() + leaveMessage);
             } else if (player.getName().equalsIgnoreCase("wolfeyeamd0")) {
-                Bukkit.broadcastMessage(ChatColor.WHITE + "[" + ChatColor.GOLD + "The Harbinger..." + ChatColor.WHITE + "] -  " + player.getDisplayName() + leaveMessage);
+                Bukkit.broadcastMessage(ChatColor.WHITE + "[" + ChatColor.GOLD + "The Harbinger..." + ChatColor.WHITE + "] " + player.getDisplayName() + leaveMessage);
             } else {
                 Bukkit.broadcastMessage(admin + player.getDisplayName() + leaveMessage);
             }
