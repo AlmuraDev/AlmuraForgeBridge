@@ -5,6 +5,8 @@ allowed-tweakers:
     - cpw.mods.fml.common.launcher.terminaltweaker
     - optifine.optifineforgetweaker
     - shadersmodcore.loading.smctweaker
+    - org.spongepowered.asm.mixin.mixinenvironment$environmentstatetweaker
+    - com.almuradev.almura.launch.almuralaunchtweaker
 allowed-mods:
     - almura
     - almurasdk
@@ -19,7 +21,9 @@ allowed-mods:
     - buildcraft|transport
     - carpentersblocks
     - cofhcore
+    - compactsolars
     - customspawner
+    - customnpcs
     - guide
     - ic2
     - inventorytweaks
@@ -27,6 +31,7 @@ allowed-mods:
     - malisiscore
     - malisisdoors
     - mantle
+    - mapwriter
     - minefactoryreloaded
     - minefactoryreloaded|compatbacktools
     - minefactoryreloaded|compatextrabiomes

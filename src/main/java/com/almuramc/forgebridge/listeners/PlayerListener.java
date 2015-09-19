@@ -19,8 +19,14 @@
  */
 package com.almuramc.forgebridge.listeners;
 
-import org.bukkit.event.player.PlayerTeleportEvent;
+import org.anjocaido.groupmanager.GroupManager;
 
+import org.anjocaido.groupmanager.dataholder.worlds.WorldsHolder;
+import org.anjocaido.groupmanager.permissions.AnjoPermissionsHandler;
+import org.anjocaido.groupmanager.dataholder.OverloadedWorldHolder;
+import org.anjocaido.groupmanager.data.User;
+import org.anjocaido.groupmanager.data.Group;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -61,7 +67,7 @@ import com.bekvon.bukkit.residence.protection.ClaimedResidence;
 import com.greatmancode.craftconomy3.tools.events.bukkit.events.EconomyChangeEvent;
 
 public class PlayerListener implements Listener {
-        
+
     // Protect all guests from PVP damage regardless of location
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onEntityDamage(EntityDamageEvent event) {
@@ -116,6 +122,22 @@ public class PlayerListener implements Listener {
                 }
             }
         } */
+    }
+
+    public void changeUserGroup(Player player, String groupName) {
+        OverloadedWorldHolder dataHolder = null;
+
+        if (player != null) {
+            dataHolder = ((GroupManager) Bukkit.getPluginManager().getPlugin("GroupManager")).getWorldsHolder().getWorldData(player);
+        }
+
+        if (dataHolder != null) {
+            Group auxGroup = dataHolder.getGroup(groupName);
+            User auxUser = dataHolder.getUser(player.getName());
+            if (auxGroup != null && auxUser != null) {
+                auxUser.setGroup(auxGroup);
+            }
+        }
     }
 
     // Group Manager's Change Event Listener
@@ -248,7 +270,7 @@ public class PlayerListener implements Listener {
             }
         }, 20L);
     }
-    
+
     // Player Respawn
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerRespawn(final PlayerRespawnEvent event) {
@@ -268,7 +290,7 @@ public class PlayerListener implements Listener {
         }, 20L);
         EconUtil.sendCurrencyAmount(event.getPlayer(), EconUtil.economy.getBalance(event.getPlayer().getName()));
     }
-    
+
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerPortal(final PlayerPortalEvent event) {
         Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
@@ -287,7 +309,7 @@ public class PlayerListener implements Listener {
         }, 20L);
         EconUtil.sendCurrencyAmount(event.getPlayer(), EconUtil.economy.getBalance(event.getPlayer().getName()));
     }
-    
+
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerTeleport(final PlayerTeleportEvent event) {
         Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
