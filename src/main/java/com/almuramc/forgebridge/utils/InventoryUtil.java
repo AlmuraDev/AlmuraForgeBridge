@@ -24,8 +24,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 
 import java.util.Iterator;
+import java.util.ListIterator;
+import java.util.Map;
 
 public class InventoryUtil {
     public static ItemStack getFirstByName(Player player, String itemName) {
@@ -45,18 +48,38 @@ public class InventoryUtil {
         }
         return false;
     }
-    
-    public static boolean removeItem(Player player, String itemName) {
-        for (Iterator<ItemStack> iter = player.getInventory().iterator(); iter.hasNext();) {
-            final ItemStack stack = iter.next();
 
-            if (stack != null && stack.getType().name() != null && stack.getType().name().equalsIgnoreCase(itemName)) {
-                iter.remove();
+    /**
+     * Removes some or all {@link Material} from a {@link PlayerInventory}.
+     * @param player The player
+     * @param materialName The name of the material
+     * @param quantity The quantity to remove. Specifying -1 means all.
+     * @return True if removal was successful, false otherwise
+     */
+    public static boolean removeItem(Player player, String materialName, int quantity) {
+        final Material material = Material.getMaterial(materialName.toUpperCase());
+        if (material != null) {
+           final int foundIndex = player.getInventory().first(material);
+            if (foundIndex != -1) {
+                if (quantity == -1) {
+                    player.getInventory().setItem(foundIndex, null);
+                } else {
+                    final ItemStack stack = player.getInventory().getItem(foundIndex);
+                    if (stack.getAmount() - quantity <= 0) {
+                        player.getInventory().setItem(foundIndex, null);
+                    } else {
+                        stack.setAmount(stack.getAmount() - quantity);
+                        player.getInventory().setItem(foundIndex, stack);
+                    }
+                }
+
+                player.updateInventory();
                 return true;
             }
         }
-        
-        Bukkit.getLogger().severe(" - Tried to remove item: " + itemName + " from user: " + player.getName() + " but if failed somehow.");
+
+        Bukkit.getLogger().severe(" - Tried to modify item: " + materialName + " from player: " + player.getName() + " with quantity [" + (quantity
+                == -1 ? "all " : quantity) + "] but it failed somehow.");
         return false;
     }
 }
