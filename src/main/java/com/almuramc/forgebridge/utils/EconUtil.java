@@ -215,14 +215,14 @@ public final class EconUtil {
                     // Feedback message to player should come via Broadcast from PlayerListener (Group Changed Event).
 
                     // Wipe Tokens from Inventory.
-                    InventoryUtil.removeItem(player, "ALMURA_CURRENCYTOKEN_FRENOR");
-                    InventoryUtil.removeItem(player, "ALMURA_CURRENCYTOKEN_SORETTA");
-                    InventoryUtil.removeItem(player, "ALMURA_CURRENCYTOKEN_MINTOS");
-                    InventoryUtil.removeItem(player, "ALMURA_CURRENCYTOKEN_SANTEEM");
-                    InventoryUtil.removeItem(player, "ALMURA_CURRENCYTOKEN_TEMPE");
-                    InventoryUtil.removeItem(player, "ALMURA_CURRENCYTOKEN_ELFVILLE");
-                    InventoryUtil.removeItem(player, "ALMURA_CURRENCYTOKEN_STANCIA");
-                    InventoryUtil.removeItem(player, "ALMURA_CURRENCYTOKEN_CAVES");
+                    InventoryUtil.removeItem(player, "ALMURA_CURRENCYTOKEN_FRENOR", 1);
+                    InventoryUtil.removeItem(player, "ALMURA_CURRENCYTOKEN_SORETTA", 1);
+                    InventoryUtil.removeItem(player, "ALMURA_CURRENCYTOKEN_MINTOS", 1);
+                    InventoryUtil.removeItem(player, "ALMURA_CURRENCYTOKEN_SANTEEM", 1);
+                    InventoryUtil.removeItem(player, "ALMURA_CURRENCYTOKEN_TEMPE", 1);
+                    InventoryUtil.removeItem(player, "ALMURA_CURRENCYTOKEN_ELFVILLE", 1);
+                    InventoryUtil.removeItem(player, "ALMURA_CURRENCYTOKEN_STANCIA", 1);
+                    InventoryUtil.removeItem(player, "ALMURA_CURRENCYTOKEN_CAVES", 1);
 
                     Bukkit.getLogger().info(" - Player: " + player.getName() + " granted Almura Citizenship.");
                 } else {

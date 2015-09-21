@@ -51,9 +51,9 @@ public class TitleUtil {
     private static String contributor = ChatColor.WHITE + "[" + contributorColor + "Contributor" + ChatColor.WHITE + "] ";
 
     private static String citizenColor = "" + ChatColor.GREEN;
-    private static String citizen = ChatColor.WHITE + "[" + citizenColor + "Member" + ChatColor.WHITE + "] ";
+    private static String citizen = ChatColor.WHITE + "[" + citizenColor + "Citizen" + ChatColor.WHITE + "] ";
     
-    private static String memberColor = "" + ChatColor.DARK_GREEN;
+    private static String memberColor = "" + ChatColor.YELLOW;
     private static String member = ChatColor.WHITE + "[" + memberColor + "Member" + ChatColor.WHITE + "] ";
 
     private static String guestColor = "" + ChatColor.GRAY;
