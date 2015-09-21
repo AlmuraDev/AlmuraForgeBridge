@@ -19,17 +19,39 @@
  */
 package com.almuramc.forgebridge.utils;
 
+import org.bukkit.Bukkit;
+
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 public class InventoryUtil {
-    public static ItemStack getFirstByName(Player player, String name) {
+    public static ItemStack getFirstByName(Player player, String itemName) {
         for (final ItemStack stack : player.getInventory()) {
-            if (stack.getType().name() != null && stack.getType().name().equalsIgnoreCase(name)) {
+            if (stack.getType().name() != null && stack.getType().name().equalsIgnoreCase(itemName)) {
                 return stack;
             }
         }
-
         return null;
+    }
+    
+    public static boolean hasItem(Player player, String itemName) {
+        for (final ItemStack stack : player.getInventory()) {
+            if (stack.getType().name() != null && stack.getType().name().equalsIgnoreCase(itemName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public static boolean removeItem(Player player, String itemName) {
+        for (final ItemStack stack : player.getInventory()) {
+            if (stack.getType().name() != null && stack.getType().name().equalsIgnoreCase(itemName)) {
+                stack.setType(Material.AIR);
+                return true;
+            }
+        }
+        Bukkit.getLogger().severe(" - Tried to remove item: " + itemName + " from user: " + player.getName() + " but if failed somehow.");
+        return false;
     }
 }

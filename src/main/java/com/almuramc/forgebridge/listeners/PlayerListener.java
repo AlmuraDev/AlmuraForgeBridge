@@ -19,8 +19,9 @@
  */
 package com.almuramc.forgebridge.listeners;
 
-import org.anjocaido.groupmanager.GroupManager;
+import com.almuramc.forgebridge.utils.UserUtil;
 
+import org.anjocaido.groupmanager.GroupManager;
 import org.anjocaido.groupmanager.dataholder.worlds.WorldsHolder;
 import org.anjocaido.groupmanager.permissions.AnjoPermissionsHandler;
 import org.anjocaido.groupmanager.dataholder.OverloadedWorldHolder;
@@ -124,22 +125,6 @@ public class PlayerListener implements Listener {
         } */
     }
 
-    public void changeUserGroup(Player player, String groupName) {
-        OverloadedWorldHolder dataHolder = null;
-
-        if (player != null) {
-            dataHolder = ((GroupManager) Bukkit.getPluginManager().getPlugin("GroupManager")).getWorldsHolder().getWorldData(player);
-        }
-
-        if (dataHolder != null) {
-            Group auxGroup = dataHolder.getGroup(groupName);
-            User auxUser = dataHolder.getUser(player.getName());
-            if (auxGroup != null && auxUser != null) {
-                auxUser.setGroup(auxGroup);
-            }
-        }
-    }
-
     // Group Manager's Change Event Listener
     @EventHandler(priority = EventPriority.LOWEST)
     public void onGMUserEvent(GMUserEvent userEvent) {
@@ -151,17 +136,16 @@ public class PlayerListener implements Listener {
         Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
             public void run() {                
                 if ((GMUserEvent.Action.USER_GROUP_CHANGED == event.getAction()) && (event.getUser().getGroupName().equalsIgnoreCase("contributor"))) {
-                    Bukkit.broadcastMessage(
-                            ChatColor.DARK_PURPLE + resPlayer.getDisplayName() + ChatColor.WHITE + " has been granted: [" + ChatColor.GOLD + event
-                            .getUser().getGroupName() + ChatColor.WHITE + "]");
-                    Bukkit.broadcastMessage(ChatColor.WHITE + "Almura Thanks " + ChatColor.GOLD + resPlayer.getDisplayName() + ChatColor.WHITE
-                            + " for their donation.  It is very much appreciated.");
+                    Bukkit.broadcastMessage(ChatColor.DARK_PURPLE + resPlayer.getDisplayName() + ChatColor.WHITE + " has been granted: [" + ChatColor.GOLD + event.getUser().getGroupName() + ChatColor.WHITE + "]");
+                    Bukkit.broadcastMessage(ChatColor.WHITE + "Almura Thanks " + ChatColor.GOLD + resPlayer.getDisplayName() + ChatColor.WHITE + " for their donation.  It is very much appreciated.");
                 }
 
                 if ((GMUserEvent.Action.USER_GROUP_CHANGED == event.getAction()) && (event.getUser().getGroupName().equalsIgnoreCase("member"))) {
-                    Bukkit.broadcastMessage(
-                            ChatColor.DARK_PURPLE + resPlayer.getDisplayName() + ChatColor.WHITE + " has been promoted to: [" + ChatColor.GOLD
-                            + event.getUser().getGroupName() + ChatColor.WHITE + "]");
+                    Bukkit.broadcastMessage(ChatColor.DARK_PURPLE + resPlayer.getDisplayName() + ChatColor.WHITE + " has been promoted to: [" + ChatColor.GOLD + event.getUser().getGroupName() + ChatColor.WHITE + "]");
+                }
+                
+                if ((GMUserEvent.Action.USER_GROUP_CHANGED == event.getAction()) && (event.getUser().getGroupName().equalsIgnoreCase("citizen"))) {
+                    Bukkit.broadcastMessage(ChatColor.DARK_PURPLE + resPlayer.getDisplayName() + ChatColor.WHITE + " has been earned: [" + ChatColor.DARK_PURPLE + "Almura Citizenship" + ChatColor.WHITE + "]");
                 }
 
                 for (Player player : Bukkit.getServer().getOnlinePlayers()) {
@@ -177,40 +161,103 @@ public class PlayerListener implements Listener {
     @SuppressWarnings("deprecation")
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
+        Player player = event.getPlayer();
+        
         // AlmuraMod's Information Wand - Additional Chat information.
-        if (event.getPlayer().getItemInHand().getType() == Material.getMaterial("ALMURA_WANDINFORMATION")) {
+        if (player.getItemInHand().getType() == Material.getMaterial("ALMURA_WANDINFORMATION")) {
             if (event.getClickedBlock() != null) {
-                event.getPlayer().sendMessage(ChatColor.ITALIC + "Block Information:");
-                event.getPlayer().sendMessage(ChatColor.WHITE + "ID: " + ChatColor.RED + event.getClickedBlock().getTypeId());
-                event.getPlayer().sendMessage(ChatColor.WHITE + "Material: " + ChatColor.GOLD + event.getClickedBlock().getType());
-                event.getPlayer().sendMessage(ChatColor.WHITE + "MetaData: " + ChatColor.AQUA + event.getClickedBlock().getData());
-                event.getPlayer().sendMessage(ChatColor.WHITE + "Biome: " + ChatColor.LIGHT_PURPLE + event.getClickedBlock().getBiome() + "\n");
+                player.sendMessage(ChatColor.ITALIC + "Block Information:");
+                player.sendMessage(ChatColor.WHITE + "ID: " + ChatColor.RED + event.getClickedBlock().getTypeId());
+                player.sendMessage(ChatColor.WHITE + "Material: " + ChatColor.GOLD + event.getClickedBlock().getType());
+                player.sendMessage(ChatColor.WHITE + "MetaData: " + ChatColor.AQUA + event.getClickedBlock().getData());
+                player.sendMessage(ChatColor.WHITE + "Biome: " + ChatColor.LIGHT_PURPLE + event.getClickedBlock().getBiome() + "\n");
+                return;
             }
         }
 
         // Force open the Res Token Confirmation GUI @ the client.
-        if (event.getPlayer().getItemInHand().getType() == Material.getMaterial("ALMURA_CURRENCYRESTOKEN")) {
-            Bukkit.getLogger().info("[Res Tokens] - Player: " + event.getPlayer().getName() + " / " + event.getPlayer().getDisplayName() + " has attempted to use a res token at: " + event.getPlayer().getLocation());
-            GuiUtil.openGui(event.getPlayer(), 1, 0);
+        if (player.getItemInHand().getType() == Material.getMaterial("ALMURA_CURRENCYRESTOKEN")) {
+            Bukkit.getLogger().info("[Res Tokens] - Player: " + player.getName() + " / " + player.getDisplayName() + " has attempted to use a res token at: " + player.getLocation());
+            GuiUtil.openGui(player, 1, 0);
+            return;
         }
 
         // Banking System
-        if (!event.getPlayer().getWorld().getName().equalsIgnoreCase("Othala") && event.getPlayer().getGameMode() != GameMode.CREATIVE && event.getClickedBlock() != null) {
+        if (player.getGameMode() != GameMode.CREATIVE && event.getClickedBlock() != null) {
             if (EconUtil.isBankingBlock(event.getClickedBlock())) {
-                if (event.getPlayer().getItemInHand() == null || EconUtil.getCoinValue(event.getPlayer().getItemInHand())==0) {
-                    event.getPlayer().sendMessage("[" + ChatColor.DARK_AQUA + "Coin Exchange" + ChatColor.WHITE + "] - please put your coins in your hand to deposit them. ");
+                if (player.getItemInHand() == null || EconUtil.getCoinValue(player.getItemInHand())==0) {
+                    player.sendMessage("[" + ChatColor.DARK_AQUA + "Coin Exchange" + ChatColor.WHITE + "] - please put your coins in your hand to deposit them. ");
+                    return;
                 } else {                
-                    if ((EconUtil.getCoinValue(event.getPlayer().getItemInHand())>0) && EconUtil.isBankingBlock(event.getClickedBlock())) {
-                        int quantity = event.getPlayer().getItemInHand().getAmount();
-                        double value = EconUtil.getCoinValue(event.getPlayer().getItemInHand());
+                    if ((EconUtil.getCoinValue(player.getItemInHand())>0) && EconUtil.isBankingBlock(event.getClickedBlock())) {
+                        int quantity = player.getItemInHand().getAmount();
+                        double value = EconUtil.getCoinValue(player.getItemInHand());
                         double amountToDeposit = quantity * value;
-                        EconUtil.add(event.getPlayer().getName(), amountToDeposit);
-                        event.getPlayer().setItemInHand(new ItemStack(Material.AIR));
-                        event.getPlayer().sendMessage("[" + ChatColor.DARK_AQUA + "Coin Exchange" + ChatColor.WHITE + "] - Deposited coins in the amount of: " + ChatColor.GOLD + EconListener.NUMBER_FORMAT.format(amountToDeposit));
-                        Bukkit.getLogger().info("Deposited coins in the amount of: " + EconListener.NUMBER_FORMAT.format(amountToDeposit) + " for player: " + event.getPlayer().getName());
+                        EconUtil.add(player.getName(), amountToDeposit);
+                        player.setItemInHand(new ItemStack(Material.AIR));
+                        player.sendMessage("[" + ChatColor.DARK_AQUA + "Coin Exchange" + ChatColor.WHITE + "] - Deposited coins in the amount of: " + ChatColor.GOLD + EconListener.NUMBER_FORMAT.format(amountToDeposit));
+                        Bukkit.getLogger().info("Deposited coins in the amount of: " + EconListener.NUMBER_FORMAT.format(amountToDeposit) + " for player: " + player.getName());
+                        return;
                     } 
                 }
             }
+        }
+        
+        // City Tokens / Citizenship Functionality
+        if (EconUtil.isCityTokenBlock(event.getClickedBlock())) {
+            if (!player.hasPermission("citizen.title")) {
+                if (EconUtil.hasAllCityTokens(player)) {
+                    // Should have upgraded player to Citizen and broadcast a message.
+                }
+            } else {
+                // Nope, Chuck Testa.
+                player.sendMessage(ChatColor.DARK_AQUA + "[City Tokens]" + ChatColor.WHITE + " - You are already a Citizen of Almura.");
+            }
+            return;
+        }
+        
+        // Passport Block Interaction / World Unlock Functionality
+        if (EconUtil.isPassportBlock(event.getClickedBlock())) {
+            if (player.getItemInHand() != null && player.getItemInHand().getType() == Material.getMaterial("ALMURA_CURRENCYPASSPORT_ATLANTIS")) {
+                if (UserUtil.addUserPermission(player, "multiverse.access.atlantis")) {
+                    player.setItemInHand(new ItemStack(Material.AIR));
+                    Bukkit.broadcastMessage(ChatColor.DARK_PURPLE + player.getDisplayName() + ChatColor.WHITE + " has been granted access to the world : [" + ChatColor.DARK_PURPLE + "Atlantis" + ChatColor.WHITE + "]");
+                    return;
+                }
+            }
+            
+            if (player.getItemInHand() != null && player.getItemInHand().getType() == Material.getMaterial("ALMURA_CURRENCYPASSPORT_TOLLANA")) {
+                if (UserUtil.addUserPermission(player, "multiverse.access.tollana")) {
+                    player.setItemInHand(new ItemStack(Material.AIR));
+                    Bukkit.broadcastMessage(ChatColor.DARK_PURPLE + player.getDisplayName() + ChatColor.WHITE + " has been granted access to the world : [" + ChatColor.DARK_PURPLE + "Tollana" + ChatColor.WHITE + "]");
+                    return;
+                }
+            }
+            
+            if (player.getItemInHand() != null && player.getItemInHand().getType() == Material.getMaterial("ALMURA_CURRENCYPASSPORT_OTHALA")) {
+                if (UserUtil.addUserPermission(player, "multiverse.access.othala")) {
+                    player.setItemInHand(new ItemStack(Material.AIR));
+                    Bukkit.broadcastMessage(ChatColor.DARK_PURPLE + player.getDisplayName() + ChatColor.WHITE + " has been granted access to the world : [" + ChatColor.DARK_PURPLE + "Othala" + ChatColor.WHITE + "]");
+                    return;
+                }
+            }
+            
+            if (player.getItemInHand() != null && player.getItemInHand().getType() == Material.getMaterial("ALMURA_CURRENCYPASSPORT_ZEAL")) {
+                if (UserUtil.addUserPermission(player, "multiverse.access.zeal")) {
+                    player.setItemInHand(new ItemStack(Material.AIR));
+                    Bukkit.broadcastMessage(ChatColor.DARK_PURPLE + player.getDisplayName() + ChatColor.WHITE + " has been granted access to the world : [" + ChatColor.DARK_PURPLE + "Zeal" + ChatColor.WHITE + "]");
+                    return;
+                }
+            }
+            
+            if (player.getItemInHand() != null && player.getItemInHand().getType() == Material.getMaterial("ALMURA_CURRENCYPASSPORT_KEYSTONE")) {
+                if (UserUtil.addUserPermission(player, "multiverse.access.keystone")) {
+                    player.setItemInHand(new ItemStack(Material.AIR));
+                    Bukkit.broadcastMessage(ChatColor.DARK_PURPLE + player.getDisplayName() + ChatColor.WHITE + " has been granted access to the world : [" + ChatColor.DARK_PURPLE + "Keystone" + ChatColor.WHITE + "]");
+                    return;
+                }
+            }
+            player.sendMessage(ChatColor.DARK_AQUA + "[Passports]" + ChatColor.WHITE + " - Make sure your Passport is in your hand before you attempt to exchange it.");
         }
     }
 

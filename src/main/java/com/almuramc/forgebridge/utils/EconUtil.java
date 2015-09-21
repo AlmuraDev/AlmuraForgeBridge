@@ -38,6 +38,11 @@
  */
 package com.almuramc.forgebridge.utils;
 
+import org.anjocaido.groupmanager.GroupManager;
+import org.anjocaido.groupmanager.data.Group;
+import org.anjocaido.groupmanager.data.User;
+import org.anjocaido.groupmanager.dataholder.OverloadedWorldHolder;
+import org.bukkit.ChatColor;
 import com.almuramc.forgebridge.BridgePlugin;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
@@ -54,7 +59,7 @@ public final class EconUtil {
 
     public static final Economy economy;
     public static final Permission permission;
-    
+
 
     static {
         final RegisteredServiceProvider<Economy> ersp = Bukkit.getServer().getServicesManager().getRegistration(Economy.class);
@@ -108,26 +113,123 @@ public final class EconUtil {
     public static boolean hasPermissions() {
         return permission != null;
     }
-    
+
     public static double getCoinValue(ItemStack item) {
-            if (item.getType() == Material.getMaterial("ALMURA_CURRENCYCOPPERCOIN")) {
-                return 100;
-            }
-            if (item.getType() == Material.getMaterial("ALMURA_CURRENCYSILVERCOIN")) {
-                return 1000;
-            }
-            if (item.getType() == Material.getMaterial("ALMURA_CURRENCYGOLDCOIN")) {
-                return 100000;
-            }
-            if (item.getType() == Material.getMaterial("ALMURA_CURRENCYPLATINUMCOIN")) {
-                return 1000000;
-            }
+        if (item.getType() == Material.getMaterial("ALMURA_CURRENCYCOPPERCOIN")) {
+            return 100;
+        }
+        if (item.getType() == Material.getMaterial("ALMURA_CURRENCYSILVERCOIN")) {
+            return 1000;
+        }
+        if (item.getType() == Material.getMaterial("ALMURA_CURRENCYGOLDCOIN")) {
+            return 100000;
+        }
+        if (item.getType() == Material.getMaterial("ALMURA_CURRENCYPLATINUMCOIN")) {
+            return 1000000;
+        }
         return 0;        
     }
-    
-    public static boolean isBankingBlock(Block block) {
-        if (block.getType() == Material.getMaterial("ALMURA_CURRENCYDEPOSITBOX")) {
+
+    public static boolean isBankingBlock(Block block) {        
+        if (block != null && block.getType() == Material.getMaterial("ALMURA_CURRENCYDEPOSITBOX")) {
             return true;        
+        }
+        return false;
+    }
+
+    public static boolean isPassportBlock(Block block) {
+        if (block != null && block.getType() == Material.getMaterial("ALMURA_CURRENCYPASSPORTBOX")) {
+            return true;        
+        }
+        return false;
+    }    
+
+    public static boolean isCityTokenBlock(Block block) {
+        if (block != null && block.getType() == Material.getMaterial("ALMURA_CURRENCYCITYTOKENBOX")) {
+            return true;        
+        }
+        return false;
+    }
+
+    public static boolean hasAllCityTokens(Player player) {
+        boolean hasFrenor = false;
+        boolean hasSoretta = false;
+        boolean hasMintos = false;
+        boolean hasSanteem = false;
+        boolean hasTempe = false;
+        boolean hasElfville = false;
+        boolean hasStancia = false;
+        boolean hasCaves = false;
+
+        if (player != null) {
+            if (InventoryUtil.hasItem(player, "ALMURA_CURRENCYTOKEN_FRENOR")) {
+                hasFrenor = true;
+            } else {
+                player.sendMessage(ChatColor.DARK_AQUA + "[City Tokens]" + ChatColor.WHITE + " - Missing: " + ChatColor.BLUE + "Frenor" + ChatColor.WHITE + " City Token.");
+            }
+
+            if (InventoryUtil.hasItem(player, "ALMURA_CURRENCYTOKEN_SORETTA")) {
+                hasSoretta = true;
+            } else {
+                player.sendMessage(ChatColor.DARK_AQUA + "[City Tokens]" + ChatColor.WHITE + " - Missing: " + ChatColor.BLUE + "Soreta" + ChatColor.WHITE + " City Token.");
+            }
+
+            if (InventoryUtil.hasItem(player, "ALMURA_CURRENCYTOKEN_MINTOS")) {
+                hasMintos = true;
+            } else {
+                player.sendMessage(ChatColor.DARK_AQUA + "[City Tokens]" + ChatColor.WHITE + " - Missing: " + ChatColor.BLUE + "Mintos" + ChatColor.WHITE + " City Token.");
+            }
+
+            if (InventoryUtil.hasItem(player, "ALMURA_CURRENCYTOKEN_SANTEEM")) {
+                hasSanteem = true;
+            } else {
+                player.sendMessage(ChatColor.DARK_AQUA + "[City Tokens]" + ChatColor.WHITE + " - Missing: " + ChatColor.BLUE + "Santeem" + ChatColor.WHITE + " City Token.");
+            }
+
+            if (InventoryUtil.hasItem(player, "ALMURA_CURRENCYTOKEN_TEMPE")) {
+                hasTempe = true;
+            } else {
+                player.sendMessage(ChatColor.DARK_AQUA + "[City Tokens]" + ChatColor.WHITE + " - Missing: " + ChatColor.BLUE + "Tempe" + ChatColor.WHITE + " City Token.");
+            }
+
+            if (InventoryUtil.hasItem(player, "ALMURA_CURRENCYTOKEN_ELFVILLE")) {
+                hasElfville = true;
+            } else {
+                player.sendMessage(ChatColor.DARK_AQUA + "[City Tokens]" + ChatColor.WHITE + " - Missing: " + ChatColor.BLUE + "Elfville" + ChatColor.WHITE + " City Token.");
+            }
+
+            if (InventoryUtil.hasItem(player, "ALMURA_CURRENCYTOKEN_STANCIA")) {
+                hasStancia = true;
+            } else {
+                player.sendMessage(ChatColor.DARK_AQUA + "[City Tokens]" + ChatColor.WHITE + " - Missing: " + ChatColor.BLUE + "Stancia" + ChatColor.WHITE + " City Token.");
+            }
+
+            if (InventoryUtil.hasItem(player, "ALMURA_CURRENCYTOKEN_CAVES")) {
+                hasCaves = true;
+            } else {
+                player.sendMessage(ChatColor.DARK_AQUA + "[City Tokens]" + ChatColor.WHITE + " - Missing: " + ChatColor.BLUE + "Caves" + ChatColor.WHITE + " City Token.");
+            }
+
+            if (hasFrenor && hasSoretta && hasMintos && hasSanteem && hasTempe && hasElfville && hasStancia && hasCaves) {
+                if (UserUtil.changeUserGroup(player, "citizen")) {
+                    // Feedback message to player should come via Broadcast from PlayerListener (Group Changed Event).
+
+                    // Wipe Tokens from Inventory.
+                    InventoryUtil.removeItem(player, "ALMURA_CURRENCYTOKEN_FRENOR");
+                    InventoryUtil.removeItem(player, "ALMURA_CURRENCYTOKEN_SORETTA");
+                    InventoryUtil.removeItem(player, "ALMURA_CURRENCYTOKEN_MINTOS");
+                    InventoryUtil.removeItem(player, "ALMURA_CURRENCYTOKEN_SANTEEM");
+                    InventoryUtil.removeItem(player, "ALMURA_CURRENCYTOKEN_TEMPE");
+                    InventoryUtil.removeItem(player, "ALMURA_CURRENCYTOKEN_ELFVILLE");
+                    InventoryUtil.removeItem(player, "ALMURA_CURRENCYTOKEN_STANCIA");
+                    InventoryUtil.removeItem(player, "ALMURA_CURRENCYTOKEN_CAVES");
+
+                    Bukkit.getLogger().info(" - Player: " + player.getName() + " granted Almura Citizenship.");
+                } else {
+                    Bukkit.getLogger().severe(" - Tried up move user: " + player.getName() + " to Citizen group but if failed somehow.");
+                }
+            }
+
         }
         return false;
     }
