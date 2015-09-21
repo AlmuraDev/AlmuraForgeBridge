@@ -50,6 +50,9 @@ public class TitleUtil {
     private static String contributorColor = "" + ChatColor.DARK_AQUA;
     private static String contributor = ChatColor.WHITE + "[" + contributorColor + "Contributor" + ChatColor.WHITE + "] ";
 
+    private static String citizenColor = "" + ChatColor.GREEN;
+    private static String citizen = ChatColor.WHITE + "[" + citizenColor + "Member" + ChatColor.WHITE + "] ";
+    
     private static String memberColor = "" + ChatColor.DARK_GREEN;
     private static String member = ChatColor.WHITE + "[" + memberColor + "Member" + ChatColor.WHITE + "] ";
 
@@ -114,8 +117,12 @@ public class TitleUtil {
             return;
         }
 
-
-        if (player.hasPermission("Member.title") && !player.hasPermission("veteran.title")) {
+        if (player.hasPermission("Citizen.title") && !player.hasPermission("veteran.title")) {
+            Bukkit.broadcastMessage(citizen + player.getDisplayName() + enterMessage);
+            return;
+        }
+        
+        if (player.hasPermission("Member.title") && !player.hasPermission("Citizen.title")) {
             Bukkit.broadcastMessage(member + player.getDisplayName() + enterMessage);
             return;
         }
@@ -174,7 +181,12 @@ public class TitleUtil {
             return;
         }
 
-        if (player.hasPermission("Member.title") && !player.hasPermission("veteran.title")) {
+        if (player.hasPermission("Citizen.title") && !player.hasPermission("veteran.title")) {
+            Bukkit.broadcastMessage(citizen + player.getDisplayName() + leaveMessage);
+            return;
+        }
+        
+        if (player.hasPermission("Member.title") && !player.hasPermission("citizen.title")) {
             Bukkit.broadcastMessage(member + player.getDisplayName() + leaveMessage);
             return;
         }
@@ -225,7 +237,11 @@ public class TitleUtil {
             return (contributorColor + "Contributor");            
         }
 
-        if (player.hasPermission("member.title") && !player.hasPermission("contributor.title")) {
+        if (player.hasPermission("citizen.title") && !player.hasPermission("contributor.title")) {
+            return (citizenColor + "Citizen");            
+        }
+        
+        if (player.hasPermission("member.title") && !player.hasPermission("citizen.title")) {
             return (memberColor + "Member");            
         }
 
@@ -277,18 +293,22 @@ public class TitleUtil {
             return 5; // Contributor
         }
 
-        if (player.hasPermission("member.title") && !player.hasPermission("contributor.title")) {
+        if (player.hasPermission("citizen.title") && !player.hasPermission("contributor.title")) {
             return 6; // Member  
+        }
+        
+        if (player.hasPermission("member.title") && !player.hasPermission("citizen.title")) {
+            return 7; // Member  
         }
 
         if (player.hasPermission("guest.title") && !player.hasPermission("member.title")) {
-            return 7; // Guest
+            return 8; // Guest
         }
 
         if (player.hasPermission("survival.title") && !player.hasPermission("member.title")) {
-            return 8; // Survival
+            return 9; // Survival
         }
-        return 8;
+        return 10;
     }
 
     public static void sendClientDetailsRequest(Player player) {
