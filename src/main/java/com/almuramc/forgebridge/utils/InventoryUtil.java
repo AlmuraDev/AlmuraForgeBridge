@@ -28,7 +28,7 @@ import org.bukkit.inventory.ItemStack;
 public class InventoryUtil {
     public static ItemStack getFirstByName(Player player, String itemName) {
         for (final ItemStack stack : player.getInventory()) {
-            if (stack.getType().name() != null && stack.getType().name().equalsIgnoreCase(itemName)) {
+            if (stack != null && stack.getType().name() != null && stack.getType().name().equalsIgnoreCase(itemName)) {
                 return stack;
             }
         }
@@ -37,7 +37,7 @@ public class InventoryUtil {
     
     public static boolean hasItem(Player player, String itemName) {
         for (final ItemStack stack : player.getInventory()) {
-            if (stack.getType().name() != null && stack.getType().name().equalsIgnoreCase(itemName)) {
+            if (stack != null && stack.getType().name() != null && stack.getType().name().equalsIgnoreCase(itemName)) {
                 return true;
             }
         }
@@ -46,7 +46,7 @@ public class InventoryUtil {
     
     public static boolean removeItem(Player player, String itemName) {
         for (final ItemStack stack : player.getInventory()) {
-            if (stack.getType().name() != null && stack.getType().name().equalsIgnoreCase(itemName)) {
+            if (stack != null && stack.getType().name() != null && stack.getType().name().equalsIgnoreCase(itemName)) {
                 stack.setType(Material.AIR);
                 return true;
             }

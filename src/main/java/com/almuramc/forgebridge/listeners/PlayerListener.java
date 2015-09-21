@@ -223,6 +223,8 @@ public class PlayerListener implements Listener {
                     player.setItemInHand(new ItemStack(Material.AIR));
                     Bukkit.broadcastMessage(ChatColor.DARK_PURPLE + player.getDisplayName() + ChatColor.WHITE + " has been granted access to the world : [" + ChatColor.DARK_PURPLE + "Atlantis" + ChatColor.WHITE + "]");
                     return;
+                } else {
+                    player.sendMessage(ChatColor.DARK_AQUA + "[Passports]" + ChatColor.WHITE + " - You already have access to this world.");
                 }
             }
             
@@ -231,6 +233,8 @@ public class PlayerListener implements Listener {
                     player.setItemInHand(new ItemStack(Material.AIR));
                     Bukkit.broadcastMessage(ChatColor.DARK_PURPLE + player.getDisplayName() + ChatColor.WHITE + " has been granted access to the world : [" + ChatColor.DARK_PURPLE + "Tollana" + ChatColor.WHITE + "]");
                     return;
+                } else {
+                    player.sendMessage(ChatColor.DARK_AQUA + "[Passports]" + ChatColor.WHITE + " - You already have access to this world.");
                 }
             }
             
@@ -239,6 +243,8 @@ public class PlayerListener implements Listener {
                     player.setItemInHand(new ItemStack(Material.AIR));
                     Bukkit.broadcastMessage(ChatColor.DARK_PURPLE + player.getDisplayName() + ChatColor.WHITE + " has been granted access to the world : [" + ChatColor.DARK_PURPLE + "Othala" + ChatColor.WHITE + "]");
                     return;
+                } else {
+                    player.sendMessage(ChatColor.DARK_AQUA + "[Passports]" + ChatColor.WHITE + " - You already have access to this world.");
                 }
             }
             
@@ -247,6 +253,8 @@ public class PlayerListener implements Listener {
                     player.setItemInHand(new ItemStack(Material.AIR));
                     Bukkit.broadcastMessage(ChatColor.DARK_PURPLE + player.getDisplayName() + ChatColor.WHITE + " has been granted access to the world : [" + ChatColor.DARK_PURPLE + "Zeal" + ChatColor.WHITE + "]");
                     return;
+                } else {
+                    player.sendMessage(ChatColor.DARK_AQUA + "[Passports]" + ChatColor.WHITE + " - You already have access to this world.");
                 }
             }
             
@@ -255,6 +263,8 @@ public class PlayerListener implements Listener {
                     player.setItemInHand(new ItemStack(Material.AIR));
                     Bukkit.broadcastMessage(ChatColor.DARK_PURPLE + player.getDisplayName() + ChatColor.WHITE + " has been granted access to the world : [" + ChatColor.DARK_PURPLE + "Keystone" + ChatColor.WHITE + "]");
                     return;
+                } else {
+                    player.sendMessage(ChatColor.DARK_AQUA + "[Passports]" + ChatColor.WHITE + " - You already have access to this world.");
                 }
             }
             player.sendMessage(ChatColor.DARK_AQUA + "[Passports]" + ChatColor.WHITE + " - Make sure your Passport is in your hand before you attempt to exchange it.");
