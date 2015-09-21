@@ -25,6 +25,8 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Iterator;
+
 public class InventoryUtil {
     public static ItemStack getFirstByName(Player player, String itemName) {
         for (final ItemStack stack : player.getInventory()) {
@@ -45,12 +47,15 @@ public class InventoryUtil {
     }
     
     public static boolean removeItem(Player player, String itemName) {
-        for (final ItemStack stack : player.getInventory()) {
+        for (Iterator<ItemStack> iter = player.getInventory().iterator(); iter.hasNext();) {
+            final ItemStack stack = iter.next();
+
             if (stack != null && stack.getType().name() != null && stack.getType().name().equalsIgnoreCase(itemName)) {
-                stack.setType(Material.AIR);
+                iter.remove();
                 return true;
             }
         }
+        
         Bukkit.getLogger().severe(" - Tried to remove item: " + itemName + " from user: " + player.getName() + " but if failed somehow.");
         return false;
     }
