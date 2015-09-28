@@ -27,37 +27,40 @@ import org.bukkit.entity.Player;
 
 public class TitleUtil {
 
-    // Color setups for membership levels 
+    // Color setups for peasantship levels 
     private static String superadminColor = "" + ChatColor.DARK_RED;
-    private static String superadmin = ChatColor.WHITE + "[" + superadminColor + "Super-Admin" + ChatColor.WHITE + "] ";
+    private static String superadmin = ChatColor.WHITE + "[" + superadminColor + "Ancient" + ChatColor.WHITE + "] ";
 
     private static String adminColor = "" + ChatColor.RED;
-    private static String admin = ChatColor.WHITE + "[" + adminColor + "Admin" + ChatColor.WHITE + "] ";
+    private static String admin = ChatColor.WHITE + "[" + adminColor + "Ancient" + ChatColor.WHITE + "] ";
 
     private static String spongeleaderColor1 = "" + ChatColor.GOLD;
     private static String spongeleaderColor2 = "" + ChatColor.BLUE;
     private static String spongeleader = ChatColor.WHITE + "[" + spongeleaderColor1 + "Sponge " + spongeleaderColor2 + "Leader" + ChatColor.WHITE + "] ";
 
-    private static String moderatorColor = "" + ChatColor.BLUE;
-    private static String moderator = ChatColor.WHITE + "[" + moderatorColor + "Moderator" + ChatColor.WHITE + "] ";
+    private static String guardianColor = "" + ChatColor.BLUE;
+    private static String guardian = ChatColor.WHITE + "[" + guardianColor + "Guardian" + ChatColor.WHITE + "] ";
     
     private static String devColor = "" + ChatColor.DARK_PURPLE;
     private static String dev = ChatColor.WHITE + "[" + devColor + "SpongeDev" + ChatColor.WHITE + "] ";
 
-    private static String veteranColor = "" + ChatColor.GOLD;
-    private static String veteran = ChatColor.WHITE + "[" + veteranColor + "Veteran" + ChatColor.WHITE + "] ";
+    private static String councilColor = "" + ChatColor.LIGHT_PURPLE;
+    private static String council = ChatColor.WHITE + "[" + councilColor + "Council" + ChatColor.WHITE + "] ";
+    
+    private static String elderColor = "" + ChatColor.GOLD;
+    private static String elder = ChatColor.WHITE + "[" + elderColor + "Elder" + ChatColor.WHITE + "] ";
 
-    private static String contributorColor = "" + ChatColor.DARK_AQUA;
-    private static String contributor = ChatColor.WHITE + "[" + contributorColor + "Contributor" + ChatColor.WHITE + "] ";
+    private static String protectorColor = "" + ChatColor.DARK_GREEN;
+    private static String protector = ChatColor.WHITE + "[" + protectorColor + "Protector" + ChatColor.WHITE + "] ";
 
     private static String citizenColor = "" + ChatColor.GREEN;
     private static String citizen = ChatColor.WHITE + "[" + citizenColor + "Citizen" + ChatColor.WHITE + "] ";
     
-    private static String memberColor = "" + ChatColor.YELLOW;
-    private static String member = ChatColor.WHITE + "[" + memberColor + "Member" + ChatColor.WHITE + "] ";
+    private static String peasantColor = "" + ChatColor.YELLOW;
+    private static String peasant = ChatColor.WHITE + "[" + peasantColor + "Peasant" + ChatColor.WHITE + "] ";
 
-    private static String guestColor = "" + ChatColor.GRAY;
-    private static String guest = ChatColor.WHITE + "[" + guestColor + "Guest" + ChatColor.WHITE + "] ";
+    private static String visitorColor = "" + ChatColor.GRAY;
+    private static String visitor = ChatColor.WHITE + "[" + visitorColor + "Visitor" + ChatColor.WHITE + "] ";
 
     private static String survivalColor = "" + ChatColor.LIGHT_PURPLE;
     private static String survival = ChatColor.WHITE + "[" + survivalColor + "Survival" + ChatColor.WHITE + "] ";
@@ -97,42 +100,47 @@ public class TitleUtil {
             return;
         }
 
-        if (player.hasPermission("moderator.title") && !player.hasPermission("Admin.title")) {
-            Bukkit.broadcastMessage(moderator + player.getDisplayName() + enterMessage);
+        if (player.hasPermission("guardian.title") && !player.hasPermission("Admin.title")) {
+            Bukkit.broadcastMessage(guardian + player.getDisplayName() + enterMessage);
             return;
         }
 
-        if (player.hasPermission("veteran.title") && !player.hasPermission("moderator.title")) {
-            Bukkit.broadcastMessage(veteran + player.getDisplayName() + enterMessage);
+        if (player.hasPermission("council.title") && !player.hasPermission("guardian.title")) {
+            Bukkit.broadcastMessage(council + player.getDisplayName() + enterMessage);
+            return;
+        }
+        
+        if (player.hasPermission("elder.title") && !player.hasPermission("council.title")) {
+            Bukkit.broadcastMessage(elder + player.getDisplayName() + enterMessage);
             return;
         }
 
-        if (player.hasPermission("dev.title") && !player.hasPermission("veteran.title")) {
+        if (player.hasPermission("dev.title") && !player.hasPermission("elder.title")) {
             Bukkit.broadcastMessage(dev + player.getDisplayName() + enterMessage);
             return;
         }
         
-        if (player.hasPermission("contributor.title") && !player.hasPermission("veteran.title")) {
-            Bukkit.broadcastMessage(contributor + player.getDisplayName() + enterMessage);
+        if (player.hasPermission("protector.title") && !player.hasPermission("elder.title")) {
+            Bukkit.broadcastMessage(protector + player.getDisplayName() + enterMessage);
             return;
         }
 
-        if (player.hasPermission("Citizen.title") && !player.hasPermission("veteran.title")) {
+        if (player.hasPermission("Citizen.title") && !player.hasPermission("protector.title")) {
             Bukkit.broadcastMessage(citizen + player.getDisplayName() + enterMessage);
             return;
         }
         
-        if (player.hasPermission("Member.title") && !player.hasPermission("Citizen.title")) {
-            Bukkit.broadcastMessage(member + player.getDisplayName() + enterMessage);
+        if (player.hasPermission("peasant.title") && !player.hasPermission("Citizen.title")) {
+            Bukkit.broadcastMessage(peasant + player.getDisplayName() + enterMessage);
             return;
         }
 
-        if (player.hasPermission("Guest.title") && !player.hasPermission("Member.title")) {
-            Bukkit.broadcastMessage(guest + player.getDisplayName() + enterMessage);
+        if (player.hasPermission("visitor.title") && !player.hasPermission("peasant.title")) {
+            Bukkit.broadcastMessage(visitor + player.getDisplayName() + enterMessage);
             return;
         }
 
-        if (player.hasPermission("Survival.title") && !player.hasPermission("Member.title")) {
+        if (player.hasPermission("Survival.title") && !player.hasPermission("peasant.title")) {
             Bukkit.broadcastMessage(survival + player.getDisplayName() + enterMessage);
             return;
         }
@@ -161,42 +169,47 @@ public class TitleUtil {
             return;
         }
 
-        if (player.hasPermission("moderator.title") && !player.hasPermission("Admin.title")) {
-            Bukkit.broadcastMessage(moderator + player.getDisplayName() + leaveMessage);
+        if (player.hasPermission("guardian.title") && !player.hasPermission("Admin.title")) {
+            Bukkit.broadcastMessage(guardian + player.getDisplayName() + leaveMessage);
             return;
         }
 
-        if (player.hasPermission("veteran.title") && !player.hasPermission("moderator.title")) {
-            Bukkit.broadcastMessage(veteran + player.getDisplayName() + leaveMessage);
+        if (player.hasPermission("council.title") && !player.hasPermission("guardian.title")) {
+            Bukkit.broadcastMessage(council + player.getDisplayName() + leaveMessage);
             return;
         }
         
-        if (player.hasPermission("dev.title") && !player.hasPermission("veteran.title")) {
+        if (player.hasPermission("elder.title") && !player.hasPermission("council.title")) {
+            Bukkit.broadcastMessage(elder + player.getDisplayName() + leaveMessage);
+            return;
+        }
+        
+        if (player.hasPermission("dev.title") && !player.hasPermission("elder.title")) {
             Bukkit.broadcastMessage(dev + player.getDisplayName() + leaveMessage);
             return;
         }
 
-        if (player.hasPermission("contributor.title") && !player.hasPermission("veteran.title")) {
-            Bukkit.broadcastMessage(contributor + player.getDisplayName() + leaveMessage);
+        if (player.hasPermission("protector.title") && !player.hasPermission("elder.title")) {
+            Bukkit.broadcastMessage(protector + player.getDisplayName() + leaveMessage);
             return;
         }
 
-        if (player.hasPermission("Citizen.title") && !player.hasPermission("veteran.title")) {
+        if (player.hasPermission("Citizen.title") && !player.hasPermission("elder.title")) {
             Bukkit.broadcastMessage(citizen + player.getDisplayName() + leaveMessage);
             return;
         }
         
-        if (player.hasPermission("Member.title") && !player.hasPermission("citizen.title")) {
-            Bukkit.broadcastMessage(member + player.getDisplayName() + leaveMessage);
+        if (player.hasPermission("peasant.title") && !player.hasPermission("citizen.title")) {
+            Bukkit.broadcastMessage(peasant + player.getDisplayName() + leaveMessage);
             return;
         }
 
-        if (player.hasPermission("Guest.title") && !player.hasPermission("Member.title")) {
-            Bukkit.broadcastMessage(guest + player.getDisplayName() + leaveMessage);
+        if (player.hasPermission("visitor.title") && !player.hasPermission("peasant.title")) {
+            Bukkit.broadcastMessage(visitor + player.getDisplayName() + leaveMessage);
             return;
         }
 
-        if (player.hasPermission("Survival.title") && !player.hasPermission("Member.title")) {
+        if (player.hasPermission("Survival.title") && !player.hasPermission("peasant.title")) {
             Bukkit.broadcastMessage(survival + player.getDisplayName() + leaveMessage);
             return;
         }
@@ -208,7 +221,7 @@ public class TitleUtil {
         }
 
         if (player.hasPermission("admin.title") && player.isOp()) {
-            return (superadminColor + "SuperAdmin");
+            return (superadminColor + "Ancient");
         }
 
         if (player.hasPermission("admin.title") && !player.isOp()) {
@@ -217,43 +230,47 @@ public class TitleUtil {
             } else if (player.getName().equalsIgnoreCase("wolfeyeamd0")) {
                 return (ChatColor.GOLD + "Harbinger");
             } else {
-                return (adminColor + "Admin");
+                return (adminColor + "Ancient");
             }
         }
 
-        if (player.hasPermission("moderator.title") && !player.hasPermission("Admin.title")) {
-            return (moderatorColor + "Moderator");            
+        if (player.hasPermission("guardian.title") && !player.hasPermission("Admin.title")) {
+            return (guardianColor + "Guardian");            
         }
 
-        if (player.hasPermission("veteran.title") && !player.hasPermission("moderator.title")) {
-            return (veteranColor + "Veteran");            
-        }
-
-        if (player.hasPermission("dev.title") && !player.hasPermission("veteran.title")) {
-            return (contributorColor + "SpongeDev");            
+        if (player.hasPermission("council.title") && !player.hasPermission("guardian.title")) {
+            return (councilColor + "Council");            
         }
         
-        if (player.hasPermission("contributor.title") && !player.hasPermission("veteran.title")) {
-            return (contributorColor + "Contributor");            
+        if (player.hasPermission("elder.title") && !player.hasPermission("council.title")) {
+            return (elderColor + "Elder");            
         }
 
-        if (player.hasPermission("citizen.title") && !player.hasPermission("contributor.title")) {
+        if (player.hasPermission("dev.title") && !player.hasPermission("elder.title")) {
+            return (protectorColor + "SpongeDev");            
+        }
+        
+        if (player.hasPermission("protector.title") && !player.hasPermission("elder.title")) {
+            return (protectorColor + "Protector");            
+        }
+
+        if (player.hasPermission("citizen.title") && !player.hasPermission("protector.title")) {
             return (citizenColor + "Citizen");            
         }
         
-        if (player.hasPermission("member.title") && !player.hasPermission("citizen.title")) {
-            return (memberColor + "Member");            
+        if (player.hasPermission("peasant.title") && !player.hasPermission("citizen.title")) {
+            return (peasantColor + "Peasant");            
         }
 
         if (!player.hasPlayedBefore()) {
             return (newbieColor + "Newbie");            
         }
 
-        if (player.hasPermission("guest.title") && !player.hasPermission("member.title")) {
-            return (guestColor + "Guest");            
+        if (player.hasPermission("visitor.title") && !player.hasPermission("peasant.title")) {
+            return (visitorColor + "Visitor");            
         }
 
-        if (player.hasPermission("survival.title") && !player.hasPermission("member.title")) {
+        if (player.hasPermission("survival.title") && !player.hasPermission("peasant.title")) {
             return (survivalColor + "Survival");            
         }
         return null;
@@ -277,35 +294,35 @@ public class TitleUtil {
             return 2; // Admin
         }
 
-        if (player.hasPermission("moderator.title") && !player.hasPermission("Admin.title")) {
-            return 3; // Moderator            
+        if (player.hasPermission("guardian.title") && !player.hasPermission("Admin.title")) {
+            return 3; // guardian            
         }
 
-        if (player.hasPermission("dev.title") && !player.hasPermission("veteran.title")) {
+        if (player.hasPermission("dev.title") && !player.hasPermission("elder.title")) {
             return 4; // Developer            
         }
         
-        if (player.hasPermission("veteran.title") && !player.hasPermission("moderator.title")) {
-            return 5; // Veteran or Contributor            
+        if (player.hasPermission("elder.title") && !player.hasPermission("guardian.title")) {
+            return 5; // elder or protector            
         }        
         
-        if (player.hasPermission("contributor.title") && !player.hasPermission("veteran.title")) {
-            return 5; // Contributor
+        if (player.hasPermission("protector.title") && !player.hasPermission("elder.title")) {
+            return 5; // protector
         }
 
-        if (player.hasPermission("citizen.title") && !player.hasPermission("contributor.title")) {
-            return 6; // Member  
+        if (player.hasPermission("citizen.title") && !player.hasPermission("protector.title")) {
+            return 6; // peasant  
         }
         
-        if (player.hasPermission("member.title") && !player.hasPermission("citizen.title")) {
-            return 7; // Member  
+        if (player.hasPermission("peasant.title") && !player.hasPermission("citizen.title")) {
+            return 7; // peasant  
         }
 
-        if (player.hasPermission("guest.title") && !player.hasPermission("member.title")) {
-            return 8; // Guest
+        if (player.hasPermission("visitor.title") && !player.hasPermission("peasant.title")) {
+            return 8; // visitor
         }
 
-        if (player.hasPermission("survival.title") && !player.hasPermission("member.title")) {
+        if (player.hasPermission("survival.title") && !player.hasPermission("peasant.title")) {
             return 9; // Survival
         }
         return 10;

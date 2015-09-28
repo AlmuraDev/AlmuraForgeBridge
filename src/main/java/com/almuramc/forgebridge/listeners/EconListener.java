@@ -48,6 +48,9 @@ public class EconListener implements Listener {
             return;
         }
         final Player died = event.getEntity();
+        if (died.hasPermission("council.title")) {
+            return;
+        }
         final double deathTax = getDropAmountMultiple();
         final double carrying = EconUtil.getBalance(died.getName());
         final double drop = carrying - (carrying * deathTax);

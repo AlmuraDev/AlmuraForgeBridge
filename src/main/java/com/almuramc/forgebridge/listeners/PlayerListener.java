@@ -135,13 +135,29 @@ public class PlayerListener implements Listener {
         }
         Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
             public void run() {                
-                if ((GMUserEvent.Action.USER_GROUP_CHANGED == event.getAction()) && (event.getUser().getGroupName().equalsIgnoreCase("contributor"))) {
+                
+                if ((GMUserEvent.Action.USER_GROUP_CHANGED == event.getAction()) && (event.getUser().getGroupName().equalsIgnoreCase("guardian"))) {
+                    Bukkit.broadcastMessage(ChatColor.DARK_PURPLE + resPlayer.getDisplayName() + ChatColor.WHITE + " has been granted: [" + ChatColor.GOLD + event.getUser().getGroupName() + ChatColor.WHITE + "]");
+                    Bukkit.broadcastMessage(ChatColor.WHITE + "Almura Thanks " + ChatColor.GOLD + resPlayer.getDisplayName() + ChatColor.WHITE + " for their donation.  It is very much appreciated.");
+                }
+                
+                if ((GMUserEvent.Action.USER_GROUP_CHANGED == event.getAction()) && (event.getUser().getGroupName().equalsIgnoreCase("council"))) {
+                    Bukkit.broadcastMessage(ChatColor.DARK_PURPLE + resPlayer.getDisplayName() + ChatColor.WHITE + " has been granted: [" + ChatColor.GOLD + event.getUser().getGroupName() + ChatColor.WHITE + "]");
+                    Bukkit.broadcastMessage(ChatColor.WHITE + "Almura Thanks " + ChatColor.GOLD + resPlayer.getDisplayName() + ChatColor.WHITE + " for their donation.  It is very much appreciated.");
+                }
+                
+                if ((GMUserEvent.Action.USER_GROUP_CHANGED == event.getAction()) && (event.getUser().getGroupName().equalsIgnoreCase("elder"))) {
+                    Bukkit.broadcastMessage(ChatColor.DARK_PURPLE + resPlayer.getDisplayName() + ChatColor.WHITE + " has been granted: [" + ChatColor.GOLD + event.getUser().getGroupName() + ChatColor.WHITE + "]");
+                    Bukkit.broadcastMessage(ChatColor.WHITE + "Almura Thanks " + ChatColor.GOLD + resPlayer.getDisplayName() + ChatColor.WHITE + " for their donation.  It is very much appreciated.");
+                }
+                
+                if ((GMUserEvent.Action.USER_GROUP_CHANGED == event.getAction()) && (event.getUser().getGroupName().equalsIgnoreCase("protector"))) {
                     Bukkit.broadcastMessage(ChatColor.DARK_PURPLE + resPlayer.getDisplayName() + ChatColor.WHITE + " has been granted: [" + ChatColor.GOLD + event.getUser().getGroupName() + ChatColor.WHITE + "]");
                     Bukkit.broadcastMessage(ChatColor.WHITE + "Almura Thanks " + ChatColor.GOLD + resPlayer.getDisplayName() + ChatColor.WHITE + " for their donation.  It is very much appreciated.");
                 }
 
-                if ((GMUserEvent.Action.USER_GROUP_CHANGED == event.getAction()) && (event.getUser().getGroupName().equalsIgnoreCase("member"))) {
-                    Bukkit.broadcastMessage(ChatColor.DARK_PURPLE + resPlayer.getDisplayName() + ChatColor.WHITE + " has been promoted to: [" + ChatColor.GOLD + event.getUser().getGroupName() + ChatColor.WHITE + "]");
+                if ((GMUserEvent.Action.USER_GROUP_CHANGED == event.getAction()) && (event.getUser().getGroupName().equalsIgnoreCase("peasant"))) {
+                    Bukkit.broadcastMessage(ChatColor.DARK_PURPLE + resPlayer.getDisplayName() + ChatColor.WHITE + " has been promoted to: [" + ChatColor.YELLOW + event.getUser().getGroupName() + ChatColor.WHITE + "]");
                 }
                 
                 if ((GMUserEvent.Action.USER_GROUP_CHANGED == event.getAction()) && (event.getUser().getGroupName().equalsIgnoreCase("citizen"))) {
@@ -218,6 +234,10 @@ public class PlayerListener implements Listener {
         
         // Passport Block Interaction / World Unlock Functionality
         if (EconUtil.isPassportBlock(event.getClickedBlock())) {
+            if (!player.hasPermission("citizen.title")) {
+                player.sendMessage(ChatColor.DARK_AQUA + "[Passports]" + ChatColor.WHITE + " - You must be a [" + ChatColor.GREEN + "Citizen" + ChatColor.WHITE + "] before you can exchange a passport.");
+                return;
+            }
             if (player.getItemInHand() != null && player.getItemInHand().getType() == Material.getMaterial("ALMURA_CURRENCYPASSPORT_ATLANTIS")) {
                 if (UserUtil.addUserPermission(player, "multiverse.access.atlantis")) {
                     player.setItemInHand(new ItemStack(Material.AIR));
