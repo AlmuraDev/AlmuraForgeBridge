@@ -19,8 +19,9 @@
  */
 package com.almuramc.forgebridge;
 
-import net.minecraft.server.v1_7_R4.BiomeBase;
+import com.almuramc.forgebridge.listeners.WorldListener;
 
+import net.minecraft.server.v1_7_R4.BiomeBase;
 import com.almuramc.forgebridge.message.impl.B02ClientDetailsResponse;
 import org.bukkit.OfflinePlayer;
 import com.almuramc.forgebridge.utils.TitleUtil;
@@ -52,6 +53,7 @@ import java.util.logging.Level;
 public class BridgePlugin extends JavaPlugin implements Listener, PluginMessageListener {
 
     private static BridgePlugin instance;
+    public boolean debugMode = false;
 
     public static BridgePlugin getInstance() {
         return instance;
@@ -70,6 +72,7 @@ public class BridgePlugin extends JavaPlugin implements Listener, PluginMessageL
         pm.registerEvents(new PlayerListener(), this);
         pm.registerEvents(new EntityListener(), this);
         pm.registerEvents(new EconListener(), this);
+        pm.registerEvents(new WorldListener(), this);
         // These packets have to be unique to the environment they are not coded per side.
         // DISCRIMINATOR_DISPLAY_NAME = 0;  
         // DISCRIMINATOR_CURRENCY = 1;
@@ -109,7 +112,7 @@ public class BridgePlugin extends JavaPlugin implements Listener, PluginMessageL
                 return true;
             }
         }
-        
+
         if (args.length > 0 && args[0].equalsIgnoreCase("info")) {
             if (sender instanceof Player) {
                 if (sender.hasPermission("bridge.info")) {
@@ -140,32 +143,11 @@ public class BridgePlugin extends JavaPlugin implements Listener, PluginMessageL
             }
         }
 
-        if (args.length > 0 && args[0].equalsIgnoreCase("clearitems")) {
-            if (sender instanceof Player) {
-                if (sender.hasPermission("bridge.clearitems")) {
-                    //ServerWorldUtil.clearItems((Player) sender, false);
-                    for (BiomeBase biome : BiomeBase.getBiomes()) {
-                        if (biome == null) {
-                            continue;
-                        }
-                        String biomeName = biome.af == null ? "unknown" : biome.af;
-                        System.out.println("Biome -> ID : [" + biome.id + "] | Name [" + biomeName + "] | Object Print [" + biome.toString() + "].");
-                    }
-                    return true;
-                } else {
-                    sender.sendMessage("[Almura Bridge] - Insufficient Permissions.");
-                    return false;
-                }
-            } else {
-                //ServerWorldUtil.displayInfo(null, true, false);
-                return true;
-            }
-        }
-        
         if (args.length > 0 && args[0].equalsIgnoreCase("config")) {
             if (sender instanceof Player) {
                 if (sender.hasPermission("bridge.config")) {
                     BridgeConfiguration.reloadConfig();
+                    sender.sendMessage("[Almura Bridge] - Configuration Reloaded.");
                     return true;
                 } else {
                     sender.sendMessage("[Almura Bridge] - Insufficient Permissions.");
@@ -176,17 +158,41 @@ public class BridgePlugin extends JavaPlugin implements Listener, PluginMessageL
                 return true;
             }
         }
+
+        if (args.length > 0 && args[0].equalsIgnoreCase("consoledebug")) {
+            if (sender instanceof Player) {
+                if (sender.hasPermission("bridge.config")) {
+                    sender.sendMessage("[Almura Bridge] - Debug Mode: " + setDebug());
+                    return true;
+                } else {
+                    sender.sendMessage("[Almura Bridge] - Insufficient Permissions.");
+                    return false;
+                }
+            } else {
+                Bukkit.getLogger().severe("[Almura Bridge] - Debug Mode: " + setDebug());
+                return true;
+            }
+        }
+
         return false;
+    }
+
+    public boolean setDebug() {
+        debugMode = !debugMode;
+        Bukkit.getLogger().log(Level.SEVERE, "Debug Mode: " + debugMode);
+        return debugMode;
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public void onPluginMessageReceived(String s, Player player, byte[] bytes) {
-//        System.out.println("Channel received! " + s);
-//        System.out.println("Dumping payload...");
-//        for (byte b : bytes) {
-//            System.out.println(b);
-//        }
+        if (debugMode) {
+            System.out.println("Channel received! " + s);
+            System.out.println("Dumping payload...");
+            for (byte b : bytes) {
+                System.out.println(b);
+            }
+        }
         if ("AM|BUK".equalsIgnoreCase(s)) {
             final ByteBuf buf = Unpooled.wrappedBuffer(bytes);
             byte discriminator;

@@ -19,6 +19,9 @@
  */
 package com.almuramc.forgebridge.utils;
 
+import org.bukkit.block.BlockState;
+
+import org.bukkit.Chunk;
 import com.almuramc.forgebridge.BridgePlugin;
 import com.bekvon.bukkit.residence.Residence;
 import com.bekvon.bukkit.residence.protection.ClaimedResidence;
@@ -75,11 +78,26 @@ public class ServerWorldUtil {
         int totalItems = 0;
         int totalChunks = 0;
         int totalPlayers = 0;
+        int tileEntities = 0;
+        int totalTileEntities = 0;
 
         if (!console && player != null) {
             player.sendMessage("---------------------------------------------------------------------------------------------");
         }
+
+
         for (World w : Bukkit.getServer().getWorlds()) {
+
+            for (Chunk c : w.getLoadedChunks()) {
+                tileEntities = c.getTileEntities().length + tileEntities;
+                if (debug) {
+                    for (BlockState t : c.getTileEntities()) {
+                        Bukkit.getLogger().info("TileEntity: " + t.getType() + "Location: " + t.getLocation());
+                    }
+                }
+
+            }
+
             for (Entity e : w.getEntities()) {
                 if (e.isDead())
                     continue;
@@ -92,14 +110,17 @@ public class ServerWorldUtil {
                     itemcount++;
                 }
                 if (console) {
-                    Bukkit.getLogger().info("Entity: " + e.getType() + " Age: " + ((e.getTicksLived()/20)/60) + " minutes, Location: " + e.getLocation());
+                    if (debug) {
+                        Bukkit.getLogger().info("Entity: " + e.getType() + " Age: " + ((e.getTicksLived()/20)/60) + " minutes, Location: " + e.getLocation());
+                    }                    
                 }
             }
             if (console) {
-                Bukkit.getLogger().info(w.getName() + " - Chunks: " + w.getLoadedChunks().length + " Players: " + w.getPlayers().size() + " Items: " + itemcount + " Monsters: " + mobcount + " Animals: " + animalCount);
+                Bukkit.getLogger().info(w.getName() + " - Chunks: " + w.getLoadedChunks().length + " Players: " + w.getPlayers().size() + " Items: " + itemcount + "TE's: "+ tileEntities + " Mob: " + mobcount + " Animals: " + animalCount);
+                //Bukkit.getLogger().info(w.getName() + " - Keep Spawn in Memory?: " + w.getKeepSpawnInMemory());
             } else {
                 if (player !=null) {
-                    player.sendMessage(ChatColor.DARK_GREEN + w.getName() + ChatColor.WHITE + " - Chunks: " + ChatColor.RED + w.getLoadedChunks().length + ChatColor.WHITE + " Players: " + ChatColor.GREEN + w.getPlayers().size() + ChatColor.WHITE + " Items: " + ChatColor.AQUA + itemcount + ChatColor.WHITE + " Monsters: " + ChatColor.GOLD + mobcount + ChatColor.WHITE + " Animals: " + ChatColor.DARK_AQUA + animalCount);
+                    player.sendMessage(ChatColor.DARK_GREEN + w.getName() + ChatColor.WHITE + " - Chunks: " + ChatColor.RED + w.getLoadedChunks().length + ChatColor.WHITE + " Players: " + ChatColor.GREEN + w.getPlayers().size() + ChatColor.WHITE + " Items: " + ChatColor.AQUA + itemcount+ ChatColor.WHITE + " TileEntities: " + ChatColor.AQUA + tileEntities + ChatColor.WHITE + " Mobs " + ChatColor.GOLD + mobcount + ChatColor.WHITE + " Animals: " + ChatColor.DARK_AQUA + animalCount);
                 }
             }
             totalAnimals = totalAnimals + animalCount;
@@ -107,17 +128,19 @@ public class ServerWorldUtil {
             totalItems = totalItems + itemcount;
             totalChunks = totalChunks + w.getLoadedChunks().length;
             totalPlayers = totalPlayers + w.getPlayers().size();
+            totalTileEntities = totalTileEntities + tileEntities;
             mobcount = 0;
             animalCount = 0;
             itemcount = 0;
+            tileEntities = 0;
         }
 
         if (console) {
-            Bukkit.getLogger().info("Totals - Chunks: " + totalChunks + " Players: " + totalPlayers + " Items: " + totalItems + " Monsters: " + totalMobs + " Animals: " + totalAnimals);                
+            Bukkit.getLogger().info("Totals - Chunks: " + totalChunks + " Players: " + totalPlayers + " Items: " + totalItems + " TE's:" + totalTileEntities + " Mobs: " + totalMobs + " Animals: " + totalAnimals);                
         } else {
             if (player !=null) {
                 player.sendMessage("---------------------------------------------------------------------------------------------");
-                player.sendMessage(ChatColor.RED + "Totals" + ChatColor.WHITE + " - Chunks: " + ChatColor.RED + totalChunks + ChatColor.WHITE + " Players: " + ChatColor.GREEN + totalPlayers + ChatColor.WHITE + " Items: " + ChatColor.AQUA + totalItems + ChatColor.WHITE + " Monsters: " + ChatColor.GOLD + totalMobs + ChatColor.WHITE + " Animals: " + ChatColor.DARK_AQUA + totalAnimals);
+                player.sendMessage(ChatColor.RED + "Totals" + ChatColor.WHITE + " - Chunks: " + ChatColor.RED + totalChunks + ChatColor.WHITE + " Players: " + ChatColor.GREEN + totalPlayers + ChatColor.WHITE + " Items: " + ChatColor.AQUA + totalItems + ChatColor.WHITE + " TileEntities: " + ChatColor.AQUA + totalTileEntities + ChatColor.WHITE + " Mobs: " + ChatColor.GOLD + totalMobs + ChatColor.WHITE + " Animals: " + ChatColor.DARK_AQUA + totalAnimals);
             }
         }
     }
@@ -131,7 +154,7 @@ public class ServerWorldUtil {
         buf.writeInt(TitleUtil.permissionsLevel(player));
         player.sendPluginMessage(BridgePlugin.getInstance(), PacketUtil.CHANNEL, buf.array());
     }
-    
+
     public static String getFormattedWorldName(String worldName) {
         if (worldName.equalsIgnoreCase("world")) {
             return "Dakara";
@@ -140,67 +163,67 @@ public class ServerWorldUtil {
         if (worldName.equalsIgnoreCase("atlantis")) {
             return "Atlantis";
         }
-        
+
         if (worldName.equalsIgnoreCase("celestis")) {
             return "Celestis";
         }
-        
+
         if (worldName.equalsIgnoreCase("dim1")) {
             return "The End";
         }
-        
+
         if (worldName.equalsIgnoreCase("dim-1")) {
             return "The Nether";
         }
-        
+
         if (worldName.equalsIgnoreCase("dim-42")) {
             return "Outer";
         }
-        
+
         if (worldName.equalsIgnoreCase("dim17")) {
             return "Wyverned";
         }
-        
+
         if (worldName.equalsIgnoreCase("faerun")) {
             return "Faerun";
         }
-        
+
         if (worldName.equalsIgnoreCase("netu")) {
             return "Netu";
         }
-        
+
         if (worldName.equalsIgnoreCase("avalon")) {
             return "Avalon";
         }
-        
+
         if (worldName.equalsIgnoreCase("keystone")) {
             return "Keystone";
         }
-        
+
         if (worldName.equalsIgnoreCase("othala")) {
             return "Othala";
         }
-        
+
         if (worldName.equalsIgnoreCase("redrock")) {
             return "Redrock";
         }
-        
+
         if (worldName.equalsIgnoreCase("redrock_nether")) {
             return "Redrock Nether";
         }
-        
+
         if (worldName.equalsIgnoreCase("tollana")) {
             return "Tollana";
         }
-        
+
         if (worldName.equalsIgnoreCase("zeal")) {
             return "Zeal";
         }
-        
+
         if (worldName.equalsIgnoreCase("asgard")) {
             return "Asgard";
         }
-        
+
         if (worldName.equalsIgnoreCase("othala")) {
             return "Othala";
         }
@@ -210,7 +233,7 @@ public class ServerWorldUtil {
     @SuppressWarnings("deprecation")
     public static void sendResidenceInfo(Player player, ClaimedResidence res) {
         final ByteBuf buf = PacketUtil.createPacketBuffer(PacketUtil.DISCRIMINATOR_RESIDENCE_INFO);
-        
+
         if (res == null) {
             buf.writeBoolean(false);
             player.sendPluginMessage(BridgePlugin.getInstance(), PacketUtil.CHANNEL, buf.array());
@@ -267,7 +290,7 @@ public class ServerWorldUtil {
 
         String bankVault;
         bankVault = "" + ChatColor.GOLD + FORMAT_NUMBER_EN.format(res.getBank().getStoredMoney());
-        
+
         buf.writeBoolean(true);
         PacketUtil.writeUTF8String(buf, resName);
         PacketUtil.writeUTF8String(buf, ownersName);
