@@ -20,7 +20,6 @@
 package com.almuramc.forgebridge.listeners;
 
 import com.almuramc.forgebridge.utils.UserUtil;
-
 import org.anjocaido.groupmanager.GroupManager;
 import org.anjocaido.groupmanager.dataholder.worlds.WorldsHolder;
 import org.anjocaido.groupmanager.permissions.AnjoPermissionsHandler;
@@ -126,6 +125,7 @@ public class PlayerListener implements Listener {
     }
 
     // Group Manager's Change Event Listener
+    @SuppressWarnings("deprecation")
     @EventHandler(priority = EventPriority.LOWEST)
     public void onGMUserEvent(GMUserEvent userEvent) {
         final GMUserEvent event = userEvent;
@@ -133,8 +133,8 @@ public class PlayerListener implements Listener {
         if (resPlayer == null) { // Is null for offline players
             return;
         }
-        Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
-            public void run() {                
+        Bukkit.getScheduler().scheduleAsyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
+            public void run() {
                 
                 if ((GMUserEvent.Action.USER_GROUP_CHANGED == event.getAction()) && (event.getUser().getGroupName().equalsIgnoreCase("guardian"))) {
                     Bukkit.broadcastMessage(ChatColor.DARK_PURPLE + resPlayer.getDisplayName() + ChatColor.WHITE + " has been granted: [" + ChatColor.GOLD + event.getUser().getGroupName() + ChatColor.WHITE + "]");
@@ -292,9 +292,10 @@ public class PlayerListener implements Listener {
     }
 
     // Player Change World event, send critical player/world/display name information to client for AlmuraMod's GUI
+    @SuppressWarnings("deprecation")
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerChangedWorld(final PlayerChangedWorldEvent event) {
-        Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
+        Bukkit.getScheduler().scheduleAsyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
             @Override
             public void run() {
                 final ClaimedResidence res = Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation());
@@ -314,7 +315,7 @@ public class PlayerListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerJoin(final PlayerJoinEvent event) {
         event.setJoinMessage("");
-        Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
+        Bukkit.getScheduler().scheduleAsyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
             @Override
             public void run() {
                 final ClaimedResidence res = Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation());
@@ -334,11 +335,12 @@ public class PlayerListener implements Listener {
         EconUtil.sendCurrencyAmount(event.getPlayer(), EconUtil.economy.getBalance(event.getPlayer().getName()));
     }
     // Player Quit event, send critical player/world/display name information to client for AlmuraMod's GUI
+    @SuppressWarnings("deprecation")
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerQuit(final PlayerQuitEvent event) {
         event.setQuitMessage("");
         TitleUtil.broadcastLogout(event.getPlayer());
-        Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
+        Bukkit.getScheduler().scheduleAsyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
             @Override
             public void run() {
                 for (Player player : Bukkit.getServer().getOnlinePlayers()) {
@@ -437,9 +439,10 @@ public class PlayerListener implements Listener {
     }
 
     // Player Change Residence event, send critical player/world/display name information to client for AlmuraMod's GUI
+    @SuppressWarnings("deprecation")
     @EventHandler
     public void onResidenceFlagChangeEvent(final ResidenceFlagChangeEvent event) {
-        Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
+        Bukkit.getScheduler().scheduleAsyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
             public void run() {
                 if (event.getPlayer() != null) {
                     ClaimedResidence res = Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation());
@@ -456,14 +459,18 @@ public class PlayerListener implements Listener {
     }
 
     // Player Change Residence event, send critical player/world/display name information to client for AlmuraMod's GUI
+    @SuppressWarnings("deprecation")
     @EventHandler
     public void onResidenceChangedEvent(final ResidenceChangedEvent event) {
-        final Location location = event.getPlayer().getLocation();
-        if (event.getPlayer() != null) {
-            ClaimedResidence res = Residence.getResidenceManager().getByLoc(location);
-            ServerWorldUtil.sendResidenceInfo(event.getPlayer(), res);
-        }
-
+        Bukkit.getScheduler().scheduleAsyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
+            public void run() {                                    
+                final Location location = event.getPlayer().getLocation();
+                if (event.getPlayer() != null) {
+                    ClaimedResidence res = Residence.getResidenceManager().getByLoc(location);
+                    ServerWorldUtil.sendResidenceInfo(event.getPlayer(), res);
+                }
+            }
+        }, 1L);
     }
 
     // Residence Owner Changed event, send critical player/world/display name information to client for AlmuraMod's GUI
@@ -477,22 +484,27 @@ public class PlayerListener implements Listener {
     }
 
     // Residence Owner Changed event, send critical player/world/display name information to client for AlmuraMod's GUI
+    @SuppressWarnings("deprecation")
     @EventHandler
     public void onResidenceOwnerChangeEvent(final ResidenceOwnerChangeEvent event) {
-        for (Player player : event.getResidence().getPlayersInResidence()) {
-            if (player != null) {
-                ServerWorldUtil.sendResidenceInfo(player, event.getResidence());
+        Bukkit.getScheduler().scheduleAsyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
+            public void run() {                                    
+                for (Player player : event.getResidence().getPlayersInResidence()) {
+                    if (player != null) {
+                        ServerWorldUtil.sendResidenceInfo(player, event.getResidence());
+                    }
+                }
             }
-        }
+        }, 5L);
     }
 
     // Residence Command event, send critical player/world/display name information to client for AlmuraMod's GUI
+    @SuppressWarnings("deprecation")
     @EventHandler
     public void onResidenceCommandEvent(final ResidenceCommandEvent event) {
-        Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
+        Bukkit.getScheduler().scheduleAsyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
             public void run() {
                 if (event.getSender() != null) {
-                    @SuppressWarnings("deprecation")
                     Player player = Bukkit.getPlayer(event.getSender().getName());
                     if (player != null) {
                         ClaimedResidence res = Residence.getResidenceManager().getByLoc(player.getLocation());
@@ -506,9 +518,10 @@ public class PlayerListener implements Listener {
     }
 
     // Player Change Residence event, send critical player/world/display name information to client for AlmuraMod's GUI
+    @SuppressWarnings("deprecation")
     @EventHandler
     public void onResidenceCreationEvent(final ResidenceCreationEvent event) {
-        Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
+        Bukkit.getScheduler().scheduleAsyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
             public void run() {
                 if (event.getPlayer() != null) {
                     ClaimedResidence res = Residence.getResidenceManager().getByLoc(event.getPlayer().getLocation());

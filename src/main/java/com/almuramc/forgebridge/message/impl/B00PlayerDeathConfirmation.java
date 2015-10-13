@@ -19,6 +19,8 @@
  */
 package com.almuramc.forgebridge.message.impl;
 
+import org.bukkit.ChatColor;
+
 import com.almuramc.forgebridge.BridgePlugin;
 import com.almuramc.forgebridge.message.IPluginMessage;
 import com.almuramc.forgebridge.message.IPluginMessageHandler;
@@ -65,7 +67,7 @@ public class B00PlayerDeathConfirmation implements IPluginMessage, IPluginMessag
             this.y = message.y;
             this.z = message.z;
             this.world = message.world;
-
+            player.sendMessage(ChatColor.GOLD + "Standby" + ChatColor.WHITE + ": reviving you at your previous location....");
             Bukkit.getLogger().info("X: " + message.x + " Y: " + message.y + " Z: " + message.z + " World: " + message.world);
             Bukkit.getScheduler().scheduleSyncDelayedTask(BridgePlugin.getInstance(), new Runnable() {
                 @Override
@@ -73,12 +75,26 @@ public class B00PlayerDeathConfirmation implements IPluginMessage, IPluginMessag
                     if (world.equalsIgnoreCase("Dakara")) {
                         Location location = new Location(Bukkit.getWorld("world"), x, y, z);
                         player.teleport(location);
+                    } else if (world.equalsIgnoreCase("The Nether")){
+                        Location location = new Location(Bukkit.getWorld("DIM-1"), x, y, z);                        
+                        System.out.println("Location: " + location);
+                        player.teleport(location);
+                    } else if (world.equalsIgnoreCase("The End")){
+                        Location location = new Location(Bukkit.getWorld("DIM1"), x, y, z);                        
+                        System.out.println("Location: " + location);
+                        player.teleport(location);
+                    } else if (world.equalsIgnoreCase("Outer")){
+                        Location location = new Location(Bukkit.getWorld("DIM-42"), x, y, z);                        
+                        System.out.println("Location: " + location);
+                        player.teleport(location);
                     } else {
-                        Location location = new Location(Bukkit.getWorld(world), x, y, z);
+                        Location location = new Location(Bukkit.getWorld(world), x, y, z);                        
+                        System.out.println("Location: " + location);
                         player.teleport(location);
                     }
+                    player.sendMessage(ChatColor.WHITE + "Revive at previous location complete.");
                 }
-            }, 10L);      
+            }, 30L);      
         }
 
         // TODO Just return null for now. Bridge may send return messages in the future.
