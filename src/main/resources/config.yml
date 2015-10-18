@@ -7,6 +7,7 @@ allowed-tweakers:
     - shadersmodcore.loading.smctweaker
     - org.spongepowered.asm.mixin.mixinenvironment$environmentstatetweaker
     - com.almuradev.almura.launch.almuralaunchtweaker
+    - fastcraft.tweaker
 allowed-mods:
     - almura
     - almurasdk
