@@ -76,20 +76,16 @@ public class B00PlayerDeathConfirmation implements IPluginMessage, IPluginMessag
                         Location location = new Location(Bukkit.getWorld("world"), x, y, z);
                         player.teleport(location);
                     } else if (world.equalsIgnoreCase("The Nether")){
-                        Location location = new Location(Bukkit.getWorld("DIM-1"), x, y, z);                        
-                        System.out.println("Location: " + location);
+                        Location location = new Location(Bukkit.getWorld("DIM-1"), x, y, z);
                         player.teleport(location);
                     } else if (world.equalsIgnoreCase("The End")){
-                        Location location = new Location(Bukkit.getWorld("DIM1"), x, y, z);                        
-                        System.out.println("Location: " + location);
+                        Location location = new Location(Bukkit.getWorld("DIM1"), x, y, z);
                         player.teleport(location);
                     } else if (world.equalsIgnoreCase("Outer")){
-                        Location location = new Location(Bukkit.getWorld("DIM-42"), x, y, z);                        
-                        System.out.println("Location: " + location);
+                        Location location = new Location(Bukkit.getWorld("DIM-42"), x, y, z);
                         player.teleport(location);
                     } else {
-                        Location location = new Location(Bukkit.getWorld(world), x, y, z);                        
-                        System.out.println("Location: " + location);
+                        Location location = new Location(Bukkit.getWorld(world), x, y, z);
                         player.teleport(location);
                     }
                     player.sendMessage(ChatColor.WHITE + "Revive at previous location complete.");

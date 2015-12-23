@@ -227,6 +227,10 @@ public class ServerWorldUtil {
         if (worldName.equalsIgnoreCase("othala")) {
             return "Othala";
         }
+        
+        if (worldName.equalsIgnoreCase("athos")) {
+            return "Athos";
+        }
         return "unknown";
     }
 
