@@ -19,9 +19,9 @@
  */
 package com.almuramc.forgebridge;
 
-import com.almuramc.forgebridge.listeners.WorldListener;
+import com.almuramc.forgebridge.message.impl.B03ChunkRegenWand;
 
-import net.minecraft.server.v1_7_R4.BiomeBase;
+import com.almuramc.forgebridge.listeners.WorldListener;
 import com.almuramc.forgebridge.message.impl.B02ClientDetailsResponse;
 import org.bukkit.OfflinePlayer;
 import com.almuramc.forgebridge.utils.TitleUtil;
@@ -83,6 +83,7 @@ public class BridgePlugin extends JavaPlugin implements Listener, PluginMessageL
         MessageRegistar.registerMessage(B00PlayerDeathConfirmation.class, B00PlayerDeathConfirmation.class, 6);
         MessageRegistar.registerMessage(B01ResTokenConfirmation.class, B01ResTokenConfirmation.class, 7);
         MessageRegistar.registerMessage(B02ClientDetailsResponse.class, B02ClientDetailsResponse.class, 9);
+        MessageRegistar.registerMessage(B03ChunkRegenWand.class, B03ChunkRegenWand.class, 10);
     }
 
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -125,6 +126,22 @@ public class BridgePlugin extends JavaPlugin implements Listener, PluginMessageL
             } else {
                 ServerWorldUtil.displayInfo(null, true, false);
                 return true;
+            }
+        }
+        
+        if (args.length > 0 && args[0].equalsIgnoreCase("regen")) {
+            if (sender instanceof Player) {
+                if (sender.hasPermission("bridge.debug")) {
+                    ((Player) sender).getWorld().regenerateChunk(((Player) sender).getLocation().getChunk().getX(),((Player) sender).getLocation().getChunk().getZ());
+                    sender.sendMessage("[Almura Bridge] - Chunk Regened..");
+                    return true;
+                } else {
+                    sender.sendMessage("[Almura Bridge] - Insufficient Permissions.");
+                    return false;
+                }
+            } else {
+                //
+                return false;
             }
         }
 
