@@ -157,6 +157,10 @@ public class ServerWorldUtil {
 
     public static String getFormattedWorldName(String worldName) {
         if (worldName.equalsIgnoreCase("world")) {
+            return "Asgard";
+        }
+
+        if (worldName.equalsIgnoreCase("dakara")) {
             return "Dakara";
         }
 
@@ -218,10 +222,6 @@ public class ServerWorldUtil {
 
         if (worldName.equalsIgnoreCase("zeal")) {
             return "Zeal";
-        }
-
-        if (worldName.equalsIgnoreCase("asgard")) {
-            return "Asgard";
         }
 
         if (worldName.equalsIgnoreCase("othala")) {

@@ -19,6 +19,8 @@
  */
 package com.almuramc.forgebridge.message.impl;
 
+import org.bukkit.block.BlockState;
+
 import com.almuramc.forgebridge.message.IPluginMessage;
 import com.almuramc.forgebridge.message.IPluginMessageHandler;
 import net.minecraft.util.io.netty.buffer.ByteBuf;
@@ -39,11 +41,16 @@ public class B03ChunkRegenWand implements IPluginMessage, IPluginMessageHandler<
     public void toBytes(ByteBuf buf) {}
 
     @Override
-    public B03ChunkRegenWand onMessage(B03ChunkRegenWand message, Player source) {        
+    public B03ChunkRegenWand onMessage(B03ChunkRegenWand message, Player source) {
         this.player = source;        
         if (player.hasPermission("admin.title")) {
             player.getWorld().regenerateChunk(player.getLocation().getChunk().getX(), player.getLocation().getChunk().getZ());
-            player.sendMessage("[Regen Wand] - Chunk regenerated.");
+            
+            for (BlockState te : player.getWorld().getChunkAt(player.getLocation()).getTileEntities()) {
+                System.out.println("TE: " + te.getBlock() + " / " + te.getLocation());
+            }
+
+            player.sendMessage("[Regen Wand] - Chunk regenerated, saved: ");
         } else {
             player.sendMessage("[Regen Wand] - Insufficient Permissions.");
         }
